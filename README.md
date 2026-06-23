@@ -61,4 +61,3 @@ python jarvis_server.py      # then open http://127.0.0.1:8765
 - If JARVIS says his "link to Claude has lapsed," re-run the auth login command above.
 - This uses *your* Claude subscription via OpenClaw's `claude-cli` provider; usage
   counts against your normal plan.
-```
