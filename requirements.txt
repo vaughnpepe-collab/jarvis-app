@@ -1,0 +1,3 @@
+# Optional. The app runs on the standard library alone.
+# psutil gives REAL cpu/ram telemetry instead of estimates.
+psutil>=5.9
