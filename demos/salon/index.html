@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumière Beauty Studio | Hair, Beauty &amp; Wellness</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{--bg:#0d0810;--surface:#160b1c;--border:#2d1540;--rose:#c084a0;--rose-light:#e8a0be;--blush:#f5dfe8;--text:#f5eaf0;--muted:#9a7a8a;--gold:#c9a96e}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+nav{background:rgba(13,8,16,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:72px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:21px;font-weight:300;color:var(--text);text-decoration:none;letter-spacing:4px;text-transform:uppercase}
+.nav-logo span{color:var(--rose-light);font-weight:700}
+.nav-logo small{display:block;font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--muted);margin-top:-2px}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:1px;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-book{background:var(--rose);color:#fff;padding:10px 22px;border-radius:4px;text-decoration:none;font-weight:600;font-size:13px;letter-spacing:1px;transition:all .2s}
+.nav-book:hover{background:var(--rose-light);transform:translateY(-1px)}
+@media(max-width:768px){.nav-links{display:none}}
+.hero{background:linear-gradient(135deg,#0d0810 0%,#1a0d22 40%,#22102c 60%,#0d0810 100%);padding:96px 5%;min-height:90vh;display:flex;align-items:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(192,132,160,.08) 0%,transparent 65%);pointer-events:none}
+.hero-content{max-width:640px;position:relative;z-index:1}
+.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:5px;text-transform:uppercase;color:var(--rose);margin-bottom:24px}
+.hero h1{font-size:clamp(36px,5.5vw,68px);font-weight:300;line-height:1.1;letter-spacing:-1px;margin-bottom:24px}
+.hero h1 strong{font-weight:800;color:var(--rose-light)}
+.hero-sub{font-size:17px;color:var(--muted);margin-bottom:40px;max-width:500px;line-height:1.8}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.btn-rose{background:var(--rose);color:#fff;padding:15px 36px;border-radius:4px;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.5px;transition:all .25s}
+.btn-rose:hover{background:var(--rose-light);transform:translateY(-2px);box-shadow:0 16px 40px rgba(192,132,160,.3)}
+.btn-outline{color:var(--muted);padding:15px 28px;border-radius:4px;text-decoration:none;font-weight:500;font-size:15px;border:1px solid var(--border);transition:all .25s;letter-spacing:.5px}
+.btn-outline:hover{color:var(--text);border-color:rgba(192,132,160,.4)}
+.hero-trust{display:flex;gap:36px;flex-wrap:wrap}
+.trust-item{font-size:13px;color:var(--muted);letter-spacing:.3px}
+section{padding:80px 5%}
+.lbl{font-size:10px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:var(--rose);margin-bottom:12px}
+h2{font-size:clamp(26px,4vw,46px);font-weight:300;letter-spacing:-1px;margin-bottom:16px}
+h2 strong{font-weight:800}
+.sub{font-size:17px;color:var(--muted);max-width:500px;line-height:1.8;margin-bottom:52px}
+.surface-bg{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.svc{background:var(--surface);padding:32px 28px;transition:background .25s}
+.svc:hover{background:rgba(255,255,255,.03)}
+.svc-icon{font-size:28px;margin-bottom:14px;display:block}
+.svc h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.svc p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px}
+.svc-price{font-size:14px;font-weight:700;color:var(--rose-light)}
+.svc-from{font-size:12px;color:var(--muted);font-weight:400}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:600px){.gallery-grid{grid-template-columns:1fr 1fr}}
+.gallery-item{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:36px;border:1px solid var(--border)}
+.g1{background:linear-gradient(135deg,#2d1540,#3d1a50)}
+.g2{background:linear-gradient(135deg,#1a0820,#2d0f3a)}
+.g3{background:linear-gradient(135deg,#2a1030,#3a1545)}
+.g4{background:linear-gradient(135deg,#200c2c,#301040)}
+.g5{background:linear-gradient(135deg,#180a22,#280e35)}
+.g6{background:linear-gradient(135deg,#1e0c28,#2e1038)}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.team-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px 24px;text-align:center}
+.team-avatar{width:70px;height:70px;background:linear-gradient(135deg,var(--surface),var(--border));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px;border:2px solid var(--border)}
+.team-card h4{font-size:16px;font-weight:700;margin-bottom:4px}
+.team-card p{font-size:13px;color:var(--muted)}
+.team-card .rose-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--rose);background:rgba(192,132,160,.1);border:1px solid rgba(192,132,160,.2);padding:3px 10px;border-radius:3px;margin-top:8px}
+.booking-section{background:linear-gradient(135deg,#160b1c,#200d28);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:80px 5%}
+.booking-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;max-width:960px;margin:0 auto}
+@media(max-width:768px){.booking-inner{grid-template-columns:1fr}}
+.booking-left p{font-size:16px;color:var(--muted);line-height:1.8;margin-bottom:28px}
+.ci{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+.ci-icon{font-size:18px}
+.ci-lbl{font-size:10px;color:var(--muted);letter-spacing:.5px;margin-bottom:2px}
+.ci-val{font-size:14px;font-weight:700}
+form{display:flex;flex-direction:column;gap:12px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:460px){.fr{grid-template-columns:1fr}}
+input,select,textarea{padding:13px 16px;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s;width:100%}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:focus,select:focus,textarea:focus{border-color:var(--rose)}
+select option{background:var(--bg);color:var(--text)}
+.fbtn{background:var(--rose);color:#fff;border:none;padding:15px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s;width:100%;letter-spacing:.5px}
+.fbtn:hover{background:var(--rose-light);transform:translateY(-1px)}
+footer{background:#0a0610;border-top:1px solid var(--border);padding:40px 5%;text-align:center}
+.footer-logo{font-size:20px;font-weight:300;letter-spacing:6px;text-transform:uppercase;color:var(--text);margin-bottom:6px}
+.footer-logo span{color:var(--rose-light);font-weight:700}
+footer p{font-size:13px;color:var(--muted);margin-bottom:16px}
+.footer-links{display:flex;justify-content:center;gap:24px;font-size:13px;margin-bottom:16px}
+.footer-links a{color:var(--muted);text-decoration:none}
+.footer-links a:hover{color:var(--rose-light)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo"><span>Lumière</span> Beauty Studio<small>Hair · Beauty · Wellness</small></a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#book">Book</a></li>
+  </ul>
+  <a href="#book" class="nav-book">Book Now</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">Award-Winning Beauty Studio</div>
+    <h1>Feel <strong>beautifully</strong><br>like yourself.</h1>
+    <p class="hero-sub">Expert hair, beauty, and wellness treatments in a calm, luxurious space. Whether it's a quick tidy-up or a full transformation, you're in the best hands.</p>
+    <div class="hero-btns">
+      <a href="#book" class="btn-rose">Book an Appointment</a>
+      <a href="#services" class="btn-outline">View Services</a>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-item">✨ Award-winning team</div>
+      <div class="trust-item">⭐ 5-star rated</div>
+      <div class="trust-item">💳 Packages available</div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="lbl">What We Offer</div>
+  <h2>Our <strong>services.</strong></h2>
+  <p class="sub">From everyday maintenance to complete transformations. All treatments use premium products.</p>
+  <div class="services-grid">
+    <div class="svc">
+      <span class="svc-icon">✂️</span>
+      <h3>Cut &amp; Style</h3>
+      <p>Precision cuts tailored to your face shape and lifestyle. Blow-dry and finish included.</p>
+      <div class="svc-price"><span class="svc-from">from </span>£45</div>
+    </div>
+    <div class="svc">
+      <span class="svc-icon">🎨</span>
+      <h3>Colour &amp; Highlights</h3>
+      <p>Full colour, balayage, highlights, and toning. Consultation included.</p>
+      <div class="svc-price"><span class="svc-from">from </span>£75</div>
+    </div>
+    <div class="svc">
+      <span class="svc-icon">💆</span>
+      <h3>Luxury Facials</h3>
+      <p>Deep cleansing, anti-ageing, and brightening facials using premium skincare ranges.</p>
+      <div class="svc-price"><span class="svc-from">from </span>£65</div>
+    </div>
+    <div class="svc">
+      <span class="svc-icon">💅</span>
+      <h3>Nails &amp; Gel</h3>
+      <p>Manicures, pedicures, gel polish, and nail art. Long-lasting results guaranteed.</p>
+      <div class="svc-price"><span class="svc-from">from </span>£30</div>
+    </div>
+    <div class="svc">
+      <span class="svc-icon">🌿</span>
+      <h3>Brows &amp; Lashes</h3>
+      <p>Brow shaping, tinting, lash lifts, and lash extensions by certified specialists.</p>
+      <div class="svc-price"><span class="svc-from">from </span>£25</div>
+    </div>
+    <div class="svc">
+      <span class="svc-icon">🧖</span>
+      <h3>Massage &amp; Wellness</h3>
+      <p>Swedish, deep tissue, and hot stone massages. Gift vouchers available.</p>
+      <div class="svc-price"><span class="svc-from">from </span>£55</div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" class="surface-bg">
+  <div class="lbl">Gallery</div>
+  <h2>Our <strong>work.</strong></h2>
+  <p class="sub">A small taste of what we create every day in the studio.</p>
+  <div class="gallery-grid">
+    <div class="gallery-item g1">💇‍♀️</div>
+    <div class="gallery-item g2">🎨</div>
+    <div class="gallery-item g3">💅</div>
+    <div class="gallery-item g4">✨</div>
+    <div class="gallery-item g5">🌿</div>
+    <div class="gallery-item g6">💆</div>
+  </div>
+</section>
+
+<section id="team">
+  <div class="lbl">Our Team</div>
+  <h2>Meet the <strong>experts.</strong></h2>
+  <p class="sub">Qualified, passionate, and genuinely lovely people. Each specialist brings years of training and a commitment to making you feel amazing.</p>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-avatar">👩</div>
+      <h4>Sophie Laurent</h4>
+      <p>Senior Stylist &amp; Colourist</p>
+      <div class="rose-tag">8 Years</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">👩‍🦱</div>
+      <h4>Emma Clarke</h4>
+      <p>Beauty Therapist &amp; Facialist</p>
+      <div class="rose-tag">6 Years</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">👩‍🦰</div>
+      <h4>Jade Williams</h4>
+      <p>Nail Technician &amp; Brow Specialist</p>
+      <div class="rose-tag">4 Years</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">🧘</div>
+      <h4>Anya Patel</h4>
+      <p>Massage Therapist</p>
+      <div class="rose-tag">5 Years</div>
+    </div>
+  </div>
+</section>
+
+<section id="book" class="booking-section">
+  <div class="booking-inner">
+    <div class="booking-left">
+      <div class="lbl">Appointments</div>
+      <h2>Book your <strong>visit.</strong></h2>
+      <p>Fill in the form and we'll confirm your appointment within 2 hours. Or call or WhatsApp us directly — we're always happy to chat.</p>
+      <div class="ci"><div class="ci-icon">📞</div><div><div class="ci-lbl">Call or WhatsApp</div><div class="ci-val">07000 000 000</div></div></div>
+      <div class="ci"><div class="ci-icon">📧</div><div><div class="ci-lbl">Email</div><div class="ci-val">hello@lumierebeauty.co.uk</div></div></div>
+      <div class="ci"><div class="ci-icon">🕐</div><div><div class="ci-lbl">Hours</div><div class="ci-val">Tue–Sat 9am–7pm · Sun 10am–5pm</div></div></div>
+      <div class="ci"><div class="ci-icon">📍</div><div><div class="ci-lbl">Location</div><div class="ci-val">14 The High Street, Town Centre</div></div></div>
+    </div>
+    <form onsubmit="return false">
+      <div class="fr">
+        <input type="text" placeholder="Your Name" required>
+        <input type="tel" placeholder="Phone / WhatsApp">
+      </div>
+      <input type="email" placeholder="Email Address">
+      <select>
+        <option value="">What are you booking?</option>
+        <option>Cut &amp; Style</option>
+        <option>Colour / Highlights</option>
+        <option>Facial</option>
+        <option>Nails / Gel</option>
+        <option>Brows / Lashes</option>
+        <option>Massage</option>
+        <option>Multiple treatments</option>
+      </select>
+      <div class="fr">
+        <input type="date">
+        <input type="time" placeholder="Preferred time">
+      </div>
+      <textarea placeholder="Any notes — e.g. first visit, specific stylist request, allergies" style="min-height:80px"></textarea>
+      <button type="submit" class="fbtn">Request Appointment →</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo"><span>Lumière</span> Beauty Studio</div>
+  <p>14 The High Street · hello@lumierebeauty.co.uk · 07000 000 000</p>
+  <div class="footer-links">
+    <a href="#services">Services</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#team">Team</a>
+    <a href="#book">Book</a>
+  </div>
+  <p>© 2025 Lumière Beauty Studio. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

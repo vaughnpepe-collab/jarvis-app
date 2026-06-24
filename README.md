@@ -1,63 +1,129 @@
-# J.A.R.V.I.S. — Desktop App
+# Launchly — £1,000 in 7 Days
 
-A JARVIS-style HUD assistant. Python backend + holographic UI, powered by **Claude
-through your OpenClaw subscription — no API key required**. Voice in and voice out.
+**The play:** Sell 2–3 websites at £499 each to UK small businesses.
 
-```
-jarvis-app/
-├─ JARVIS.bat        ← double-click to launch
-├─ jarvis_server.py  ← Python backend (the brain bridge + telemetry)
-├─ ui.html           ← the HUD interface
-└─ requirements.txt  ← optional (psutil for real CPU/RAM)
-```
+---
 
-## Auth — Claude with NO API key
-
-JARVIS talks to Claude through OpenClaw's `claude-cli` provider using your
-**Claude.ai subscription OAuth token** (no API key). The backend **auto-refreshes
-that token** when it expires, so normally you never touch this.
-
-If the subscription login is ever fully lost, re-link it once in a terminal:
+## What's in this repo
 
 ```
-openclaw.cmd infer model auth login --provider anthropic
-```
-(choose the **Claude CLI / subscription** option, not API key).
-
-Notes for Windows PowerShell:
-- Use `openclaw.cmd ...` (the `.ps1` form is blocked by the script-execution policy),
-  or run once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
-- The backend invokes OpenClaw via `node openclaw.mjs` directly — the `.cmd` shim
-  mangles multi-line prompts, so don't change that.
-
-## Run
-
-**Double-click `JARVIS.bat`.** It will:
-1. start the Python backend (minimized window),
-2. open JARVIS in a frameless app window (Chrome → Edge → default browser).
-
-Or manually:
-
-```
-python jarvis_server.py      # then open http://127.0.0.1:8765
+index.html                  ← Main portfolio/sales page (launchly.co.uk)
+demos/
+  trades/index.html         ← Live demo: Peak Trades & Plumbing
+  restaurant/index.html     ← Live demo: The Golden Fork restaurant
+  salon/index.html          ← Live demo: Lumière Beauty Studio
+outreach/
+  email_templates.md        ← Cold email + DM scripts
+  phone_script.md           ← Cold call script + call log
 ```
 
-## Using it
+---
 
-- **Type** in the console and press Enter — replies come from real Claude, in character.
-- **🎙 Mic** — click, then say **"Jarvis, …"** followed by your request (wake-word gated).
-- **🔊 Speaker** — mute / restore JARVIS's spoken replies.
-- Live telemetry, arc-reactor core (pulses faster while thinking), activity log.
+## Before You Start — One-Time Setup
 
-## Notes & limits
+### 1. Deploy the site (free)
+Push this repo to GitHub and enable GitHub Pages:
+- Settings → Pages → Source: main branch → `/` root
+- Your site will be live at `https://[username].github.io/[repo]`
+- Eventually point `launchly.co.uk` here (or use any free host)
 
-- **Voice needs Chrome or Edge** (Web Speech API). The mic also needs microphone
-  permission and an internet connection for recognition.
-- **Telemetry**: install `psutil` (`pip install psutil`) for real CPU/RAM; otherwise
-  estimated values are shown.
-- **Model**: defaults to `claude-cli/claude-opus-4-8`. Override with an env var:
-  `set JARVIS_MODEL=claude-cli/claude-sonnet-4-6` before launching.
-- **Conversation memory** is kept for the session in the backend (last ~12 turns).
-- If JARVIS says his "link to Claude has lapsed," re-run the auth login command above.
-- This uses *your* Claude subscription via OpenClaw's `claude-cli` provider; usage
-  counts against your normal plan.
+### 2. Set up a contact form (free)
+- Go to [formspree.io](https://formspree.io) → create free account
+- Create a new form → get your form ID
+- Replace `YOUR_FORM_ID` in `index.html` with your actual ID
+- Enquiries will land straight in your email
+
+### 3. Get a phone number (optional but recommended)
+- A local SIM or Google Voice number looks more credible
+- WhatsApp Business is free and lets you reply faster
+
+---
+
+## The 7-Day Plan
+
+### Day 1 (Today)
+- [ ] Deploy the site (GitHub Pages, takes 5 minutes)
+- [ ] Set up Formspree
+- [ ] Update your phone number in `index.html` and both outreach files
+- [ ] Find 20 target businesses using the methods in `outreach/email_templates.md`
+- [ ] Send 20 outreach messages (email + DM)
+
+### Day 2
+- [ ] Follow up on anyone who opened but didn't reply
+- [ ] Find + contact 20 more businesses
+- [ ] Start cold calling (10–15 calls, use `outreach/phone_script.md`)
+- [ ] For anyone interested: build a free mockup using their business name/colours
+
+### Day 3
+- [ ] First sales should be coming in — close them
+- [ ] Keep sending 20 outreach messages
+- [ ] Build and deliver any paid sites (you have 48hrs, but aim for same-day)
+- [ ] Ask for a Google review on delivery
+
+### Day 4–5
+- [ ] Scale what's working — if email is converting, send more emails
+- [ ] If calls are working, do 20 calls a day
+- [ ] Post about Launchly on your personal Facebook/LinkedIn ("just launched this")
+- [ ] Post in local Facebook business groups
+
+### Day 6–7
+- [ ] Chase all follow-ups from Day 1–2
+- [ ] Post a "just built this" post on social with a link to a demo
+- [ ] By Day 7 you should have 2–3 clients = £998–£1,497
+
+---
+
+## The Numbers That Work
+
+| Action | Daily Volume | Conversion | Weekly Result |
+|---|---|---|---|
+| Cold emails/DMs | 20 | ~10% reply | ~14 replies |
+| Replies → calls | 14 | ~30% book call | ~4 calls |
+| Calls → mockup | 4 | ~50% want mockup | ~2 mockups |
+| Mockup → sale | 2 | ~70% convert | 1–2 sales |
+
+**2 sales × £499 = £998**
+**3 sales × £499 = £1,497**
+
+---
+
+## Building Sites Fast
+
+Once you have a paid client:
+1. Get their business name, logo (if they have one), phone, email, address, services
+2. Copy the most relevant demo (`trades`, `restaurant`, or `salon`)
+3. Find + replace the business name and details throughout
+4. Swap placeholder content for their real info
+5. Update colours if they have a brand (one CSS variable change)
+6. Deploy on GitHub Pages under their own account, or Netlify (free)
+7. Done in 2–4 hours, delivered in under 48 hours ✓
+
+If they want a custom domain (e.g. peaktrades.co.uk):
+- Point their domain to GitHub Pages or Netlify
+- Costs them ~£10/year via Namecheap — you can set it up for them
+
+---
+
+## Pricing Reminders
+
+| Package | Price | What to offer |
+|---|---|---|
+| Standard website | **£499** | Default offer for most businesses |
+| + Google Business setup | +£149 | Upsell to everyone — easy win |
+| + Booking system | +£99 | Salons and restaurants especially |
+| Monthly maintenance | £39/mo | Offer on delivery — great recurring income |
+
+**Collecting payment:**
+- PayPal invoice (instant, professional)
+- Bank transfer (ask for 50% upfront)
+- Stripe (set up free at stripe.com)
+
+---
+
+## Key Mindset
+
+- You only need **2 sales** to hit the target
+- The demo sites do the selling — link to them in every message
+- The free mockup offer closes the deal — always offer it
+- Rejection is arithmetic, not failure — 1 in 15 contacts = 1 sale
+- Volume beats perfection — send 20 messages today, not 5 perfect ones

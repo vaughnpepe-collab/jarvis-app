@@ -3,233 +3,247 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chiltern Trades & Build | High Wycombe</title>
+<title>Peak Trades & Plumbing | Local Plumber & Heating Engineer</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1e293b;line-height:1.6}
-:root{--navy:#1e3a5f;--navy-dark:#152a47;--orange:#f97316;--orange-dark:#ea6c0a;--light:#f8fafc;--grey:#64748b;--border:#e2e8f0}
-
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(30,58,95,.97);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;border-bottom:1px solid rgba(255,255,255,.1)}
-.nav-logo{color:#fff;font-size:20px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:10px}
-.nav-logo span{color:var(--orange)}
-.nav-links{display:flex;gap:32px;list-style:none}
-.nav-links a{color:rgba(255,255,255,.85);text-decoration:none;font-size:15px;transition:color .2s}
-.nav-links a:hover{color:var(--orange)}
-.nav-cta{background:var(--orange);color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;transition:background .2s}
-.nav-cta:hover{background:var(--orange-dark)}
-
-.hero{min-height:100vh;display:flex;align-items:center;background:linear-gradient(135deg,#0f2137 0%,#1e3a5f 50%,#1a4a7a 100%);padding:100px 5% 60px;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E")}
-.hero-content{position:relative;max-width:680px}
-.hero-badge{display:inline-block;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);color:var(--orange);padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;letter-spacing:.5px;margin-bottom:24px}
-.hero h1{font-size:clamp(32px,5vw,58px);font-weight:800;color:#fff;line-height:1.15;margin-bottom:20px}
-.hero h1 span{color:var(--orange)}
-.hero p{font-size:18px;color:rgba(255,255,255,.75);margin-bottom:36px;max-width:540px}
-.hero-btns{display:flex;gap:16px;flex-wrap:wrap}
-.btn-primary{background:var(--orange);color:#fff;padding:15px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
-.btn-primary:hover{background:var(--orange-dark);transform:translateY(-1px);box-shadow:0 8px 24px rgba(249,115,22,.3)}
-.btn-secondary{background:rgba(255,255,255,.1);color:#fff;padding:15px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:16px;border:1px solid rgba(255,255,255,.2);transition:all .2s}
-.btn-secondary:hover{background:rgba(255,255,255,.15)}
-.hero-trust{display:flex;gap:32px;margin-top:48px;flex-wrap:wrap}
-.trust-item{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.7);font-size:14px}
-.trust-icon{width:36px;height:36px;background:rgba(249,115,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-
-.stats-bar{background:var(--orange);padding:24px 5%;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;text-align:center}
-.stat-item .num{font-size:32px;font-weight:800;color:#fff;line-height:1}
-.stat-item .lab{font-size:13px;color:rgba(255,255,255,.85);margin-top:4px}
-
+:root{--bg:#0c1a2e;--surface:#0f2040;--border:#1a3a5c;--blue:#1d6fb5;--blue-light:#3b9de8;--orange:#f97316;--text:#f1f5f9;--muted:#94a3b8;--green:#22c55e;--red:#ef4444}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+.emergency-bar{background:var(--red);color:#fff;text-align:center;padding:12px 16px;font-size:14px;font-weight:700;position:relative;z-index:200}
+.emergency-bar a{color:#fff;text-decoration:none;font-size:17px;font-weight:900;margin-left:8px;border:2px solid rgba(255,255,255,.5);padding:4px 14px;border-radius:6px}
+nav{background:rgba(12,26,46,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:20px;font-weight:900;color:var(--text);text-decoration:none;letter-spacing:-.5px;display:flex;align-items:center;gap:10px}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--orange);color:#fff;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:800;font-size:14px;transition:all .2s;white-space:nowrap}
+.nav-cta:hover{filter:brightness(1.1);transform:translateY(-1px)}
+@media(max-width:768px){.nav-links{display:none}}
+.hero{background:linear-gradient(135deg,#0c1a2e 0%,#0f2a45 60%,#0c1a2e 100%);padding:80px 5%;min-height:85vh;display:flex;align-items:center}
+.hero-content{max-width:680px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:var(--green);padding:7px 16px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
+.hero h1{font-size:clamp(34px,5.5vw,62px);font-weight:900;line-height:1.08;letter-spacing:-1.5px;margin-bottom:20px}
+.hero h1 span{color:var(--blue-light)}
+.hero-sub{font-size:18px;color:var(--muted);margin-bottom:36px;max-width:520px;line-height:1.7}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:40px}
+.btn-p{background:var(--orange);color:#fff;padding:16px 34px;border-radius:10px;text-decoration:none;font-weight:800;font-size:16px;transition:all .25s}
+.btn-p:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 16px 40px rgba(249,115,22,.35)}
+.btn-s{color:var(--muted);padding:16px 28px;border-radius:10px;text-decoration:none;font-weight:600;font-size:16px;border:1px solid var(--border);transition:all .25s}
+.btn-s:hover{color:var(--text);border-color:rgba(59,157,232,.4)}
+.hero-trust{display:flex;gap:32px;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
 section{padding:80px 5%}
-.section-tag{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:12px}
-h2{font-size:clamp(26px,4vw,40px);font-weight:800;color:var(--navy);line-height:1.2;margin-bottom:16px}
-.section-sub{font-size:17px;color:var(--grey);max-width:560px;margin-bottom:52px}
-
-.services-bg{background:var(--light)}
-.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
-.service-card{background:#fff;border-radius:12px;padding:32px 28px;border:1px solid var(--border);transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.service-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(30,58,95,.12);border-color:var(--orange)}
-.service-icon{font-size:36px;margin-bottom:16px}
-.service-card h3{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:10px}
-.service-card p{font-size:14px;color:var(--grey);line-height:1.7}
-
-.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
-.why-list{list-style:none;display:flex;flex-direction:column;gap:20px}
-.why-item{display:flex;gap:16px;align-items:flex-start}
-.why-check{width:28px;height:28px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0;margin-top:2px}
-.why-item h4{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px}
-.why-item p{font-size:14px;color:var(--grey)}
-.why-visual{background:linear-gradient(135deg,var(--navy),#1a4a7a);border-radius:16px;min-height:380px;display:flex;align-items:center;justify-content:center;font-size:120px;filter:drop-shadow(0 20px 40px rgba(0,0,0,.3))}
-
-.testimonials-bg{background:var(--light)}
-.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
-.testimonial-card{background:#fff;border-radius:12px;padding:28px;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.stars{color:#f59e0b;font-size:18px;margin-bottom:14px}
-.testimonial-card p{font-size:15px;color:#374151;line-height:1.7;margin-bottom:20px;font-style:italic}
-.testimonial-author{display:flex;align-items:center;gap:12px}
-.author-avatar{width:42px;height:42px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0}
-.author-name{font-weight:700;font-size:14px;color:var(--navy)}
-.author-loc{font-size:12px;color:var(--grey)}
-
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
-.contact-info{display:flex;flex-direction:column;gap:24px;margin-top:16px}
-.contact-item{display:flex;gap:16px;align-items:flex-start}
-.contact-icon{width:46px;height:46px;background:rgba(30,58,95,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.contact-item h4{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
-.contact-item p{font-size:15px;color:var(--grey)}
-form{display:flex;flex-direction:column;gap:16px}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-input,select,textarea{padding:13px 16px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:inherit;color:var(--navy);outline:none;transition:border-color .2s;width:100%;background:#fff}
-input:focus,select:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,.1)}
-textarea{resize:vertical;min-height:120px}
-.form-submit{background:var(--navy);color:#fff;border:none;padding:15px 32px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
-.form-submit:hover{background:var(--navy-dark);transform:translateY(-1px)}
-
-footer{background:var(--navy-dark);color:rgba(255,255,255,.6);padding:32px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;font-size:14px}
-footer strong{color:#fff}
-.footer-links{display:flex;gap:24px}
-.footer-links a{color:rgba(255,255,255,.6);text-decoration:none}
-.footer-links a:hover{color:var(--orange)}
-
-@media(max-width:768px){
-  .nav-links{display:none}
-  .why-grid,.contact-grid{grid-template-columns:1fr}
-  .why-visual{min-height:200px}
-  .form-row{grid-template-columns:1fr}
-}
+.lbl{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--blue-light);margin-bottom:10px}
+h2{font-size:clamp(26px,4vw,44px);font-weight:900;letter-spacing:-1px;margin-bottom:14px}
+.sub{font-size:17px;color:var(--muted);max-width:520px;line-height:1.7;margin-bottom:52px}
+.stat-bar{background:rgba(0,0,0,.2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:48px 5%}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:32px;text-align:center}
+.stat-num{font-size:48px;font-weight:900;color:var(--blue-light);letter-spacing:-2px;line-height:1;margin-bottom:6px}
+.stat-lbl{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.stat-sub{font-size:13px;color:var(--muted)}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.svc{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;transition:all .25s}
+.svc:hover{border-color:rgba(59,157,232,.4);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.3)}
+.svc-icon{font-size:36px;margin-bottom:16px;display:block}
+.svc h3{font-size:17px;font-weight:800;margin-bottom:8px}
+.svc p{font-size:14px;color:var(--muted);line-height:1.65}
+.svc-emg{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05)}
+.emg-badge{display:inline-block;background:var(--red);color:#fff;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-left:8px;vertical-align:middle}
+.surface-bg{background:rgba(0,0,0,.15);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.rev{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px}
+.stars{color:#f59e0b;font-size:16px;letter-spacing:2px;margin-bottom:14px}
+.rev-text{font-size:15px;color:var(--muted);line-height:1.75;margin-bottom:18px;font-style:italic}
+.rev-name{font-size:14px;font-weight:700}
+.rev-loc{font-size:12px;color:var(--muted)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+@media(max-width:768px){.about-grid{grid-template-columns:1fr}}
+.about-img{background:linear-gradient(135deg,var(--surface),var(--border));border-radius:16px;height:320px;display:flex;align-items:center;justify-content:center;font-size:80px;border:1px solid var(--border)}
+.about-text p{font-size:16px;color:var(--muted);line-height:1.8;margin-bottom:16px}
+.certs{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.cert{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px}
+@media(max-width:768px){.contact-grid{grid-template-columns:1fr}}
+.ci{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.ci-icon{font-size:22px}
+.ci-lbl{font-size:11px;color:var(--muted);margin-bottom:2px}
+.ci-val{font-size:15px;font-weight:700}
+form{display:flex;flex-direction:column;gap:14px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:480px){.fr{grid-template-columns:1fr}}
+input,select,textarea{padding:14px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s;width:100%}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:focus,select:focus,textarea:focus{border-color:var(--blue-light)}
+select option{background:var(--bg)}
+textarea{resize:vertical;min-height:110px}
+.fbtn{background:var(--orange);color:#fff;border:none;padding:16px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .25s;width:100%}
+.fbtn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+footer{background:rgba(0,0,0,.3);border-top:1px solid var(--border);padding:28px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--muted)}
+footer strong{color:var(--text)}
+.fl{display:flex;gap:20px}
+.fl a{color:var(--muted);text-decoration:none}
+.fl a:hover{color:var(--text)}
 </style>
 </head>
 <body>
 
+<div class="emergency-bar">🚨 24/7 Emergency Plumbing — Call Now <a href="tel:07000000000">07000 000 000</a></div>
+
 <nav>
-  <a href="#" class="nav-logo">Chiltern <span>Trades</span></a>
+  <a href="#" class="nav-logo">🔧 Peak Trades &amp; Plumbing</a>
   <ul class="nav-links">
     <li><a href="#services">Services</a></li>
     <li><a href="#about">About</a></li>
-    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#reviews">Reviews</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
   <a href="#contact" class="nav-cta">Free Quote</a>
 </nav>
 
-<section class="hero" id="home">
+<section class="hero">
   <div class="hero-content">
-    <div class="hero-badge">📍 High Wycombe & Buckinghamshire</div>
-    <h1>Trusted <span>Trades</span> Services for Your Home & Business</h1>
-    <p>Local, reliable, and fairly priced. Plumbing, electrical, building, and more — all under one roof. No call-out fees. No surprises.</p>
+    <div class="hero-badge">✓ Gas Safe Registered · ✓ 10 Years Local</div>
+    <h1>Your trusted local<br><span>plumber &amp; heating</span><br>engineer.</h1>
+    <p class="hero-sub">Covering the local area for over 10 years. Boiler repairs, bathroom fits, leaks, and 24/7 emergency callouts — all jobs, big and small.</p>
     <div class="hero-btns">
-      <a href="#contact" class="btn-primary">Get a Free Quote →</a>
-      <a href="tel:01494000000" class="btn-secondary">📞 01494 000 000</a>
+      <a href="#contact" class="btn-p">📋 Get a Free Quote</a>
+      <a href="tel:07000000000" class="btn-s">📞 Call Now</a>
     </div>
     <div class="hero-trust">
-      <div class="trust-item"><div class="trust-icon">✓</div>Fully Insured</div>
-      <div class="trust-item"><div class="trust-icon">⭐</div>5-Star Rated</div>
-      <div class="trust-item"><div class="trust-icon">⏱</div>Same-Day Response</div>
+      <div class="trust-item">⭐ 5-star rated</div>
+      <div class="trust-item">🔒 Fully insured</div>
+      <div class="trust-item">⚡ Same-day available</div>
+      <div class="trust-item">💷 No call-out fee</div>
     </div>
   </div>
 </section>
 
-<div class="stats-bar">
-  <div class="stat-item"><div class="num">250+</div><div class="lab">Projects Completed</div></div>
-  <div class="stat-item"><div class="num">12+</div><div class="lab">Years in Business</div></div>
-  <div class="stat-item"><div class="num">100%</div><div class="lab">Satisfaction Guarantee</div></div>
-  <div class="stat-item"><div class="num">24hr</div><div class="lab">Emergency Response</div></div>
+<div class="stat-bar">
+  <div class="stat-grid">
+    <div><div class="stat-num">10+</div><div class="stat-lbl">Years Experience</div><div class="stat-sub">Over a decade serving locally</div></div>
+    <div><div class="stat-num">500+</div><div class="stat-lbl">Jobs Completed</div><div class="stat-sub">From dripping taps to full bathroom suites</div></div>
+    <div><div class="stat-num">24/7</div><div class="stat-lbl">Emergency Cover</div><div class="stat-sub">Day and night, 365 days a year</div></div>
+    <div><div class="stat-num">★5.0</div><div class="stat-lbl">Star Rating</div><div class="stat-sub">Consistently top-rated on Google</div></div>
+  </div>
 </div>
 
-<section id="services" class="services-bg">
-  <div class="section-tag">What We Do</div>
-  <h2>Our Services</h2>
-  <p class="section-sub">From small repairs to full renovations — quality workmanship and transparent pricing every time.</p>
+<section id="services">
+  <div class="lbl">What We Do</div>
+  <h2>Services we cover.</h2>
+  <p class="sub">Everything plumbing and heating — domestic and light commercial. No job too small.</p>
   <div class="services-grid">
-    <div class="service-card"><div class="service-icon">🔧</div><h3>Plumbing</h3><p>Leaks, boilers, bathroom fitting, and emergency call-outs. Gas Safe registered.</p></div>
-    <div class="service-card"><div class="service-icon">⚡</div><h3>Electrical</h3><p>Rewiring, consumer units, sockets, lighting, and full electrical certificates.</p></div>
-    <div class="service-card"><div class="service-icon">🧱</div><h3>Building & Extensions</h3><p>Extensions, conversions, structural work, and full project management.</p></div>
-    <div class="service-card"><div class="service-icon">🪟</div><h3>Windows & Doors</h3><p>Supply and fit of UPVC, composite, and timber windows and doors.</p></div>
-    <div class="service-card"><div class="service-icon">🎨</div><h3>Painting & Decorating</h3><p>Interior and exterior painting, wallpapering, and full makeovers.</p></div>
-    <div class="service-card"><div class="service-icon">🛁</div><h3>Bathroom Fitting</h3><p>Full bathroom design and installation — tiling, plumbing, electrics.</p></div>
+    <div class="svc svc-emg">
+      <span class="svc-icon">🚨 <span class="emg-badge">24/7</span></span>
+      <h3>Emergency Callouts</h3>
+      <p>Burst pipe? Boiler failure? We're on call around the clock. Fast response, no emergency surcharge.</p>
+    </div>
+    <div class="svc">
+      <span class="svc-icon">🔥</span>
+      <h3>Boiler Repair &amp; Service</h3>
+      <p>Gas Safe registered. We service, repair, and replace all major boiler brands. Annual service certificates issued.</p>
+    </div>
+    <div class="svc">
+      <span class="svc-icon">🚿</span>
+      <h3>Bathroom Installation</h3>
+      <p>Full bathroom and en-suite fits, including tiling, plumbing, and waste runs — fully project-managed.</p>
+    </div>
+    <div class="svc">
+      <span class="svc-icon">💧</span>
+      <h3>Leak Detection &amp; Repair</h3>
+      <p>We trace and fix leaks under floors, behind walls, and in concealed pipework — minimal disruption.</p>
+    </div>
+    <div class="svc">
+      <span class="svc-icon">🌡</span>
+      <h3>Central Heating</h3>
+      <p>Power flushing, radiator installation, thermostatic valves, and full system overhauls.</p>
+    </div>
+    <div class="svc">
+      <span class="svc-icon">🏠</span>
+      <h3>General Plumbing</h3>
+      <p>Taps, toilets, stopcocks, outside taps, kitchen plumbing — all the everyday jobs sorted fast.</p>
+    </div>
+  </div>
+</section>
+
+<section id="reviews" class="surface-bg">
+  <div class="lbl">Testimonials</div>
+  <h2>What our customers say.</h2>
+  <p class="sub">Real reviews from real local people.</p>
+  <div class="reviews-grid">
+    <div class="rev">
+      <div class="stars">★★★★★</div>
+      <p class="rev-text">"Called on a Sunday with a burst pipe and someone was at my door within 90 minutes. Sorted the problem, no mess, fair price. Couldn't ask for more."</p>
+      <div class="rev-name">Dave M.</div><div class="rev-loc">Local homeowner</div>
+    </div>
+    <div class="rev">
+      <div class="stars">★★★★★</div>
+      <p class="rev-text">"Had my boiler serviced and three radiators replaced. Super professional, explained everything clearly. Definitely my go-to plumber from now on."</p>
+      <div class="rev-name">Sarah T.</div><div class="rev-loc">Semi-detached renovation</div>
+    </div>
+    <div class="rev">
+      <div class="stars">★★★★★</div>
+      <p class="rev-text">"Fitted a new bathroom from scratch — meticulous, tidy, finished on time. Peak Trades delivered exactly what they promised."</p>
+      <div class="rev-name">Rob &amp; Linda K.</div><div class="rev-loc">Full bathroom refurb</div>
+    </div>
   </div>
 </section>
 
 <section id="about">
-  <div class="why-grid">
-    <div>
-      <div class="section-tag">Why Choose Us</div>
-      <h2>Local Tradespeople You Can Actually Trust</h2>
-      <p class="section-sub">We've been working in High Wycombe and Buckinghamshire for over a decade. We're your neighbours — your reputation matters to us.</p>
-      <ul class="why-list">
-        <li class="why-item"><div class="why-check">✓</div><div><h4>Fixed Prices, No Surprises</h4><p>We quote upfront and stick to it. You'll never get a shock invoice.</p></div></li>
-        <li class="why-item"><div class="why-check">✓</div><div><h4>Fully Insured & Certified</h4><p>All tradespeople carry relevant qualifications and £2M public liability insurance.</p></div></li>
-        <li class="why-item"><div class="why-check">✓</div><div><h4>Same-Day Response</h4><p>We answer our phones and respond to all enquiries within 2 hours.</p></div></li>
-        <li class="why-item"><div class="why-check">✓</div><div><h4>12-Month Workmanship Guarantee</h4><p>If something's not right, we come back and fix it — no questions asked.</p></div></li>
-      </ul>
-    </div>
-    <div class="why-visual">🔧</div>
-  </div>
-</section>
-
-<section id="testimonials" class="testimonials-bg">
-  <div class="section-tag">Reviews</div>
-  <h2>What Our Customers Say</h2>
-  <p class="section-sub">Don't take our word for it — here's what local homeowners and businesses say about us.</p>
-  <div class="testimonials-grid">
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p>"Had a full bathroom fitted by Chiltern Trades. Immaculate job, finished on time and on budget. Wouldn't use anyone else."</p>
-      <div class="testimonial-author"><div class="author-avatar">SH</div><div><div class="author-name">Sarah H.</div><div class="author-loc">High Wycombe</div></div></div>
-    </div>
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p>"Called them at 7am with a burst pipe. They were at my door by 9. Sorted it quickly and charged a fair price. Lifesavers."</p>
-      <div class="testimonial-author"><div class="author-avatar">MK</div><div><div class="author-name">Mark K.</div><div class="author-loc">Beaconsfield</div></div></div>
-    </div>
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p>"Used them for our office rewire. Professional, tidy, fair quote. Our go-to for all maintenance work going forward."</p>
-      <div class="testimonial-author"><div class="author-avatar">LP</div><div><div class="author-name">Lisa P.</div><div class="author-loc">Marlow</div></div></div>
-    </div>
-  </div>
-</section>
-
-<section id="contact">
-  <div class="contact-grid">
-    <div>
-      <div class="section-tag">Get In Touch</div>
-      <h2>Get a Free, No-Obligation Quote</h2>
-      <p class="section-sub">Tell us what you need and we'll get back to you within 2 hours.</p>
-      <div class="contact-info">
-        <div class="contact-item"><div class="contact-icon">📞</div><div><h4>Phone</h4><p>01494 000 000</p></div></div>
-        <div class="contact-item"><div class="contact-icon">📧</div><div><h4>Email</h4><p>hello@chilterntrades.co.uk</p></div></div>
-        <div class="contact-item"><div class="contact-icon">📍</div><div><h4>Area Covered</h4><p>High Wycombe, Marlow, Beaconsfield, Amersham & surrounding areas</p></div></div>
+  <div class="about-grid">
+    <div class="about-img">🔧</div>
+    <div class="about-text">
+      <div class="lbl">About Us</div>
+      <h2>Local, reliable,<br>fully qualified.</h2>
+      <p>Peak Trades & Plumbing has been serving local households and businesses for over 10 years. As a small owner-run business, every job gets our full personal attention — no call centres, no sub-contractors.</p>
+      <p>We're Gas Safe registered, fully insured, and we never cut corners. Every job includes a proper sign-off and we're always available for follow-up questions.</p>
+      <div class="certs">
+        <div class="cert">🔵 Gas Safe Registered</div>
+        <div class="cert">✅ Fully Insured</div>
+        <div class="cert">🏠 Checkatrade Approved</div>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="contact" class="surface-bg">
+  <div class="contact-grid">
+    <div>
+      <div class="lbl">Get In Touch</div>
+      <h2>Get a free quote.</h2>
+      <p style="font-size:16px;color:var(--muted);line-height:1.75;margin-bottom:28px">Fill in the form and we'll reply the same day with a price. Or call / WhatsApp us directly for a faster response.</p>
+      <div class="ci"><div class="ci-icon">📞</div><div><div class="ci-lbl">Call or WhatsApp</div><div class="ci-val">07000 000 000</div></div></div>
+      <div class="ci"><div class="ci-icon">📧</div><div><div class="ci-lbl">Email</div><div class="ci-val">info@peaktrades.co.uk</div></div></div>
+      <div class="ci"><div class="ci-icon">🕐</div><div><div class="ci-lbl">Hours</div><div class="ci-val">Mon–Sat 7am–7pm · Emergency 24/7</div></div></div>
+    </div>
     <form onsubmit="return false">
-      <div class="form-row">
-        <input type="text" placeholder="Your Name">
+      <div class="fr">
+        <input type="text" placeholder="Your Name" required>
         <input type="tel" placeholder="Phone Number">
       </div>
       <input type="email" placeholder="Email Address">
       <select>
-        <option value="">Service Required</option>
-        <option>Plumbing</option>
-        <option>Electrical</option>
-        <option>Building & Extensions</option>
-        <option>Windows & Doors</option>
-        <option>Painting & Decorating</option>
-        <option>Bathroom Fitting</option>
+        <option value="">What do you need?</option>
+        <option>Emergency callout</option>
+        <option>Boiler repair / service</option>
+        <option>Bathroom installation</option>
+        <option>Leak repair</option>
+        <option>General plumbing</option>
         <option>Other</option>
       </select>
-      <textarea placeholder="Tell us about your project…"></textarea>
-      <button type="submit" class="form-submit">Send Enquiry →</button>
+      <textarea placeholder="Describe the job — as much detail as you can"></textarea>
+      <button type="submit" class="fbtn">Send Enquiry →</button>
     </form>
   </div>
 </section>
 
 <footer>
-  <div><strong>Chiltern Trades</strong> · High Wycombe, Buckinghamshire</div>
-  <div class="footer-links">
+  <strong>Peak Trades &amp; Plumbing</strong>
+  <div class="fl">
     <a href="#services">Services</a>
+    <a href="#reviews">Reviews</a>
     <a href="#contact">Contact</a>
   </div>
-  <div>© 2025 Chiltern Trades. All rights reserved.</div>
+  <div>Gas Safe · Fully Insured · © 2025</div>
 </footer>
 
 </body>
