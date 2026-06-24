@@ -8,7 +8,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 :root{
-  --bg:#08040100;--dark:#0a0500;--dark2:#140900;--dark3:#1e0e00;
+  --bg:#080401;--dark:#0a0500;--dark2:#140900;--dark3:#1e0e00;
   --gold:#c9943a;--gold2:#e8b050;--gold3:#f5c96e;
   --cream:#f5e8d0;--cream2:#e8d5b8;
   --text:#f5e8d0;--muted:#9a7a58;--border:#3a1c00;
@@ -23,6 +23,8 @@ body{font-family:'Georgia',serif;background:var(--dark);color:var(--text);line-h
 .reveal-right{opacity:0;transform:translateX(36px);transition:opacity .75s ease,transform .75s ease}
 .reveal-right.visible{opacity:1;transform:none}
 .delay-1{transition-delay:.1s}.delay-2{transition-delay:.2s}.delay-3{transition-delay:.3s}.delay-4{transition-delay:.4s}
+/* Always show above-fold content immediately */
+.hero .reveal,.hero .reveal-left,.hero .reveal-right{opacity:1;transform:none}
 
 nav{background:rgba(8,4,1,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:76px;position:sticky;top:0;z-index:100;transition:box-shadow .3s}
 nav.scrolled{box-shadow:0 4px 40px rgba(0,0,0,.7)}

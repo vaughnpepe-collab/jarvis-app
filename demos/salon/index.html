@@ -23,6 +23,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .reveal-right{opacity:0;transform:translateX(36px);transition:opacity .75s ease,transform .75s ease}
 .reveal-right.visible{opacity:1;transform:none}
 .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}.d5{transition-delay:.5s}
+/* Always show above-fold content immediately */
+.hero .reveal,.hero .reveal-left,.hero .reveal-right,.stats .reveal{opacity:1;transform:none}
 
 /* NAV */
 nav{background:rgba(8,4,14,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:72px;position:sticky;top:0;z-index:100;transition:box-shadow .3s}
