@@ -20,8 +20,8 @@
   body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.18;
     background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
     background-size:46px 46px;mask-image:radial-gradient(circle at 50% 45%,#000 0%,transparent 78%)}
-  .app{display:grid;grid-template-columns:300px 1fr 300px;grid-template-rows:auto 1fr auto;gap:14px;height:100vh;padding:16px;
-    grid-template-areas:"head head head" "left center right" "left console right"}
+  .app{display:grid;grid-template-columns:300px 1fr 300px;grid-template-rows:auto 1fr auto auto;gap:14px;height:100vh;padding:16px;
+    grid-template-areas:"head head head" "left center right" "left console projects" "left console projects"}
   .panel{border:1px solid var(--line);border-radius:10px;
     background:linear-gradient(180deg,rgba(12,34,52,.55),rgba(4,16,26,.35));
     box-shadow:inset 0 0 22px rgba(57,199,255,.07);backdrop-filter:blur(3px);position:relative;overflow:hidden}
@@ -42,7 +42,7 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   .greeting{font-size:13px}.greeting b{color:var(--cyan)}
   .clock{text-align:right}.clock .t{font-size:28px;letter-spacing:3px;color:#eaf7ff}.clock .d{font-size:10px;letter-spacing:2px;color:var(--mut)}
-  aside.left{grid-area:left}aside.right{grid-area:right}
+  aside.left{grid-area:left}aside.right{grid-area:right}.projects{grid-area:projects}
   .center{grid-area:center;display:flex;align-items:center;justify-content:center;position:relative}
   .reactor-wrap{position:relative;width:min(44vh,420px);aspect-ratio:1}
   .reactor-wrap svg{position:absolute;inset:0;width:100%;height:100%}
@@ -99,6 +99,12 @@
   .sc-row .nm a:hover{text-decoration:underline}
   .sc-row .fl{color:var(--mut);font-size:10.5px;margin-top:2px}
   .sc-row .ph{color:var(--cyan-dim);font-size:10px;margin-top:1px}
+  .proj-item{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px dashed rgba(57,199,255,.12)}
+  .proj-item .pnm{color:#eaf7ff;font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .proj-item .pst{font-size:9px;letter-spacing:1px;border-radius:3px;padding:1px 5px;flex-shrink:0}
+  .proj-item .pst.active{background:rgba(82,255,184,.12);color:var(--green);border:1px solid var(--green)}
+  .proj-item .pst.paused{background:rgba(255,179,71,.12);color:var(--amber);border:1px solid var(--amber)}
+  .proj-item .pst.done{background:rgba(57,199,255,.1);color:var(--cyan-dim);border:1px solid var(--cyan-dim)}
   ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--cyan-dim);border-radius:3px}
   .boot{position:fixed;inset:0;z-index:100;background:#01060c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .8s}
   .boot h2{letter-spacing:12px;color:var(--cyan);font-size:18px}
@@ -168,6 +174,16 @@
         <div class="kv"><span>Model</span><span id="modelName" class="ok">—</span></div>
         <div class="kv"><span>Threat Level</span><span class="ok">GREEN</span></div>
         <div class="kv"><span>Location</span><span id="loc" class="warn">UNLINKED</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <aside class="projects panel">
+    <div class="ttl">Projects <span class="dot"></span></div>
+    <div class="body" style="overflow:auto;max-height:calc(100% - 40px)">
+      <div id="proj-list"></div>
+      <div style="margin-top:10px;font-size:9.5px;color:var(--mut);letter-spacing:1px;line-height:1.7">
+        Say <span style="color:var(--cyan-dim)">"add project X"</span> · <span style="color:var(--cyan-dim)">"done project X"</span> · <span style="color:var(--cyan-dim)">"remove project X"</span>
       </div>
     </div>
   </aside>
@@ -296,7 +312,27 @@
     }catch(e){ph.remove();say('The prospecting run failed, Sir — '+e.message);thinkOff();}
   }
 
+  /* ---- projects ---- */
+  const PROJ_KEY='jarvis_projects';
+  function loadProjects(){try{return JSON.parse(localStorage.getItem(PROJ_KEY)||'[]');}catch(e){return[];}}
+  function saveProjects(p){localStorage.setItem(PROJ_KEY,JSON.stringify(p));}
+  function renderProjects(){
+    const list=$('proj-list');const ps=loadProjects();
+    if(!ps.length){list.innerHTML='<div style="color:var(--mut);font-size:10.5px;padding:4px 0">No projects logged, Sir.</div>';return;}
+    list.innerHTML=ps.map(p=>`<div class="proj-item"><span class="pnm">${esc(p.name)}</span><span class="pst ${p.status}">${p.status}</span></div>`).join('');
+  }
+  renderProjects();
+
   function respond(text){
+    const addM=text.match(/^(?:add|new|create|log)\s+project\s+(.+)/i);
+    if(addM){const name=addM[1].trim();const ps=loadProjects();ps.unshift({name,status:'active',added:Date.now()});saveProjects(ps);renderProjects();say(`Project "${name}" has been added to your roster, Sir.`);logFeed('Project added: '+name,'');return;}
+    const rmM=text.match(/^(?:remove|delete|drop)\s+project\s+(.+)/i);
+    if(rmM){const name=rmM[1].trim();saveProjects(loadProjects().filter(p=>p.name.toLowerCase()!==name.toLowerCase()));renderProjects();say(`Project "${name}" removed from the roster, Sir.`);logFeed('Project removed: '+name,'');return;}
+    const doneM=text.match(/^(?:complete|finish|done|close)\s+project\s+(.+)/i);
+    if(doneM){const name=doneM[1].trim();const ps=loadProjects();const p=ps.find(p=>p.name.toLowerCase()===name.toLowerCase());if(p){p.status='done';saveProjects(ps);renderProjects();say(`Marked "${name}" as complete. Well done, Sir.`);}else{say(`I couldn't find a project called "${name}", Sir.`);}return;}
+    const pauseM=text.match(/^(?:pause|hold)\s+project\s+(.+)/i);
+    if(pauseM){const name=pauseM[1].trim();const ps=loadProjects();const p=ps.find(p=>p.name.toLowerCase()===name.toLowerCase());if(p){p.status='paused';saveProjects(ps);renderProjects();say(`Project "${name}" placed on hold, Sir.`);}return;}
+    if(/^(?:list|show)\s+projects?/i.test(text)){const ps=loadProjects();if(!ps.length){say('No projects in the roster, Sir.');}else{say(`You have ${ps.length} project${ps.length>1?'s':''}: `+ps.map(p=>p.name).join(', ')+'.');}return;}
     const m=text.match(/\b(?:find|prospect|source|audit|scan)\b\s+(.+?)\s+\bin\b\s+(.+)/i);
     if(m){return runProspect(m[1].trim().replace(/s$/i,''),m[2].trim());}
     return askJarvis(text);
