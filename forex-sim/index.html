@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>J.A.R.V.I.S. — Forex Training Cockpit (DEMO)</title>
+<style>
+  :root{
+    --cyan:#39c7ff; --cyan-dim:#1b6f93; --cyan-glow:rgba(57,199,255,.55);
+    --amber:#ffb347; --red:#ff4d4d; --green:#52ffb8;
+    --text:#cfeeff; --mut:#6fa9c4; --line:rgba(57,199,255,.28);
+    --panel-bg:linear-gradient(180deg,rgba(12,34,52,.55),rgba(4,16,26,.35));
+    --font:"Segoe UI","Consolas",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 800px at 50% 20%,#04203a 0%,#020912 55%,#01060c 100%);
+    color:var(--text);font-family:var(--font);min-height:100vh;-webkit-font-smoothing:antialiased}
+  a{color:var(--cyan)}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 18px 60px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    border:1px solid var(--line);border-radius:12px;padding:14px 20px;
+    background:linear-gradient(90deg,rgba(12,34,52,.6),rgba(4,16,26,.25))}
+  .brand h1{margin:0;font-size:20px;letter-spacing:6px;font-weight:600;color:#eaf7ff}
+  .brand small{display:block;font-size:9px;letter-spacing:3px;color:var(--mut);margin-top:3px}
+  .demobadge{font-size:11px;letter-spacing:2px;color:#02151f;background:var(--amber);
+    padding:6px 12px;border-radius:20px;font-weight:700;box-shadow:0 0 16px rgba(255,179,71,.45)}
+  .truth{margin:14px 0;border:1px solid rgba(255,179,71,.4);border-radius:10px;
+    background:linear-gradient(180deg,rgba(60,40,10,.4),rgba(20,12,2,.25));padding:12px 16px;font-size:13px;line-height:1.5}
+  .truth b{color:var(--amber)}
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:14px;margin-top:14px}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  .panel{border:1px solid var(--line);border-radius:10px;background:var(--panel-bg);
+    box-shadow:inset 0 0 22px rgba(57,199,255,.07);overflow:hidden}
+  .ttl{font-size:11px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;padding:10px 14px;
+    border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .ttl .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .pad{padding:14px}
+  canvas{display:block;width:100%;height:320px;background:rgba(2,12,20,.4)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .row+.row{margin-top:10px}
+  label{font-size:10px;letter-spacing:1.5px;color:var(--mut);text-transform:uppercase;display:block;margin-bottom:4px}
+  select,input{background:rgba(2,14,24,.7);border:1px solid var(--line);color:var(--text);
+    border-radius:7px;padding:9px 10px;font-family:var(--font);font-size:14px;width:100%}
+  input[type=range]{padding:0}
+  .col{flex:1;min-width:90px}
+  .btn{border:1px solid var(--line);background:rgba(57,199,255,.08);color:var(--text);
+    border-radius:8px;padding:11px 14px;font-family:var(--font);font-size:13px;letter-spacing:1px;
+    cursor:pointer;transition:.15s;font-weight:600}
+  .btn:hover{background:rgba(57,199,255,.18);box-shadow:0 0 14px var(--cyan-glow)}
+  .btn.buy{border-color:rgba(82,255,184,.5);background:rgba(82,255,184,.12);color:var(--green)}
+  .btn.buy:hover{background:rgba(82,255,184,.22)}
+  .btn.sell{border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.12);color:var(--red)}
+  .btn.sell:hover{background:rgba(255,77,77,.22)}
+  .btn.ghost{background:transparent;font-weight:500}
+  .stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed rgba(57,199,255,.15);font-size:13px}
+  .stat:last-child{border-bottom:0}
+  .stat .k{color:var(--mut)}
+  .stat .v{font-variant-numeric:tabular-nums;font-weight:600}
+  .big{font-size:26px;letter-spacing:1px;color:#eaf7ff;font-variant-numeric:tabular-nums}
+  .price{font-size:30px;letter-spacing:1px;font-variant-numeric:tabular-nums}
+  .up{color:var(--green)} .down{color:var(--red)} .neutral{color:var(--text)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{text-align:right;padding:7px 8px;border-bottom:1px solid rgba(57,199,255,.12);white-space:nowrap}
+  th{color:var(--mut);font-weight:500;letter-spacing:1px;font-size:10px;text-transform:uppercase}
+  th:first-child,td:first-child{text-align:left}
+  .log{font-size:12px;line-height:1.6;max-height:160px;overflow:auto;color:var(--mut)}
+  .log .t{color:var(--cyan-dim)}
+  .pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid var(--line);letter-spacing:1px}
+  .tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .tab{font-size:11px;letter-spacing:1.5px;padding:8px 12px;border:1px solid var(--line);border-radius:7px;
+    cursor:pointer;color:var(--mut);text-transform:uppercase}
+  .tab.active{color:var(--cyan);background:rgba(57,199,255,.1);box-shadow:inset 0 0 12px rgba(57,199,255,.12)}
+  .hide{display:none}
+  .reality .verdict{margin-top:10px;padding:11px 13px;border-radius:8px;border:1px solid rgba(255,77,77,.4);
+    background:rgba(255,77,77,.08);font-size:13px;line-height:1.5}
+  .reality .verdict b{color:var(--red)}
+  .leverage-val{color:var(--amber);font-weight:700}
+  .foot{margin-top:22px;font-size:11px;color:var(--mut);line-height:1.6;text-align:center}
+  .danger{color:var(--red)} .good{color:var(--green)} .warn{color:var(--amber)}
+  .liq{animation:flash .5s ease-in-out 6}
+  @keyframes flash{0%,100%{background:var(--panel-bg)}50%{background:rgba(255,77,77,.18)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>FOREX TRAINING COCKPIT</h1>
+      <small>J.A.R.V.I.S. · PROVE-IT-FIRST SIMULATOR · NO REAL FUNDS AT RISK</small>
+    </div>
+    <div class="demobadge" id="demoBadge">● DEMO FUNDS ONLY</div>
+  </header>
+
+  <div class="truth">
+    <b>Read this once.</b> Every price, trade and pound here is <b>simulated</b>. That's the point — you can blow up this
+    account a hundred times this week and lose <b>£0</b>. UK/EU brokers are legally required to disclose that
+    <b>~74–84% of retail forex traders lose money</b>. The goal of this tool is to make you the rare exception by failing
+    *here*, on fake money, until your strategy actually survives. Hit the <b>Reality Check</b> tab to see, in your own
+    numbers, exactly what a "£1,000 in 7 days" target really demands.
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: chart + positions -->
+    <div>
+      <div class="panel">
+        <div class="ttl"><span>LIVE MARKET — <span id="pairLabel">GBP/USD</span></span>
+          <span><span id="priceTick" class="neutral">—</span> <span class="dot"></span></span></div>
+        <canvas id="chart"></canvas>
+      </div>
+
+      <div class="panel" style="margin-top:14px">
+        <div class="ttl"><span>OPEN POSITIONS</span><span id="posCount" class="pill">0 open</span></div>
+        <div class="pad">
+          <table id="posTable">
+            <thead><tr><th>Pair</th><th>Side</th><th>Lots</th><th>Lev</th><th>Entry</th><th>Now</th><th>P/L</th><th></th></tr></thead>
+            <tbody id="posBody"><tr><td colspan="8" style="text-align:center;color:var(--mut);padding:18px">No open positions. Place one →</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:14px">
+        <div class="ttl"><span>ACTIVITY LOG</span><span class="pill">session</span></div>
+        <div class="pad"><div class="log" id="log"></div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: account + tabs -->
+    <div>
+      <div class="panel">
+        <div class="ttl"><span>ACCOUNT (DEMO)</span><span id="marginLevelPill" class="pill">— margin</span></div>
+        <div class="pad" id="acctPanel">
+          <div class="stat"><span class="k">Equity</span><span class="v big" id="equity">£10,000.00</span></div>
+          <div class="stat"><span class="k">Balance</span><span class="v" id="balance">£10,000.00</span></div>
+          <div class="stat"><span class="k">Open P/L</span><span class="v" id="openpl">£0.00</span></div>
+          <div class="stat"><span class="k">Used margin</span><span class="v" id="usedmargin">£0.00</span></div>
+          <div class="stat"><span class="k">Free margin</span><span class="v" id="freemargin">£10,000.00</span></div>
+          <div class="row" style="margin-top:12px">
+            <button class="btn ghost col" id="resetBtn">⟲ RESET DEMO ACCOUNT</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:14px">
+        <div class="ttl"><span>CONTROLS</span><span class="dot"></span></div>
+        <div class="pad">
+          <div class="tabs">
+            <div class="tab active" data-tab="trade">Trade</div>
+            <div class="tab" data-tab="sizer">Position Sizer</div>
+            <div class="tab" data-tab="reality">Reality Check</div>
+            <div class="tab" data-tab="backtest">Backtester</div>
+            <div class="tab" data-tab="journal">Journal</div>
+          </div>
+
+          <!-- TRADE -->
+          <div id="tab-trade">
+            <div class="row">
+              <div class="col">
+                <label>Pair</label>
+                <select id="pair">
+                  <option value="GBP/USD">GBP/USD</option>
+                  <option value="EUR/USD">EUR/USD</option>
+                  <option value="USD/JPY">USD/JPY</option>
+                  <option value="AUD/USD">AUD/USD</option>
+                  <option value="EUR/GBP">EUR/GBP</option>
+                  <option value="USD/CAD">USD/CAD</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>Lot size (1.0 = 100k units)</label>
+                <input id="lots" type="number" min="0.01" max="50" step="0.01" value="0.10"/>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Leverage <span id="levVal" class="leverage-val">30×</span></label>
+                <input id="lev" type="range" min="1" max="500" step="1" value="30"/>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col"><label>Stop loss (pips, 0=none)</label><input id="sl" type="number" min="0" step="1" value="20"/></div>
+              <div class="col"><label>Take profit (pips, 0=none)</label><input id="tp" type="number" min="0" step="1" value="40"/></div>
+            </div>
+            <div id="tradeMeta" style="font-size:11px;color:var(--mut);margin-top:10px;line-height:1.5"></div>
+            <div class="row" style="margin-top:12px">
+              <button class="btn buy col" id="buyBtn">▲ BUY / LONG</button>
+              <button class="btn sell col" id="sellBtn">▼ SELL / SHORT</button>
+            </div>
+          </div>
+
+          <!-- SIZER -->
+          <div id="tab-sizer" class="hide">
+            <p style="font-size:12px;color:var(--mut);margin:0 0 12px">The pros size positions by <b>risk</b>, not greed.
+              Never risk more than 1–2% of the account on one trade. This tells you how big you're actually allowed to go.</p>
+            <div class="row">
+              <div class="col"><label>Account balance (£)</label><input id="sz_bal" type="number" value="10000" step="100"/></div>
+              <div class="col"><label>Risk per trade (%)</label><input id="sz_risk" type="number" value="1" step="0.5" min="0.1"/></div>
+            </div>
+            <div class="row">
+              <div class="col"><label>Stop distance (pips)</label><input id="sz_stop" type="number" value="20" step="1" min="1"/></div>
+              <div class="col"><label>£ / pip / lot</label><input id="sz_pip" type="number" value="8" step="0.5" min="0.5"/></div>
+            </div>
+            <div id="sizerOut" style="margin-top:12px"></div>
+          </div>
+
+          <!-- REALITY -->
+          <div id="tab-reality" class="reality hide">
+            <p style="font-size:12px;color:var(--mut);margin:0 0 12px">The honest calculator. Put in your real plan and
+              see what the maths actually asks of you.</p>
+            <div class="row">
+              <div class="col"><label>Starting capital (£)</label><input id="r_cap" type="number" value="200" step="50"/></div>
+              <div class="col"><label>Profit target (£)</label><input id="r_tgt" type="number" value="1000" step="100"/></div>
+            </div>
+            <div class="row">
+              <div class="col"><label>Days</label><input id="r_days" type="number" value="7" step="1" min="1"/></div>
+              <div class="col"><label>Instrument daily range (%)</label><input id="r_range" type="number" value="0.7" step="0.1" min="0.1"/></div>
+            </div>
+            <div id="realityOut"></div>
+          </div>
+
+          <!-- BACKTEST -->
+          <div id="tab-backtest" class="reality hide">
+            <p style="font-size:12px;color:var(--mut);margin:0 0 12px">Test a mechanical strategy on simulated history.
+              The lesson isn't the result — it's how wildly it <b>changes every run</b>. Uses the pair picked on the Trade tab.</p>
+            <div class="row">
+              <div class="col"><label>Strategy</label>
+                <select id="bt_strat">
+                  <option value="ma">Moving-average cross (10/30)</option>
+                  <option value="rsi">RSI(14) 30/70</option>
+                  <option value="rand">Random coin-flip (baseline)</option>
+                </select></div>
+              <div class="col"><label>Bars</label><input id="bt_bars" type="number" value="300" min="50" max="2000" step="50"/></div>
+            </div>
+            <div class="row" style="margin-top:10px"><button class="btn col" id="bt_run">▶ RUN BACKTEST</button></div>
+            <div id="btOut" style="margin-top:12px"></div>
+          </div>
+
+          <!-- JOURNAL -->
+          <div id="tab-journal" class="reality hide">
+            <p style="font-size:12px;color:var(--mut);margin:0 0 12px">Every trade you close on the Trade tab lands here with running stats.
+              A <b>profit factor</b> &gt; 1 and positive <b>expectancy</b> are what separate a trader from a gambler.</p>
+            <div id="jrOut"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    Educational simulator · simulated price data · not financial advice · no broker connection · no real money moves here.<br/>
+    When you're ready for real funds: use an <b>FCA-regulated</b> broker, never one promising guaranteed returns, and start with money you can afford to lose entirely.
+  </div>
+</div>
+
+<script>
+"use strict";
+// ---------- tiny helpers ----------
+const $ = id => document.getElementById(id);
+const fmt = (n,d=2) => (n<0?'-':'')+'£'+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d});
+const now = () => new Date().toLocaleTimeString('en-GB',{hour12:false});
+function log(msg, cls){ const el=$('log'); const line=document.createElement('div');
+  line.innerHTML=`<span class="t">${now()}</span> · `+(cls?`<span class="${cls}">${msg}</span>`:msg);
+  el.prepend(line); while(el.children.length>60) el.lastChild.remove(); }
+
+// ---------- market model (SIMULATED) ----------
+// Each pair: starting price, pip size, and £ value per pip per 1.0 lot (simplified, account-currency GBP).
+const PAIRS = {
+  'GBP/USD':{p:1.2700, pip:0.0001, pipPerLot:8,  vol:0.00018, dec:4},
+  'EUR/USD':{p:1.0850, pip:0.0001, pipPerLot:8,  vol:0.00015, dec:4},
+  'USD/JPY':{p:156.40, pip:0.01,   pipPerLot:6,  vol:0.020,   dec:3},
+  'AUD/USD':{p:0.6620, pip:0.0001, pipPerLot:8,  vol:0.00016, dec:5},
+  'EUR/GBP':{p:0.8450, pip:0.0001, pipPerLot:10, vol:0.00013, dec:4},
+  'USD/CAD':{p:1.3680, pip:0.0001, pipPerLot:6,  vol:0.00016, dec:4},
+};
+const SPREAD_PIPS = 1.5;            // round-trip cost baked into bid/ask
+let pairKey = 'GBP/USD';
+let mid = PAIRS[pairKey].p;
+let candles = [];                  // {o,h,l,c}
+let curCandle = null, tickInCandle = 0;
+const TICKS_PER_CANDLE = 6, MAX_CANDLES = 80;
+
+function seedCandles(){
+  candles=[]; let m = PAIRS[pairKey].p; mid=m;
+  for(let i=0;i<MAX_CANDLES;i++){
+    let o=m, h=m, l=m;
+    for(let t=0;t<TICKS_PER_CANDLE;t++){ m += (Math.random()-0.5)*2*PAIRS[pairKey].vol; h=Math.max(h,m); l=Math.min(l,m); }
+    candles.push({o,h,l,c:m});
+  }
+  mid=m; curCandle={o:m,h:m,l:m,c:m}; tickInCandle=0;
+}
+
+function tick(){
+  const P = PAIRS[pairKey];
+  // random walk with mild mean-reversion so it doesn't drift off-screen
+  const drift = (P.p - mid)*0.0008;
+  mid += drift + (Math.random()-0.5)*2*P.vol;
+  curCandle.c=mid; curCandle.h=Math.max(curCandle.h,mid); curCandle.l=Math.min(curCandle.l,mid);
+  if(++tickInCandle>=TICKS_PER_CANDLE){
+    candles.push(curCandle); if(candles.length>MAX_CANDLES) candles.shift();
+    curCandle={o:mid,h:mid,l:mid,c:mid}; tickInCandle=0;
+  }
+}
+const spread = () => SPREAD_PIPS*PAIRS[pairKey].pip;
+const ask = () => mid + spread()/2;   // you BUY at ask
+const bid = () => mid - spread()/2;   // you SELL at bid
+
+// ---------- account & positions ----------
+const START = 10000;
+let balance = START;
+let positions = [];   // {id,pair,side,lots,lev,entry,sl,tp,pipPerLot,pip}
+let closed = [];      // closed-trade history for the journal
+let pid = 1;
+
+function notional(pos){ return pos.lots*100000*pos.entry; }          // simplified notional in quote ccy
+function margin(pos){ return notional(pos)/pos.lev/ (pos.pair.startsWith('USD')?1: (pos.pair.endsWith('USD')? pos.entry:1)); }
+// Keep margin intuitive & in £: margin = lots * 100000 * pip-normalised / lev. Use a simple model:
+function marginReq(pos){ return (pos.lots*100000*pos.entry)/pos.lev/ (pos.entry||1); } // ≈ lots*100000/lev
+function posPL(pos){
+  const px = pos.side==='BUY'? bid() : ask();     // close BUY at bid, SELL at ask
+  const diff = (px - pos.entry) * (pos.side==='BUY'?1:-1);
+  const pips = diff/pos.pip;
+  return pips*pos.pipPerLot*pos.lots;
+}
+function usedMargin(){ return positions.reduce((s,p)=>s+marginReq(p),0); }
+function openPL(){ return positions.reduce((s,p)=>s+posPL(p),0); }
+function equity(){ return balance+openPL(); }
+function freeMargin(){ return equity()-usedMargin(); }
+function marginLevel(){ const u=usedMargin(); return u<=0?Infinity:(equity()/u)*100; }
+
+function placeTrade(side){
+  const lots=Math.max(0.01,parseFloat($('lots').value)||0.01);
+  const lev=parseInt($('lev').value);
+  const P=PAIRS[pairKey];
+  const entry = side==='BUY'? ask() : bid();
+  const slp=Math.max(0,parseFloat($('sl').value)||0);
+  const tpp=Math.max(0,parseFloat($('tp').value)||0);
+  const pos={id:pid++,pair:pairKey,side,lots,lev,entry,pip:P.pip,pipPerLot:P.pipPerLot,
+    sl: slp>0? (side==='BUY'? entry-slp*P.pip : entry+slp*P.pip):null,
+    tp: tpp>0? (side==='BUY'? entry+tpp*P.pip : entry-tpp*P.pip):null};
+  const need=marginReq(pos);
+  if(need>freeMargin()){ log(`Trade rejected — not enough free margin (need ${fmt(need)}, free ${fmt(freeMargin())}). Lower lots or leverage.`,'warn'); return; }
+  positions.push(pos);
+  log(`${side==='BUY'?'▲ LONG':'▼ SHORT'} ${lots} lot ${pairKey} @ ${entry.toFixed(P.dec)} · ${lev}× · margin ${fmt(need)}`, side==='BUY'?'good':'danger');
+  render();
+}
+function closePos(id, reason){
+  const i=positions.findIndex(p=>p.id===id); if(i<0) return;
+  const pos=positions[i]; const pl=posPL(pos); balance+=pl; positions.splice(i,1);
+  closed.push({time:now(), pair:pos.pair, side:pos.side, lots:pos.lots, pl, reason:reason||'manual', entry:pos.entry});
+  log(`Closed ${pos.side} ${pos.lots} ${pos.pair} → ${pl>=0?'+':''}${fmt(pl)} ${reason?'('+reason+')':''}`, pl>=0?'good':'danger');
+  renderJournal(); render();
+}
+function checkAutoClose(){
+  for(const p of [...positions]){
+    const px = p.side==='BUY'? bid() : ask();
+    if(p.sl!=null && ((p.side==='BUY'&&px<=p.sl)||(p.side==='SELL'&&px>=p.sl))) closePos(p.id,'stop loss');
+    else if(p.tp!=null && ((p.side==='BUY'&&px>=p.tp)||(p.side==='SELL'&&px<=p.tp))) closePos(p.id,'take profit');
+  }
+}
+function checkMarginCall(){
+  if(positions.length && marginLevel()<50){
+    log('⚠ MARGIN CALL — equity fell below 50% of used margin. The broker liquidates everything. This is how leverage ends accounts.','danger');
+    const panel=$('acctPanel'); panel.classList.add('liq'); setTimeout(()=>panel.classList.remove('liq'),3000);
+    for(const p of [...positions]) closePos(p.id,'LIQUIDATED');
+  }
+}
+
+// ---------- rendering ----------
+function colorFor(v){ return v>0?'up':v<0?'down':'neutral'; }
+function render(){
+  const eq=equity(), opl=openPL(), um=usedMargin(), fm=freeMargin(), ml=marginLevel();
+  $('equity').textContent=fmt(eq); $('equity').className='v big '+colorFor(eq-START);
+  $('balance').textContent=fmt(balance);
+  $('openpl').textContent=(opl>=0?'+':'')+fmt(opl); $('openpl').className='v '+colorFor(opl);
+  $('usedmargin').textContent=fmt(um);
+  $('freemargin').textContent=fmt(fm); $('freemargin').className='v '+(fm<0?'down':'');
+  const mlp=$('marginLevelPill');
+  mlp.textContent = (ml===Infinity?'— margin':Math.round(ml)+'% margin');
+  mlp.style.color = ml===Infinity?'var(--mut)': ml<100?'var(--red)': ml<300?'var(--amber)':'var(--green)';
+
+  // positions table
+  const body=$('posBody'); $('posCount').textContent=positions.length+' open';
+  if(!positions.length){ body.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--mut);padding:18px">No open positions. Place one →</td></tr>'; }
+  else body.innerHTML=positions.map(p=>{
+    const pl=posPL(p), px=p.side==='BUY'?bid():ask(), P=PAIRS[p.pair]||PAIRS[pairKey];
+    return `<tr><td>${p.pair}</td><td class="${p.side==='BUY'?'up':'down'}">${p.side}</td><td>${p.lots}</td>
+      <td>${p.lev}×</td><td>${p.entry.toFixed(P.dec)}</td><td>${px.toFixed(P.dec)}</td>
+      <td class="${colorFor(pl)}">${pl>=0?'+':''}${fmt(pl)}</td>
+      <td><button class="btn ghost" style="padding:4px 9px;font-size:11px" onclick="window.__close(${p.id})">Close</button></td></tr>`;
+  }).join('');
+}
+window.__close = id => closePos(id,'manual');
+
+// chart
+const cv=$('chart'), ctx=cv.getContext('2d');
+function drawChart(){
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth, h=cv.clientHeight;
+  cv.width=w*dpr; cv.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  const data=[...candles, curCandle]; const P=PAIRS[pairKey];
+  let hi=-Infinity,lo=Infinity; for(const c of data){hi=Math.max(hi,c.h);lo=Math.min(lo,c.l);}
+  const pad=(hi-lo)*0.12||P.pip*10; hi+=pad; lo-=pad;
+  const x2=(i)=>40+ i*( (w-60)/data.length );
+  const y2=(v)=> 10 + (hi-v)/(hi-lo)*(h-30);
+  // grid
+  ctx.strokeStyle='rgba(57,199,255,.10)'; ctx.lineWidth=1; ctx.fillStyle='rgba(111,169,196,.7)'; ctx.font='10px Consolas,monospace';
+  for(let g=0;g<=4;g++){ const v=hi-(hi-lo)*g/4, yy=y2(v); ctx.beginPath();ctx.moveTo(40,yy);ctx.lineTo(w-20,yy);ctx.stroke();
+    ctx.fillText(v.toFixed(P.dec),2,yy+3); }
+  // candles
+  const cw=Math.max(2,(w-60)/data.length*0.6);
+  data.forEach((c,i)=>{ const x=x2(i), up=c.c>=c.o; ctx.strokeStyle=up?'#52ffb8':'#ff4d4d'; ctx.fillStyle=up?'rgba(82,255,184,.35)':'rgba(255,77,77,.35)';
+    ctx.beginPath();ctx.moveTo(x,y2(c.h));ctx.lineTo(x,y2(c.l));ctx.stroke();
+    const yo=y2(c.o),yc=y2(c.c); ctx.fillRect(x-cw/2,Math.min(yo,yc),cw,Math.max(2,Math.abs(yc-yo)));
+    ctx.strokeRect(x-cw/2,Math.min(yo,yc),cw,Math.max(2,Math.abs(yc-yo))); });
+  // entry lines
+  for(const p of positions){ if(p.pair!==pairKey) continue; const y=y2(p.entry);
+    ctx.strokeStyle=p.side==='BUY'?'rgba(82,255,184,.6)':'rgba(255,77,77,.6)'; ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(w-20,y);ctx.stroke(); ctx.setLineDash([]); }
+}
+
+// ---------- trade meta preview ----------
+function updateTradeMeta(){
+  const lots=Math.max(0.01,parseFloat($('lots').value)||0.01), lev=parseInt($('lev').value), P=PAIRS[pairKey];
+  const notion=lots*100000; const marg=notion/lev;
+  const wipePips = (marg / (P.pipPerLot*lots)); // pips of adverse move that ≈ wipes this position's margin
+  $('levVal').textContent=lev+'×';
+  let warn = lev>=100? '<span class="danger">extreme</span>' : lev>=50? '<span class="warn">high</span>':'<span class="good">sane</span>';
+  $('tradeMeta').innerHTML =
+    `Notional ≈ ${ (notion).toLocaleString('en-GB') } units · margin needed ≈ <b>${fmt(marg)}</b> · leverage risk: ${warn}<br/>`+
+    `≈ <b>${wipePips.toFixed(0)} pips</b> against you would burn this position's whole margin. Typical ${pairKey} day ≈ ${(P.vol*TICKS_PER_CANDLE*MAX_CANDLES/ P.pip/6).toFixed(0)}–${(P.vol*TICKS_PER_CANDLE*MAX_CANDLES/P.pip/3).toFixed(0)} pips.`;
+}
+
+// ---------- position sizer ----------
+function calcSizer(){
+  const bal=parseFloat($('sz_bal').value)||0, risk=parseFloat($('sz_risk').value)||0,
+        stop=parseFloat($('sz_stop').value)||1, pip=parseFloat($('sz_pip').value)||1;
+  const riskAmt=bal*risk/100; const lots=riskAmt/(stop*pip);
+  const cls = risk>2?'danger':'good';
+  $('sizerOut').innerHTML=
+    `<div class="stat"><span class="k">£ at risk on this trade</span><span class="v ${cls}">${fmt(riskAmt)}</span></div>
+     <div class="stat"><span class="k">Max position size</span><span class="v">${lots.toFixed(2)} lots</span></div>
+     <div class="stat"><span class="k">If stop is hit</span><span class="v down">you lose ${fmt(riskAmt)} — and that's fine</span></div>
+     <p style="font-size:11px;color:var(--mut);margin:10px 0 0;line-height:1.5">
+       ${risk>2?'<span class="danger">⚠ Risking over 2% per trade is how accounts die slowly.</span> ':''}
+       At ${risk}% risk you can be <b>wrong ${Math.floor(100/risk)} times in a row</b> before you're wiped. That survivability is the whole game.</p>`;
+}
+
+// ---------- reality check ----------
+function calcReality(){
+  const cap=parseFloat($('r_cap').value)||1, tgt=parseFloat($('r_tgt').value)||0,
+        days=Math.max(1,parseInt($('r_days').value)||1), range=Math.max(0.05,parseFloat($('r_range').value)||0.7);
+  const finalEq=cap+tgt; const mult=finalEq/cap;
+  const daily=(Math.pow(mult,1/days)-1)*100;                 // required % per day, compounded
+  const impliedLev=daily/range;                              // if you captured the full daily range every day
+  const wipeMove=100/Math.max(impliedLev,0.0001);            // % adverse move that wipes you at that leverage
+  const coin=Math.pow(0.5,days)*100;                         // chance of N winning days at 50/50, pre-costs
+  let sev = daily>15?'danger':daily>6?'warn':'good';
+  $('realityOut').innerHTML=
+    `<div class="stat"><span class="k">Total growth needed</span><span class="v">${((mult-1)*100).toFixed(0)}% in ${days} days</span></div>
+     <div class="stat"><span class="k">Required return / day</span><span class="v ${sev}">${daily.toFixed(1)}% every day</span></div>
+     <div class="stat"><span class="k">Implied leverage</span><span class="v ${impliedLev>20?'danger':impliedLev>8?'warn':'good'}">≈ ${impliedLev.toFixed(0)}×</span></div>
+     <div class="stat"><span class="k">Wipeout move at that leverage</span><span class="v danger">just ${wipeMove.toFixed(2)}% against you = £0</span></div>
+     <div class="stat"><span class="k">Odds of ${days} green days @ 50/50</span><span class="v danger">≈ ${coin.toFixed(1)}% (before costs)</span></div>
+     <div class="verdict">
+       ${daily>15
+         ? `To make <b>${fmt(tgt,0)}</b> from <b>${fmt(cap,0)}</b> in ${days} days you'd need <b>${daily.toFixed(1)}% a day</b> — that forces roughly <b class="leverage-val">${impliedLev.toFixed(0)}× leverage</b>, where a <b>${wipeMove.toFixed(2)}%</b> tick (smaller than an ordinary candle) zeroes you. This isn't trading, it's a fast coin-flip with the spread skimming you every flip. <b>That's the trap.</b>`
+         : daily>6
+         ? `<b>${daily.toFixed(1)}% a day</b> is still elite-fund territory sustained — most pros target a few % a <i>month</i>. Possible to chase, very easy to blow up. Treat with huge caution.`
+         : `<b>${daily.toFixed(1)}% a day</b> is at least in the realm of the sane. Stretch the days or shrink the target and the maths stops fighting you.`}
+       <br/><br/>Reframe that worked for others: aim to <b>not lose</b> for 2 weeks on this demo first. Survival before profit.
+     </div>`;
+}
+
+// ---------- backtester (SIMULATED data, intuition only) ----------
+function sma(arr,i,n){ if(i<n-1) return null; let s=0; for(let k=i-n+1;k<=i;k++) s+=arr[k]; return s/n; }
+function rsiSeries(px,n=14){
+  const out=new Array(px.length).fill(null); let gain=0,loss=0;
+  for(let i=1;i<px.length;i++){ const d=px[i]-px[i-1];
+    if(i<=n){ if(d>0)gain+=d; else loss-=d; if(i===n){ gain/=n; loss/=n; out[i]= loss===0?100:100-100/(1+gain/loss); } }
+    else { gain=(gain*(n-1)+(d>0?d:0))/n; loss=(loss*(n-1)+(d<0?-d:0))/n; out[i]= loss===0?100:100-100/(1+gain/loss); } }
+  return out;
+}
+function genSeries(n){ const P=PAIRS[pairKey]; let m=P.p; const px=[];
+  for(let i=0;i<n;i++){ m += (P.p-m)*0.0008 + (Math.random()-0.5)*2*P.vol; px.push(m); } return px; }
+function signalSeries(strat,px){
+  const n=px.length, pos=new Array(n).fill(0);
+  if(strat==='ma'){ for(let i=0;i<n;i++){ const f=sma(px,i,10), s=sma(px,i,30); pos[i]=(f==null||s==null)?0:(f>s?1:-1); } }
+  else if(strat==='rsi'){ const r=rsiSeries(px,14); let cur=0; for(let i=0;i<n;i++){ if(r[i]!=null){ if(r[i]<30)cur=1; else if(r[i]>70)cur=-1; } pos[i]=cur; } }
+  else { let cur=Math.random()<.5?1:-1; for(let i=0;i<n;i++){ if(i%8===0) cur=Math.random()<.5?1:-1; pos[i]=cur; } }
+  return pos;
+}
+function runBacktest(){
+  const strat=$('bt_strat').value, n=Math.min(2000,Math.max(50,parseInt($('bt_bars').value)||300)), P=PAIRS[pairKey];
+  const px=genSeries(n), pos=signalSeries(strat,px), lots=0.10;
+  let bal=10000, peak=10000, maxDD=0, trades=0, wins=0, gross=0, costs=0, dir=0, entryPx=0;
+  const settle=(exit)=>{ const pl=(exit-entryPx)/P.pip*P.pipPerLot*lots*dir, cost=SPREAD_PIPS*P.pipPerLot*lots;
+    gross+=pl; costs+=cost; bal+=pl-cost; trades++; if(pl-cost>0)wins++;
+    peak=Math.max(peak,bal); maxDD=Math.max(maxDD,(peak-bal)/peak*100); };
+  for(let i=1;i<n;i++){ if(pos[i]!==dir){ if(dir!==0) settle(px[i]); dir=pos[i]; entryPx=px[i]; } }
+  if(dir!==0) settle(px[n-1]);
+  const net=gross-costs, ret=net/10000*100, wr=trades?wins/trades*100:0, cls=net>=0?'good':'danger';
+  const name=strat==='ma'?'MA cross 10/30':strat==='rsi'?'RSI(14) 30/70':'Random coin-flip';
+  $('btOut').innerHTML=
+    `<div class="stat"><span class="k">Strategy</span><span class="v">${name}</span></div>
+     <div class="stat"><span class="k">Trades</span><span class="v">${trades}</span></div>
+     <div class="stat"><span class="k">Win rate</span><span class="v">${wr.toFixed(0)}%</span></div>
+     <div class="stat"><span class="k">Gross P/L</span><span class="v ${gross>=0?'up':'down'}">${gross>=0?'+':''}${fmt(gross)}</span></div>
+     <div class="stat"><span class="k">Spread costs</span><span class="v down">-${fmt(costs)}</span></div>
+     <div class="stat"><span class="k">Net P/L</span><span class="v ${cls}">${net>=0?'+':''}${fmt(net)} (${ret>=0?'+':''}${ret.toFixed(1)}%)</span></div>
+     <div class="stat"><span class="k">Max drawdown</span><span class="v warn">${maxDD.toFixed(1)}%</span></div>
+     <div class="verdict" style="border-color:${net>=0?'rgba(82,255,184,.4)':'rgba(255,77,77,.4)'};background:${net>=0?'rgba(82,255,184,.07)':'rgba(255,77,77,.07)'}">
+       ${net<0
+         ? `Lost money on this run — and notice the <b>${fmt(costs)}</b> of spread paid across ${trades} trades. You pay that whether you win or lose. <b>This is why over-trading bleeds accounts dry.</b>`
+         : `Made money on <i>this</i> run. Now hit <b>RUN BACKTEST</b> again. And again. Watch it swing wildly each time. <b>One good backtest proves nothing</b> — an edge has to survive hundreds of runs and real costs.`}
+       <br/><br/>Honest caveat: simulated data, one random seed, no slippage. Real backtesting needs real history and out-of-sample testing. This builds intuition, not proof.
+     </div>`;
+}
+
+// ---------- journal ----------
+function renderJournal(){
+  const el=$('jrOut'); if(!el) return;
+  if(!closed.length){ el.innerHTML='<p style="font-size:12px;color:var(--mut)">No closed trades yet. Close a position on the Trade tab and your running stats appear here — this is how real traders find their leaks.</p>'; return; }
+  const wins=closed.filter(t=>t.pl>0), losses=closed.filter(t=>t.pl<=0);
+  const gw=wins.reduce((s,t)=>s+t.pl,0), gl=losses.reduce((s,t)=>s+t.pl,0), net=gw+gl;
+  const wr=wins.length/closed.length*100, exp=net/closed.length, pf=gl!==0?gw/Math.abs(gl):Infinity;
+  const bw=Math.max(0,...closed.map(t=>t.pl)), bl=Math.min(0,...closed.map(t=>t.pl));
+  el.innerHTML=
+    `<div class="stat"><span class="k">Closed trades</span><span class="v">${closed.length}</span></div>
+     <div class="stat"><span class="k">Win rate</span><span class="v">${wr.toFixed(0)}% (${wins.length}/${closed.length})</span></div>
+     <div class="stat"><span class="k">Net result</span><span class="v ${net>=0?'up':'down'}">${net>=0?'+':''}${fmt(net)}</span></div>
+     <div class="stat"><span class="k">Expectancy / trade</span><span class="v ${exp>=0?'up':'down'}">${exp>=0?'+':''}${fmt(exp)}</span></div>
+     <div class="stat"><span class="k">Profit factor</span><span class="v ${pf>=1?'up':'down'}">${pf===Infinity?'∞':pf.toFixed(2)}</span></div>
+     <div class="stat"><span class="k">Best / worst</span><span class="v"><span class="up">+${fmt(bw)}</span> / <span class="down">${fmt(bl)}</span></span></div>
+     <table style="margin-top:10px"><thead><tr><th>Time</th><th>Pair</th><th>Side</th><th>P/L</th><th>Why</th></tr></thead><tbody>
+     ${closed.slice(-12).reverse().map(t=>`<tr><td>${t.time}</td><td>${t.pair}</td><td class="${t.side==='BUY'?'up':'down'}">${t.side}</td><td class="${t.pl>=0?'up':'down'}">${t.pl>=0?'+':''}${fmt(t.pl)}</td><td style="color:var(--mut)">${t.reason||''}</td></tr>`).join('')}
+     </tbody></table>`;
+}
+
+// ---------- wiring ----------
+$('pair').onchange=e=>{ pairKey=e.target.value; $('pairLabel').textContent=pairKey; seedCandles(); updateTradeMeta(); log('Switched market to '+pairKey); render(); };
+['lots','lev','sl','tp'].forEach(id=>$(id).addEventListener('input',updateTradeMeta));
+$('buyBtn').onclick=()=>placeTrade('BUY');
+$('sellBtn').onclick=()=>placeTrade('SELL');
+$('resetBtn').onclick=()=>{ balance=START; positions=[]; closed=[]; pid=1; seedCandles(); log('Demo account reset to '+fmt(START),'warn'); renderJournal(); render(); };
+['sz_bal','sz_risk','sz_stop','sz_pip'].forEach(id=>$(id).addEventListener('input',calcSizer));
+['r_cap','r_tgt','r_days','r_range'].forEach(id=>$(id).addEventListener('input',calcReality));
+$('bt_run').onclick=runBacktest;
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+  ['trade','sizer','reality','backtest','journal'].forEach(n=>$('tab-'+n).classList.toggle('hide', n!==t.dataset.tab));
+});
+
+// ---------- main loop ----------
+let lastMid=mid;
+seedCandles(); updateTradeMeta(); calcSizer(); calcReality(); renderJournal(); render();
+log('Cockpit online. DEMO funds: '+fmt(START)+'. Nothing here touches real money.','good');
+setInterval(()=>{ tick(); checkAutoClose(); checkMarginCall();
+  const pt=$('priceTick'); const P=PAIRS[pairKey];
+  pt.textContent=mid.toFixed(P.dec)+' ('+(mid>=lastMid?'▲':'▼')+')'; pt.className= mid>=lastMid?'up':'down'; lastMid=mid;
+  drawChart(); render();
+}, 600);
+window.addEventListener('resize',drawChart);
+</script>
+</body>
+</html>
