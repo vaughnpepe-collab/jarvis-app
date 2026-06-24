@@ -3,259 +3,769 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumière Beauty Studio | Hair, Beauty &amp; Wellness</title>
+<title>Lumière Beauty Studio | Hair · Beauty · Wellness</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-:root{--bg:#0d0810;--surface:#160b1c;--border:#2d1540;--rose:#c084a0;--rose-light:#e8a0be;--blush:#f5dfe8;--text:#f5eaf0;--muted:#9a7a8a;--gold:#c9a96e}
+:root{
+  --bg:#08040e;--dark2:#100818;--dark3:#160b20;--dark4:#1c1028;
+  --rose:#c084a0;--rose2:#d4a0b8;--rose3:#e8c0d0;
+  --gold:#c9a870;--gold2:#e0c090;
+  --text:#f5eaf2;--muted:#9a7898;--border:#2e1840;
+  --green:#22c55e;
+}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
-nav{background:rgba(13,8,16,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:72px;position:sticky;top:0;z-index:100}
-.nav-logo{font-size:21px;font-weight:300;color:var(--text);text-decoration:none;letter-spacing:4px;text-transform:uppercase}
-.nav-logo span{color:var(--rose-light);font-weight:700}
-.nav-logo small{display:block;font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--muted);margin-top:-2px}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .75s ease,transform .75s ease}
+.reveal.visible{opacity:1;transform:none}
+.reveal-left{opacity:0;transform:translateX(-36px);transition:opacity .75s ease,transform .75s ease}
+.reveal-left.visible{opacity:1;transform:none}
+.reveal-right{opacity:0;transform:translateX(36px);transition:opacity .75s ease,transform .75s ease}
+.reveal-right.visible{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}.d5{transition-delay:.5s}
+
+/* NAV */
+nav{background:rgba(8,4,14,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:72px;position:sticky;top:0;z-index:100;transition:box-shadow .3s}
+nav.scrolled{box-shadow:0 4px 40px rgba(0,0,0,.6)}
+.nav-logo{text-decoration:none;display:flex;flex-direction:column}
+.logo-name{font-size:20px;font-weight:300;color:var(--text);letter-spacing:5px;text-transform:uppercase}
+.logo-name strong{font-weight:800;color:var(--rose2)}
+.logo-sub{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--muted);margin-top:-1px}
 .nav-links{display:flex;gap:28px;list-style:none}
 .nav-links a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:1px;transition:color .2s}
 .nav-links a:hover{color:var(--text)}
-.nav-book{background:var(--rose);color:#fff;padding:10px 22px;border-radius:4px;text-decoration:none;font-weight:600;font-size:13px;letter-spacing:1px;transition:all .2s}
-.nav-book:hover{background:var(--rose-light);transform:translateY(-1px)}
-@media(max-width:768px){.nav-links{display:none}}
-.hero{background:linear-gradient(135deg,#0d0810 0%,#1a0d22 40%,#22102c 60%,#0d0810 100%);padding:96px 5%;min-height:90vh;display:flex;align-items:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(192,132,160,.08) 0%,transparent 65%);pointer-events:none}
-.hero-content{max-width:640px;position:relative;z-index:1}
-.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:5px;text-transform:uppercase;color:var(--rose);margin-bottom:24px}
-.hero h1{font-size:clamp(36px,5.5vw,68px);font-weight:300;line-height:1.1;letter-spacing:-1px;margin-bottom:24px}
-.hero h1 strong{font-weight:800;color:var(--rose-light)}
-.hero-sub{font-size:17px;color:var(--muted);margin-bottom:40px;max-width:500px;line-height:1.8}
-.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
-.btn-rose{background:var(--rose);color:#fff;padding:15px 36px;border-radius:4px;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.5px;transition:all .25s}
-.btn-rose:hover{background:var(--rose-light);transform:translateY(-2px);box-shadow:0 16px 40px rgba(192,132,160,.3)}
-.btn-outline{color:var(--muted);padding:15px 28px;border-radius:4px;text-decoration:none;font-weight:500;font-size:15px;border:1px solid var(--border);transition:all .25s;letter-spacing:.5px}
+.btn-book{background:var(--rose);color:#fff;padding:10px 22px;border-radius:3px;text-decoration:none;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;transition:all .2s}
+.btn-book:hover{background:var(--rose2);transform:translateY(-1px)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{width:22px;height:1px;background:var(--text);transition:all .3s}
+@media(max-width:800px){.nav-links{display:none}.hamburger{display:flex}}
+.mobile-menu{display:none;position:fixed;top:72px;left:0;right:0;background:rgba(8,4,14,.98);border-bottom:1px solid var(--border);padding:24px 5%;z-index:99;flex-direction:column;gap:16px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{color:var(--text);text-decoration:none;font-size:15px;padding:10px 0;border-bottom:1px solid var(--border);letter-spacing:1px}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:96px 5% 80px;position:relative;overflow:hidden;background:linear-gradient(160deg,var(--bg) 0%,var(--dark2) 40%,var(--dark3) 70%,var(--bg) 100%)}
+.hero-glow{position:absolute;top:50%;right:-10%;transform:translateY(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(192,132,160,.07) 0%,transparent 65%);pointer-events:none}
+.hero-glow2{position:absolute;bottom:-200px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(201,168,112,.04) 0%,transparent 65%);pointer-events:none}
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1280px;margin:0 auto;width:100%;position:relative;z-index:1}
+@media(max-width:900px){.hero-inner{grid-template-columns:1fr}.hero-side{display:none}}
+.hero-eyebrow{font-size:10px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:var(--rose);margin-bottom:24px;display:block}
+.hero h1{font-size:clamp(36px,5vw,66px);font-weight:300;line-height:1.1;letter-spacing:-1px;margin-bottom:28px}
+.hero h1 strong{font-weight:800;color:var(--rose2)}
+.hero-sub{font-size:17px;color:var(--muted);margin-bottom:40px;max-width:480px;line-height:1.85}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:44px}
+.btn-rose{background:var(--rose);color:#fff;padding:15px 36px;border-radius:3px;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;transition:all .25s}
+.btn-rose:hover{background:var(--rose2);transform:translateY(-2px);box-shadow:0 16px 40px rgba(192,132,160,.3)}
+.btn-outline{color:var(--muted);padding:15px 28px;border-radius:3px;text-decoration:none;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--border);transition:all .25s}
 .btn-outline:hover{color:var(--text);border-color:rgba(192,132,160,.4)}
-.hero-trust{display:flex;gap:36px;flex-wrap:wrap}
-.trust-item{font-size:13px;color:var(--muted);letter-spacing:.3px}
-section{padding:80px 5%}
+.hero-trust{display:flex;gap:28px;flex-wrap:wrap}
+.ht{font-size:13px;color:var(--muted);letter-spacing:.3px}
+.ht span{color:var(--rose)}
+/* Hero side visual */
+.hero-side{display:flex;align-items:center;justify-content:center}
+.hero-circle{width:340px;height:340px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--dark3),var(--dark2));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:110px;position:relative;box-shadow:0 0 80px rgba(192,132,160,.1)}
+.hero-ring{position:absolute;inset:-16px;border-radius:50%;border:1px solid rgba(192,132,160,.15);animation:spin 20s linear infinite}
+.hero-ring2{position:absolute;inset:-32px;border-radius:50%;border:1px dashed rgba(201,168,112,.07);animation:spin 35s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero-tags{position:absolute;right:0;bottom:20px;display:flex;flex-direction:column;gap:8px}
+.htag{background:var(--dark3);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;white-space:nowrap;color:var(--text)}
+
+/* STATS */
+.stats{background:var(--dark2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:44px 5%}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:900px;margin:0 auto;text-align:center}
+@media(max-width:600px){.stats-grid{grid-template-columns:1fr 1fr}}
+.stat-num{font-size:44px;font-weight:900;color:var(--rose2);letter-spacing:-2px;line-height:1;display:block}
+.stat-lbl{font-size:14px;font-weight:700;color:var(--text);margin:6px 0 3px}
+.stat-sub{font-size:12px;color:var(--muted)}
+
+/* SECTIONS */
+section{padding:88px 5%}
+.section-inner{max-width:1280px;margin:0 auto}
 .lbl{font-size:10px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:var(--rose);margin-bottom:12px}
-h2{font-size:clamp(26px,4vw,46px);font-weight:300;letter-spacing:-1px;margin-bottom:16px}
+h2{font-size:clamp(26px,4vw,48px);font-weight:300;letter-spacing:-1px;margin-bottom:16px}
 h2 strong{font-weight:800}
-.sub{font-size:17px;color:var(--muted);max-width:500px;line-height:1.8;margin-bottom:52px}
-.surface-bg{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px;border:1px solid var(--border);border-radius:16px;overflow:hidden}
-.svc{background:var(--surface);padding:32px 28px;transition:background .25s}
-.svc:hover{background:rgba(255,255,255,.03)}
-.svc-icon{font-size:28px;margin-bottom:14px;display:block}
-.svc h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.sub{font-size:17px;color:var(--muted);max-width:520px;line-height:1.85;margin-bottom:52px}
+.surface{background:var(--dark2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.center{text-align:center}
+.center .sub{margin-left:auto;margin-right:auto}
+
+/* SERVICE TABS */
+.stabs{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;width:fit-content;margin-bottom:36px}
+.stab{padding:11px 28px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:inherit;transition:all .2s;border-right:1px solid var(--border)}
+.stab:last-child{border-right:none}
+.stab.active,.stab:hover{background:var(--rose);color:#fff}
+.spanel{display:none}
+.spanel.active{display:block}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.svc{background:var(--dark3);border:1px solid var(--border);border-radius:12px;padding:28px;transition:all .3s}
+.svc:hover{border-color:rgba(192,132,160,.35);transform:translateY(-5px);box-shadow:0 20px 48px rgba(0,0,0,.4)}
+.svc-icon{font-size:32px;margin-bottom:16px;display:block}
+.svc h3{font-size:16px;font-weight:700;margin-bottom:8px}
 .svc p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px}
-.svc-price{font-size:14px;font-weight:700;color:var(--rose-light)}
-.svc-from{font-size:12px;color:var(--muted);font-weight:400}
-.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.svc-price-wrap{display:flex;align-items:center;justify-content:space-between}
+.svc-price{font-size:15px;font-weight:700;color:var(--rose2)}
+.svc-duration{font-size:12px;color:var(--muted);background:rgba(192,132,160,.08);border:1px solid rgba(192,132,160,.15);padding:3px 10px;border-radius:20px}
+
+/* GALLERY */
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media(max-width:600px){.gallery-grid{grid-template-columns:1fr 1fr}}
-.gallery-item{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:36px;border:1px solid var(--border)}
-.g1{background:linear-gradient(135deg,#2d1540,#3d1a50)}
-.g2{background:linear-gradient(135deg,#1a0820,#2d0f3a)}
-.g3{background:linear-gradient(135deg,#2a1030,#3a1545)}
-.g4{background:linear-gradient(135deg,#200c2c,#301040)}
-.g5{background:linear-gradient(135deg,#180a22,#280e35)}
-.g6{background:linear-gradient(135deg,#1e0c28,#2e1038)}
-.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
-.team-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px 24px;text-align:center}
-.team-avatar{width:70px;height:70px;background:linear-gradient(135deg,var(--surface),var(--border));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px;border:2px solid var(--border)}
-.team-card h4{font-size:16px;font-weight:700;margin-bottom:4px}
-.team-card p{font-size:13px;color:var(--muted)}
-.team-card .rose-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--rose);background:rgba(192,132,160,.1);border:1px solid rgba(192,132,160,.2);padding:3px 10px;border-radius:3px;margin-top:8px}
-.booking-section{background:linear-gradient(135deg,#160b1c,#200d28);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:80px 5%}
-.booking-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;max-width:960px;margin:0 auto}
-@media(max-width:768px){.booking-inner{grid-template-columns:1fr}}
+.gitem{border-radius:10px;overflow:hidden;position:relative;cursor:pointer}
+.gitem:nth-child(1),.gitem:nth-child(4){aspect-ratio:3/4}
+.gitem:nth-child(2),.gitem:nth-child(3),.gitem:nth-child(5),.gitem:nth-child(6){aspect-ratio:1}
+.ginner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;transition:transform .4s;border:1px solid var(--border)}
+.g1{background:linear-gradient(135deg,#1a0820,#3d1550)}
+.g2{background:linear-gradient(135deg,#0e0518,#2a0d40)}
+.g3{background:linear-gradient(135deg,#1c0a22,#3a1248)}
+.g4{background:linear-gradient(135deg,#220e2c,#4a1858)}
+.g5{background:linear-gradient(135deg,#140820,#2e1040)}
+.g6{background:linear-gradient(135deg,#180b26,#341245)}
+.gitem:hover .ginner{transform:scale(1.06)}
+.gitem-overlay{position:absolute;inset:0;background:rgba(192,132,160,.0);display:flex;align-items:flex-end;padding:16px;transition:background .3s}
+.gitem:hover .gitem-overlay{background:rgba(8,4,14,.6)}
+.gitem-label{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:transparent;transition:color .3s}
+.gitem:hover .gitem-label{color:#fff}
+
+/* WHY US */
+.why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.why{background:var(--dark3);border:1px solid var(--border);border-radius:12px;padding:32px 28px;transition:all .3s}
+.why:hover{border-color:rgba(192,132,160,.3);transform:translateY(-4px)}
+.why-icon{font-size:36px;margin-bottom:16px;display:block}
+.why h4{font-size:16px;font-weight:700;margin-bottom:10px}
+.why p{font-size:14px;color:var(--muted);line-height:1.7}
+
+/* TEAM */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.team-card{background:var(--dark3);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all .3s;text-align:center}
+.team-card:hover{border-color:rgba(192,132,160,.35);transform:translateY(-5px);box-shadow:0 20px 48px rgba(0,0,0,.4)}
+.team-photo{height:200px;display:flex;align-items:center;justify-content:center;font-size:72px;position:relative}
+.team-photo.tp1{background:linear-gradient(135deg,#1a0820,#3a1550)}
+.team-photo.tp2{background:linear-gradient(135deg,#0f0818,#2a1040)}
+.team-photo.tp3{background:linear-gradient(135deg,#1c0a24,#381248)}
+.team-photo.tp4{background:linear-gradient(135deg,#0d0818,#220e38)}
+.team-body{padding:24px 20px}
+.team-name{font-size:17px;font-weight:800;margin-bottom:5px}
+.team-role{font-size:13px;color:var(--muted);margin-bottom:12px}
+.team-exp{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--rose);background:rgba(192,132,160,.1);border:1px solid rgba(192,132,160,.2);padding:4px 12px;border-radius:20px;margin-bottom:14px}
+.team-specialties{font-size:12px;color:var(--muted);line-height:1.6}
+.team-book{display:block;margin-top:16px;background:rgba(192,132,160,.1);border:1px solid rgba(192,132,160,.2);color:var(--rose2);padding:9px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:all .2s}
+.team-book:hover{background:var(--rose);color:#fff;border-color:var(--rose)}
+
+/* TESTIMONIALS */
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.trev{background:var(--dark3);border:1px solid var(--border);border-radius:12px;padding:32px;transition:all .3s}
+.trev:hover{border-color:rgba(192,132,160,.2)}
+.trev-top{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.trev-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose2));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0}
+.trev-name{font-size:15px;font-weight:800}
+.trev-date{font-size:12px;color:var(--muted);margin-top:2px}
+.trev-stars{color:#f59e0b;font-size:14px;letter-spacing:2px;margin-bottom:12px}
+.trev-text{font-size:14px;color:var(--muted);line-height:1.8;font-style:italic}
+.trev-treatment{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--rose);background:rgba(192,132,160,.08);border:1px solid rgba(192,132,160,.15);padding:3px 10px;border-radius:20px;margin-top:14px}
+
+/* VOUCHERS BANNER */
+.voucher-banner{background:linear-gradient(135deg,var(--dark3),var(--dark4));border:1px solid var(--border);border-radius:16px;padding:60px 5%;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap;position:relative;overflow:hidden;margin:0 5%}
+.voucher-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--rose2),transparent)}
+.voucher-banner::after{content:'';position:absolute;bottom:-80px;right:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(192,132,160,.08) 0%,transparent 70%);pointer-events:none}
+.voucher-text h2{font-size:clamp(22px,3vw,38px);margin-bottom:10px}
+.voucher-text p{font-size:16px;color:var(--muted);max-width:440px;line-height:1.75}
+.voucher-right{display:flex;flex-direction:column;align-items:center;gap:14px}
+.voucher-price{font-size:64px;font-weight:900;color:var(--rose2);letter-spacing:-3px;line-height:1}
+.voucher-label{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.voucher-btn{background:var(--rose);color:#fff;padding:14px 36px;border-radius:3px;text-decoration:none;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;transition:all .25s}
+.voucher-btn:hover{background:var(--rose2);transform:translateY(-1px)}
+
+/* BOOKING */
+.booking-wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+@media(max-width:768px){.booking-wrap{grid-template-columns:1fr}}
 .booking-left p{font-size:16px;color:var(--muted);line-height:1.8;margin-bottom:28px}
-.ci{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px}
-.ci-icon{font-size:18px}
-.ci-lbl{font-size:10px;color:var(--muted);letter-spacing:.5px;margin-bottom:2px}
-.ci-val{font-size:14px;font-weight:700}
+.bi{display:flex;align-items:center;gap:16px;background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:10px}
+.bi-icon{font-size:20px}
+.bi-lbl{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.bi-val{font-size:14px;font-weight:700}
 form{display:flex;flex-direction:column;gap:12px}
-.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:460px){.fr{grid-template-columns:1fr}}
-input,select,textarea{padding:13px 16px;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s;width:100%}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.frow{grid-template-columns:1fr}}
+input,select,textarea{padding:13px 16px;background:var(--dark3);border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s;width:100%}
 input::placeholder,textarea::placeholder{color:var(--muted)}
 input:focus,select:focus,textarea:focus{border-color:var(--rose)}
 select option{background:var(--bg);color:var(--text)}
-.fbtn{background:var(--rose);color:#fff;border:none;padding:15px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s;width:100%;letter-spacing:.5px}
-.fbtn:hover{background:var(--rose-light);transform:translateY(-1px)}
-footer{background:#0a0610;border-top:1px solid var(--border);padding:40px 5%;text-align:center}
-.footer-logo{font-size:20px;font-weight:300;letter-spacing:6px;text-transform:uppercase;color:var(--text);margin-bottom:6px}
-.footer-logo span{color:var(--rose-light);font-weight:700}
-footer p{font-size:13px;color:var(--muted);margin-bottom:16px}
-.footer-links{display:flex;justify-content:center;gap:24px;font-size:13px;margin-bottom:16px}
-.footer-links a{color:var(--muted);text-decoration:none}
-.footer-links a:hover{color:var(--rose-light)}
+textarea{resize:vertical;min-height:100px}
+.fbtn{background:var(--rose);color:#fff;border:none;padding:15px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:2px;text-transform:uppercase;transition:all .25s;width:100%}
+.fbtn:hover{background:var(--rose2);transform:translateY(-1px);box-shadow:0 12px 32px rgba(192,132,160,.3)}
+
+/* FOOTER */
+footer{background:#060309;border-top:1px solid var(--border);padding:56px 5% 32px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;max-width:1280px;margin:0 auto 48px;padding-bottom:48px;border-bottom:1px solid var(--border)}
+@media(max-width:768px){.footer-grid{grid-template-columns:1fr}}
+.footer-brand .logo-name{font-size:18px}
+.footer-desc{font-size:14px;color:var(--muted);line-height:1.8;margin-top:12px}
+.footer-col h5{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:13px;transition:color .2s;letter-spacing:.3px}
+.footer-links a:hover{color:var(--text)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--muted);max-width:1280px;margin:0 auto}
 </style>
 </head>
 <body>
 
-<nav>
-  <a href="#" class="nav-logo"><span>Lumière</span> Beauty Studio<small>Hair · Beauty · Wellness</small></a>
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="logo-name"><strong>Lumière</strong> Beauty Studio</div>
+    <div class="logo-sub">Hair · Beauty · Wellness</div>
+  </a>
   <ul class="nav-links">
     <li><a href="#services">Services</a></li>
     <li><a href="#gallery">Gallery</a></li>
-    <li><a href="#team">Team</a></li>
+    <li><a href="#team">Our Team</a></li>
     <li><a href="#book">Book</a></li>
   </ul>
-  <a href="#book" class="nav-book">Book Now</a>
+  <a href="#book" class="btn-book">Book Now</a>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#services">Services</a>
+  <a href="#gallery">Gallery</a>
+  <a href="#team">Our Team</a>
+  <a href="#book">Book an Appointment →</a>
+</div>
 
+<!-- HERO -->
 <section class="hero">
-  <div class="hero-content">
-    <div class="hero-eyebrow">Award-Winning Beauty Studio</div>
-    <h1>Feel <strong>beautifully</strong><br>like yourself.</h1>
-    <p class="hero-sub">Expert hair, beauty, and wellness treatments in a calm, luxurious space. Whether it's a quick tidy-up or a full transformation, you're in the best hands.</p>
-    <div class="hero-btns">
-      <a href="#book" class="btn-rose">Book an Appointment</a>
-      <a href="#services" class="btn-outline">View Services</a>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <div>
+      <span class="hero-eyebrow reveal">Award-winning beauty studio</span>
+      <h1 class="reveal d1">Feel <strong>beautifully</strong><br>like yourself.</h1>
+      <p class="hero-sub reveal d2">Expert hair, beauty, and wellness treatments in a calm, luxurious space. Every appointment is an experience, not just a service. Walk in as you are. Leave feeling exceptional.</p>
+      <div class="hero-btns reveal d3">
+        <a href="#book" class="btn-rose">Book an Appointment</a>
+        <a href="#services" class="btn-outline">View Services</a>
+      </div>
+      <div class="hero-trust reveal d4">
+        <div class="ht"><span>✨</span> Award-winning team</div>
+        <div class="ht"><span>⭐</span> 5-star rated</div>
+        <div class="ht"><span>💳</span> Packages available</div>
+        <div class="ht"><span>🎁</span> Gift vouchers</div>
+      </div>
     </div>
-    <div class="hero-trust">
-      <div class="trust-item">✨ Award-winning team</div>
-      <div class="trust-item">⭐ 5-star rated</div>
-      <div class="trust-item">💳 Packages available</div>
+    <div class="hero-side reveal-right">
+      <div style="position:relative">
+        <div class="hero-circle">
+          <div class="hero-ring"></div>
+          <div class="hero-ring2"></div>
+          ✨
+        </div>
+        <div class="hero-tags">
+          <div class="htag">✂️ Hair Colour</div>
+          <div class="htag">💆 Facials</div>
+          <div class="htag">💅 Nails</div>
+          <div class="htag">🌿 Brows</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-grid">
+    <div class="reveal d1">
+      <span class="stat-num" data-target="8" data-suffix="+">0</span>
+      <div class="stat-lbl">Years Open</div>
+      <div class="stat-sub">Established studio</div>
+    </div>
+    <div class="reveal d2">
+      <span class="stat-num" data-target="2400" data-suffix="+">0</span>
+      <div class="stat-lbl">Happy Clients</div>
+      <div class="stat-sub">And counting</div>
+    </div>
+    <div class="reveal d3">
+      <span class="stat-num" data-target="4" data-suffix=" Awards">0</span>
+      <div class="stat-lbl">Industry Awards</div>
+      <div class="stat-sub">Local business excellence</div>
+    </div>
+    <div class="reveal d4">
+      <span class="stat-num" data-target="15" data-suffix="+">0</span>
+      <div class="stat-lbl">Services Offered</div>
+      <div class="stat-sub">One studio, everything</div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
 <section id="services">
-  <div class="lbl">What We Offer</div>
-  <h2>Our <strong>services.</strong></h2>
-  <p class="sub">From everyday maintenance to complete transformations. All treatments use premium products.</p>
-  <div class="services-grid">
-    <div class="svc">
-      <span class="svc-icon">✂️</span>
-      <h3>Cut &amp; Style</h3>
-      <p>Precision cuts tailored to your face shape and lifestyle. Blow-dry and finish included.</p>
-      <div class="svc-price"><span class="svc-from">from </span>£45</div>
+  <div class="section-inner">
+    <div class="lbl reveal">Treatments</div>
+    <h2 class="reveal">Our <strong>services.</strong></h2>
+    <p class="sub reveal">Premium treatments, premium products, and specialists who genuinely love what they do.</p>
+    <div class="stabs reveal">
+      <button class="stab active" data-panel="hair">Hair</button>
+      <button class="stab" data-panel="beauty">Beauty</button>
+      <button class="stab" data-panel="wellness">Wellness</button>
+      <button class="stab" data-panel="nails">Nails</button>
     </div>
-    <div class="svc">
-      <span class="svc-icon">🎨</span>
-      <h3>Colour &amp; Highlights</h3>
-      <p>Full colour, balayage, highlights, and toning. Consultation included.</p>
-      <div class="svc-price"><span class="svc-from">from </span>£75</div>
-    </div>
-    <div class="svc">
-      <span class="svc-icon">💆</span>
-      <h3>Luxury Facials</h3>
-      <p>Deep cleansing, anti-ageing, and brightening facials using premium skincare ranges.</p>
-      <div class="svc-price"><span class="svc-from">from </span>£65</div>
-    </div>
-    <div class="svc">
-      <span class="svc-icon">💅</span>
-      <h3>Nails &amp; Gel</h3>
-      <p>Manicures, pedicures, gel polish, and nail art. Long-lasting results guaranteed.</p>
-      <div class="svc-price"><span class="svc-from">from </span>£30</div>
-    </div>
-    <div class="svc">
-      <span class="svc-icon">🌿</span>
-      <h3>Brows &amp; Lashes</h3>
-      <p>Brow shaping, tinting, lash lifts, and lash extensions by certified specialists.</p>
-      <div class="svc-price"><span class="svc-from">from </span>£25</div>
-    </div>
-    <div class="svc">
-      <span class="svc-icon">🧖</span>
-      <h3>Massage &amp; Wellness</h3>
-      <p>Swedish, deep tissue, and hot stone massages. Gift vouchers available.</p>
-      <div class="svc-price"><span class="svc-from">from </span>£55</div>
-    </div>
-  </div>
-</section>
 
-<section id="gallery" class="surface-bg">
-  <div class="lbl">Gallery</div>
-  <h2>Our <strong>work.</strong></h2>
-  <p class="sub">A small taste of what we create every day in the studio.</p>
-  <div class="gallery-grid">
-    <div class="gallery-item g1">💇‍♀️</div>
-    <div class="gallery-item g2">🎨</div>
-    <div class="gallery-item g3">💅</div>
-    <div class="gallery-item g4">✨</div>
-    <div class="gallery-item g5">🌿</div>
-    <div class="gallery-item g6">💆</div>
-  </div>
-</section>
-
-<section id="team">
-  <div class="lbl">Our Team</div>
-  <h2>Meet the <strong>experts.</strong></h2>
-  <p class="sub">Qualified, passionate, and genuinely lovely people. Each specialist brings years of training and a commitment to making you feel amazing.</p>
-  <div class="team-grid">
-    <div class="team-card">
-      <div class="team-avatar">👩</div>
-      <h4>Sophie Laurent</h4>
-      <p>Senior Stylist &amp; Colourist</p>
-      <div class="rose-tag">8 Years</div>
-    </div>
-    <div class="team-card">
-      <div class="team-avatar">👩‍🦱</div>
-      <h4>Emma Clarke</h4>
-      <p>Beauty Therapist &amp; Facialist</p>
-      <div class="rose-tag">6 Years</div>
-    </div>
-    <div class="team-card">
-      <div class="team-avatar">👩‍🦰</div>
-      <h4>Jade Williams</h4>
-      <p>Nail Technician &amp; Brow Specialist</p>
-      <div class="rose-tag">4 Years</div>
-    </div>
-    <div class="team-card">
-      <div class="team-avatar">🧘</div>
-      <h4>Anya Patel</h4>
-      <p>Massage Therapist</p>
-      <div class="rose-tag">5 Years</div>
-    </div>
-  </div>
-</section>
-
-<section id="book" class="booking-section">
-  <div class="booking-inner">
-    <div class="booking-left">
-      <div class="lbl">Appointments</div>
-      <h2>Book your <strong>visit.</strong></h2>
-      <p>Fill in the form and we'll confirm your appointment within 2 hours. Or call or WhatsApp us directly — we're always happy to chat.</p>
-      <div class="ci"><div class="ci-icon">📞</div><div><div class="ci-lbl">Call or WhatsApp</div><div class="ci-val">07000 000 000</div></div></div>
-      <div class="ci"><div class="ci-icon">📧</div><div><div class="ci-lbl">Email</div><div class="ci-val">hello@lumierebeauty.co.uk</div></div></div>
-      <div class="ci"><div class="ci-icon">🕐</div><div><div class="ci-lbl">Hours</div><div class="ci-val">Tue–Sat 9am–7pm · Sun 10am–5pm</div></div></div>
-      <div class="ci"><div class="ci-icon">📍</div><div><div class="ci-lbl">Location</div><div class="ci-val">14 The High Street, Town Centre</div></div></div>
-    </div>
-    <form onsubmit="return false">
-      <div class="fr">
-        <input type="text" placeholder="Your Name" required>
-        <input type="tel" placeholder="Phone / WhatsApp">
+    <div class="spanel active" id="spanel-hair">
+      <div class="services-grid">
+        <div class="svc reveal d1">
+          <span class="svc-icon">✂️</span>
+          <h3>Women's Cut &amp; Style</h3>
+          <p>Precision cuts tailored to your face shape, hair type, and lifestyle. Blow-dry and finish included.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £55</div><div class="svc-duration">45–75 min</div></div>
+        </div>
+        <div class="svc reveal d2">
+          <span class="svc-icon">🎨</span>
+          <h3>Full Colour</h3>
+          <p>Root to tip colour transformation, expertly blended to flatter your complexion. Consultation always included.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £85</div><div class="svc-duration">2–3 hrs</div></div>
+        </div>
+        <div class="svc reveal d3">
+          <span class="svc-icon">🌈</span>
+          <h3>Balayage &amp; Highlights</h3>
+          <p>Hand-painted balayage, foil highlights, and toning for naturally sun-kissed, dimensional colour.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £120</div><div class="svc-duration">2.5–4 hrs</div></div>
+        </div>
+        <div class="svc reveal d4">
+          <span class="svc-icon">💇</span>
+          <h3>Men's Cut</h3>
+          <p>Classic and contemporary men's cuts with styling advice. Includes wash and finish.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £35</div><div class="svc-duration">30–45 min</div></div>
+        </div>
+        <div class="svc reveal d1">
+          <span class="svc-icon">🌀</span>
+          <h3>Keratin Smoothing</h3>
+          <p>Brazilian blowout treatment to eliminate frizz and add incredible shine for up to 3 months.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £180</div><div class="svc-duration">3–4 hrs</div></div>
+        </div>
+        <div class="svc reveal d2">
+          <span class="svc-icon">💫</span>
+          <h3>Blow-Dry &amp; Style</h3>
+          <p>Perfect for occasions or when you just want to feel polished. Wash, blow-dry, and finish.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £38</div><div class="svc-duration">30–45 min</div></div>
+        </div>
       </div>
-      <input type="email" placeholder="Email Address">
-      <select>
-        <option value="">What are you booking?</option>
-        <option>Cut &amp; Style</option>
-        <option>Colour / Highlights</option>
-        <option>Facial</option>
-        <option>Nails / Gel</option>
-        <option>Brows / Lashes</option>
-        <option>Massage</option>
-        <option>Multiple treatments</option>
-      </select>
-      <div class="fr">
-        <input type="date">
-        <input type="time" placeholder="Preferred time">
+    </div>
+
+    <div class="spanel" id="spanel-beauty">
+      <div class="services-grid">
+        <div class="svc reveal d1">
+          <span class="svc-icon">💆</span>
+          <h3>Luxury Facial</h3>
+          <p>Deep cleansing, exfoliation, extraction, and nourishing mask tailored to your skin type. Pure indulgence.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £70</div><div class="svc-duration">60 min</div></div>
+        </div>
+        <div class="svc reveal d2">
+          <span class="svc-icon">✨</span>
+          <h3>Anti-Ageing Facial</h3>
+          <p>Advanced collagen-boosting treatment targeting fine lines, wrinkles, and loss of elasticity.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £95</div><div class="svc-duration">75 min</div></div>
+        </div>
+        <div class="svc reveal d3">
+          <span class="svc-icon">🌿</span>
+          <h3>Brow Shaping &amp; Tint</h3>
+          <p>Expert waxing or threading to define your brows, finished with a tint for maximum impact.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £28</div><div class="svc-duration">30 min</div></div>
+        </div>
+        <div class="svc reveal d4">
+          <span class="svc-icon">👁</span>
+          <h3>Lash Lift &amp; Tint</h3>
+          <p>Lifts and curls your natural lashes from root to tip. Lash tint included for a wide-eyed effect.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £55</div><div class="svc-duration">45 min</div></div>
+        </div>
+        <div class="svc reveal d1">
+          <span class="svc-icon">🦋</span>
+          <h3>Classic Lash Extensions</h3>
+          <p>Individual synthetic lashes applied to each natural lash for a beautiful, natural flutter.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £75</div><div class="svc-duration">90 min</div></div>
+        </div>
+        <div class="svc reveal d2">
+          <span class="svc-icon">🧖</span>
+          <h3>Body Waxing</h3>
+          <p>Smooth, long-lasting results using premium warm wax. All areas available.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £20</div><div class="svc-duration">15–45 min</div></div>
+        </div>
       </div>
-      <textarea placeholder="Any notes — e.g. first visit, specific stylist request, allergies" style="min-height:80px"></textarea>
-      <button type="submit" class="fbtn">Request Appointment →</button>
-    </form>
+    </div>
+
+    <div class="spanel" id="spanel-wellness">
+      <div class="services-grid">
+        <div class="svc reveal d1">
+          <span class="svc-icon">🌸</span>
+          <h3>Swedish Massage</h3>
+          <p>Long, flowing strokes to relax, ease tension, and improve circulation. The classic full-body massage.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £60</div><div class="svc-duration">60 min</div></div>
+        </div>
+        <div class="svc reveal d2">
+          <span class="svc-icon">🪨</span>
+          <h3>Hot Stone Massage</h3>
+          <p>Heated basalt stones melt away muscle tension in this deeply relaxing, therapeutic treatment.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £80</div><div class="svc-duration">75 min</div></div>
+        </div>
+        <div class="svc reveal d3">
+          <span class="svc-icon">💪</span>
+          <h3>Deep Tissue Massage</h3>
+          <p>Targeting deep muscle layers to relieve chronic pain, stiffness, and injury tension.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £70</div><div class="svc-duration">60 min</div></div>
+        </div>
+        <div class="svc reveal d4">
+          <span class="svc-icon">🧘</span>
+          <h3>Aromatherapy Massage</h3>
+          <p>Essential oil blends chosen for your mood and needs, combined with relaxing massage techniques.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £65</div><div class="svc-duration">60 min</div></div>
+        </div>
+        <div class="svc reveal d1">
+          <span class="svc-icon">🌊</span>
+          <h3>Pregnancy Massage</h3>
+          <p>Safe, soothing massage designed specifically for mums-to-be, using specialist positioning cushions.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £65</div><div class="svc-duration">60 min</div></div>
+        </div>
+        <div class="svc reveal d2">
+          <span class="svc-icon">🌺</span>
+          <h3>Pamper Package</h3>
+          <p>Full body massage + luxury facial + brow tint. Perfect treat for yourself or as a gift.</p>
+          <div class="svc-price-wrap"><div class="svc-price">£145</div><div class="svc-duration">2.5 hrs</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spanel" id="spanel-nails">
+      <div class="services-grid">
+        <div class="svc reveal d1">
+          <span class="svc-icon">💅</span>
+          <h3>Classic Manicure</h3>
+          <p>Soak, file, cuticle work, hand massage, and your choice of polish. Hands that feel cared for.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £28</div><div class="svc-duration">30–45 min</div></div>
+        </div>
+        <div class="svc reveal d2">
+          <span class="svc-icon">🔮</span>
+          <h3>Gel Manicure</h3>
+          <p>Long-lasting gel colour with mirror-shine finish. Chip-free for up to 3 weeks guaranteed.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £40</div><div class="svc-duration">45 min</div></div>
+        </div>
+        <div class="svc reveal d3">
+          <span class="svc-icon">🦶</span>
+          <h3>Luxury Pedicure</h3>
+          <p>Foot soak, exfoliation, hard skin removal, nail care, leg massage, and polish. Bliss.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £45</div><div class="svc-duration">60 min</div></div>
+        </div>
+        <div class="svc reveal d4">
+          <span class="svc-icon">🌸</span>
+          <h3>Nail Art</h3>
+          <p>Intricate designs, French tips, ombre, florals, and seasonal looks. Show us your inspiration.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £55</div><div class="svc-duration">60–90 min</div></div>
+        </div>
+        <div class="svc reveal d1">
+          <span class="svc-icon">✨</span>
+          <h3>BIAB (Builder Gel)</h3>
+          <p>Builder in a bottle — strengthens natural nails while extending length. The healthier alternative to acrylics.</p>
+          <div class="svc-price-wrap"><div class="svc-price">From £50</div><div class="svc-duration">60–75 min</div></div>
+        </div>
+        <div class="svc reveal d2">
+          <span class="svc-icon">💆</span>
+          <h3>Hands &amp; Feet Package</h3>
+          <p>Gel manicure + luxury pedicure together. Treat both and save.</p>
+          <div class="svc-price-wrap"><div class="svc-price">£78</div><div class="svc-duration">90 min</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="surface">
+  <div class="section-inner">
+    <div class="lbl center reveal">Gallery</div>
+    <h2 class="center reveal">Our <strong>work.</strong></h2>
+    <p class="sub center reveal">A glimpse into what we create every day inside the studio.</p>
+    <div class="gallery-grid">
+      <div class="gitem reveal d1"><div class="ginner g1">💇‍♀️</div><div class="gitem-overlay"><span class="gitem-label">Hair Colour</span></div></div>
+      <div class="gitem reveal d2"><div class="ginner g2">🎨</div><div class="gitem-overlay"><span class="gitem-label">Balayage</span></div></div>
+      <div class="gitem reveal d3"><div class="ginner g3">💆</div><div class="gitem-overlay"><span class="gitem-label">Facial</span></div></div>
+      <div class="gitem reveal d1"><div class="ginner g4">💅</div><div class="gitem-overlay"><span class="gitem-label">Nail Art</span></div></div>
+      <div class="gitem reveal d2"><div class="ginner g5">🌿</div><div class="gitem-overlay"><span class="gitem-label">Brows</span></div></div>
+      <div class="gitem reveal d3"><div class="ginner g6">🪨</div><div class="gitem-overlay"><span class="gitem-label">Hot Stone</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section>
+  <div class="section-inner">
+    <div class="lbl center reveal">Why Lumière</div>
+    <h2 class="center reveal">The difference is in the <strong>detail.</strong></h2>
+    <p class="sub center reveal">We built Lumière to be everything a beauty studio should be, and nothing it shouldn't.</p>
+    <div class="why-grid">
+      <div class="why reveal d1">
+        <span class="why-icon">🎓</span>
+        <h4>Expert specialists only</h4>
+        <p>Every therapist is fully qualified, insured, and has a minimum of 3 years professional experience. We never rush training to fill chairs.</p>
+      </div>
+      <div class="why reveal d2">
+        <span class="why-icon">🌿</span>
+        <h4>Premium product ranges</h4>
+        <p>We use only premium salon brands — L'Oréal, Wella, Dermalogica, OPI. If it's on your skin or hair, it has to be the best.</p>
+      </div>
+      <div class="why reveal d3">
+        <span class="why-icon">⏱</span>
+        <h4>We respect your time</h4>
+        <p>We book appointments properly — never double-booked, never rushed. Your appointment starts when we say it will.</p>
+      </div>
+      <div class="why reveal d4">
+        <span class="why-icon">💬</span>
+        <h4>Honest consultation</h4>
+        <p>We'll tell you what will genuinely work for your hair and skin, not just say yes. Great results start with great conversations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team" class="surface">
+  <div class="section-inner">
+    <div class="lbl center reveal">The Team</div>
+    <h2 class="center reveal">Meet our <strong>specialists.</strong></h2>
+    <p class="sub center reveal">Qualified, passionate, and genuinely brilliant at what they do.</p>
+    <div class="team-grid">
+      <div class="team-card reveal d1">
+        <div class="team-photo tp1">👩</div>
+        <div class="team-body">
+          <div class="team-name">Sophie Laurent</div>
+          <div class="team-role">Creative Director &amp; Colourist</div>
+          <div class="team-exp">9 Years</div>
+          <div class="team-specialties">Balayage · Colour correction · Creative colour</div>
+          <a href="#book" class="team-book">Book with Sophie</a>
+        </div>
+      </div>
+      <div class="team-card reveal d2">
+        <div class="team-photo tp2">👩‍🦱</div>
+        <div class="team-body">
+          <div class="team-name">Emma Clarke</div>
+          <div class="team-role">Senior Beauty Therapist</div>
+          <div class="team-exp">7 Years</div>
+          <div class="team-specialties">Advanced facials · Lashes · Brows</div>
+          <a href="#book" class="team-book">Book with Emma</a>
+        </div>
+      </div>
+      <div class="team-card reveal d3">
+        <div class="team-photo tp3">👩‍🦰</div>
+        <div class="team-body">
+          <div class="team-name">Jade Williams</div>
+          <div class="team-role">Nail Technician</div>
+          <div class="team-exp">5 Years</div>
+          <div class="team-specialties">Gel · BIAB · Nail art · Acrylics</div>
+          <a href="#book" class="team-book">Book with Jade</a>
+        </div>
+      </div>
+      <div class="team-card reveal d4">
+        <div class="team-photo tp4">🧘</div>
+        <div class="team-body">
+          <div class="team-name">Anya Patel</div>
+          <div class="team-role">Massage Therapist</div>
+          <div class="team-exp">6 Years</div>
+          <div class="team-specialties">Swedish · Deep tissue · Hot stone · Pregnancy</div>
+          <a href="#book" class="team-book">Book with Anya</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section>
+  <div class="section-inner">
+    <div class="lbl center reveal">Reviews</div>
+    <h2 class="center reveal">What our clients say.</h2>
+    <p class="sub center reveal">4.9 stars on Google · 180+ verified reviews.</p>
+    <div class="testimonials-grid">
+      <div class="trev reveal d1">
+        <div class="trev-top">
+          <div class="trev-avatar">RJ</div>
+          <div><div class="trev-name">Rachel J.</div><div class="trev-date">Google · 2 weeks ago</div></div>
+        </div>
+        <div class="trev-stars">★★★★★</div>
+        <p class="trev-text">"Sophie is an absolute genius with colour. I came in with badly bleached, damaged hair and left with the most beautiful honey balayage. She completely transformed it. I've never felt more confident."</p>
+        <div class="trev-treatment">Balayage &amp; Treatment</div>
+      </div>
+      <div class="trev reveal d2">
+        <div class="trev-top">
+          <div class="trev-avatar">SL</div>
+          <div><div class="trev-name">Sarah L.</div><div class="trev-date">Google · 1 month ago</div></div>
+        </div>
+        <div class="trev-stars">★★★★★</div>
+        <p class="trev-text">"I had the luxury facial with Emma and it was genuinely one of the most relaxing hours of my life. My skin glowed for days afterwards. Already booked my next one. This place is a hidden gem."</p>
+        <div class="trev-treatment">Luxury Facial</div>
+      </div>
+      <div class="trev reveal d3">
+        <div class="trev-top">
+          <div class="trev-avatar">CM</div>
+          <div><div class="trev-name">Claire M.</div><div class="trev-date">Google · 3 weeks ago</div></div>
+        </div>
+        <div class="trev-stars">★★★★★</div>
+        <p class="trev-text">"Jade did the most incredible nail art for my wedding. So patient, so talented, and exactly what I wanted. Everyone at the wedding was asking about my nails. Cannot recommend highly enough."</p>
+        <div class="trev-treatment">Bridal Nail Art</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VOUCHERS -->
+<section style="padding:0 0 88px">
+  <div class="voucher-banner reveal">
+    <div class="voucher-text">
+      <div class="lbl">Gift Vouchers</div>
+      <h2>Give the gift of <strong>feeling amazing.</strong></h2>
+      <p>Gift vouchers are available in any amount and can be used across all our treatments. Beautifully packaged and delivered instantly by email or in person.</p>
+    </div>
+    <div class="voucher-right">
+      <div class="voucher-label">From</div>
+      <div class="voucher-price">£25</div>
+      <a href="#book" class="voucher-btn">Buy a Voucher →</a>
+    </div>
+  </div>
+</section>
+
+<!-- BOOK -->
+<section id="book" class="surface">
+  <div class="section-inner">
+    <div class="booking-wrap">
+      <div class="reveal-left">
+        <div class="lbl">Appointments</div>
+        <h2>Book your <strong>visit.</strong></h2>
+        <p>Fill in the form and we'll confirm your appointment within 2 hours. Or call or WhatsApp us — we're always happy to help you choose the right treatment.</p>
+        <div class="bi"><div class="bi-icon">📞</div><div><div class="bi-lbl">Call or WhatsApp</div><div class="bi-val">07000 000 000</div></div></div>
+        <div class="bi"><div class="bi-icon">📧</div><div><div class="bi-lbl">Email</div><div class="bi-val">hello@lumierebeauty.co.uk</div></div></div>
+        <div class="bi"><div class="bi-icon">🕐</div><div><div class="bi-lbl">Opening Hours</div><div class="bi-val">Tue–Sat 9am–7pm · Sun 10am–5pm</div></div></div>
+        <div class="bi"><div class="bi-icon">📍</div><div><div class="bi-lbl">Location</div><div class="bi-val">14 The High Street, Town Centre</div></div></div>
+      </div>
+      <div class="reveal-right">
+        <form onsubmit="return false">
+          <div class="frow">
+            <input type="text" placeholder="Your Name" required>
+            <input type="tel" placeholder="Phone / WhatsApp">
+          </div>
+          <input type="email" placeholder="Email Address">
+          <select>
+            <option value="">What treatment are you booking?</option>
+            <optgroup label="Hair">
+              <option>Cut &amp; Style</option>
+              <option>Full Colour</option>
+              <option>Balayage / Highlights</option>
+              <option>Keratin Treatment</option>
+            </optgroup>
+            <optgroup label="Beauty">
+              <option>Luxury Facial</option>
+              <option>Brows / Lashes</option>
+              <option>Waxing</option>
+            </optgroup>
+            <optgroup label="Wellness">
+              <option>Swedish Massage</option>
+              <option>Hot Stone Massage</option>
+              <option>Pamper Package</option>
+            </optgroup>
+            <optgroup label="Nails">
+              <option>Manicure / Gel</option>
+              <option>Pedicure</option>
+              <option>Nail Art</option>
+            </optgroup>
+          </select>
+          <select>
+            <option value="">Preferred therapist</option>
+            <option>Sophie (Hair &amp; Colour)</option>
+            <option>Emma (Beauty &amp; Lashes)</option>
+            <option>Jade (Nails)</option>
+            <option>Anya (Massage &amp; Wellness)</option>
+            <option>No preference</option>
+          </select>
+          <div class="frow">
+            <input type="date">
+            <input type="time" placeholder="Preferred time">
+          </div>
+          <textarea placeholder="Anything else? First visit, specific look you want, allergy info..." style="min-height:80px"></textarea>
+          <button type="submit" class="fbtn">Request Appointment →</button>
+        </form>
+      </div>
+    </div>
   </div>
 </section>
 
 <footer>
-  <div class="footer-logo"><span>Lumière</span> Beauty Studio</div>
-  <p>14 The High Street · hello@lumierebeauty.co.uk · 07000 000 000</p>
-  <div class="footer-links">
-    <a href="#services">Services</a>
-    <a href="#gallery">Gallery</a>
-    <a href="#team">Team</a>
-    <a href="#book">Book</a>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">
+        <div class="logo-name"><strong>Lumière</strong> Beauty Studio</div>
+      </div>
+      <p class="footer-desc">Award-winning hair, beauty, and wellness studio. Our mission is simple: make every client feel extraordinary. Booking always open, walk-ins welcome when we can.</p>
+    </div>
+    <div>
+      <h5>Treatments</h5>
+      <ul class="footer-links">
+        <li><a href="#">Hair &amp; Colour</a></li>
+        <li><a href="#">Facials &amp; Beauty</a></li>
+        <li><a href="#">Massage &amp; Wellness</a></li>
+        <li><a href="#">Nails &amp; Gel</a></li>
+        <li><a href="#">Gift Vouchers</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <ul class="footer-links">
+        <li><a href="tel:07000000000">📞 07000 000 000</a></li>
+        <li><a href="#">📧 hello@lumierebeauty.co.uk</a></li>
+        <li><a href="#">📍 14 High Street, Town Centre</a></li>
+        <li><a href="#">Tue–Sat 9am–7pm</a></li>
+        <li><a href="#">Sun 10am–5pm</a></li>
+      </ul>
+    </div>
   </div>
-  <p>© 2025 Lumière Beauty Studio. All rights reserved.</p>
+  <div class="footer-bottom">
+    <div>© 2025 Lumière Beauty Studio. All rights reserved.</div>
+    <div>✨ Award-winning · 4.9★ Rated · Est. 2017</div>
+  </div>
 </footer>
 
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible') });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => observer.observe(el));
+
+function runCounter(el) {
+  const target = +el.dataset.target;
+  const suffix = el.dataset.suffix || '';
+  const duration = 1800;
+  const step = target / (duration / 16);
+  let val = 0;
+  const t = setInterval(() => {
+    val += step;
+    if (val >= target) { val = target; clearInterval(t); }
+    el.textContent = Math.floor(val) + suffix;
+  }, 16);
+}
+const cObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) { runCounter(e.target); cObs.unobserve(e.target); } });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stat-num[data-target]').forEach(el => cObs.observe(el));
+
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('mobile-menu').classList.toggle('open');
+});
+document.querySelectorAll('#mobile-menu a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('open'));
+});
+
+// Service tabs
+document.querySelectorAll('.stab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.spanel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('spanel-' + btn.dataset.panel).classList.add('active');
+  });
+});
+</script>
 </body>
 </html>
