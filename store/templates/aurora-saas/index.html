@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aurora — The all-in-one platform for modern teams</title>
+  <meta name="description" content="Aurora is a premium SaaS landing page template. Ship faster with analytics, automation, and collaboration in one beautiful workspace." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind (Play CDN — for production swap in a compiled build, see README) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Space Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            sans: ['"DM Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            ink: {
+              50: '#F5F6FA', 100: '#E6E8F0', 200: '#C8CCDD', 300: '#9CA3B8',
+              400: '#6E7691', 500: '#4A516B', 600: '#333950', 700: '#23283A',
+              800: '#161A28', 900: '#0E111B', 950: '#080A11',
+            },
+            accent: {
+              400: '#A78BFA', 500: '#8B5CF6', 600: '#7C3AED', 700: '#6D28D9',
+            },
+            sky: { 400: '#60A5FA', 500: '#3B82F6' },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body { -webkit-font-smoothing: antialiased; }
+    .glass {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .grad-text {
+      background: linear-gradient(100deg, #A78BFA 0%, #60A5FA 60%, #C4B5FD 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .grad-btn {
+      background: linear-gradient(100deg, #7C3AED, #4F46E5);
+    }
+    .glow {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(90px);
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ring-grad { box-shadow: 0 0 0 1px rgba(167,139,250,.25), 0 30px 80px -20px rgba(124,58,237,.35); }
+    /* Visible keyboard focus for accessibility */
+    a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible {
+      outline: 2px solid #A78BFA;
+      outline-offset: 2px;
+      border-radius: 8px;
+    }
+    details > summary { list-style: none; cursor: pointer; }
+    details > summary::-webkit-details-marker { display: none; }
+    details[open] .faq-icon { transform: rotate(45deg); }
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1 !important; transform: none !important; transition: none; }
+      * { animation: none !important; }
+    }
+    ::selection { background: rgba(139,92,246,.35); }
+  </style>
+</head>
+
+<body class="bg-ink-950 text-ink-100 font-sans">
+
+  <!-- Announcement bar -->
+  <div class="relative z-20 bg-accent-700/20 border-b border-white/5 text-center text-sm py-2 px-4 text-ink-100">
+    <span class="grad-text font-semibold font-display">New</span>
+    <span class="text-ink-200">Aurora 2.0 — automations, AI insights & SSO are live.</span>
+    <a href="#features" class="underline decoration-accent-400/60 underline-offset-4 hover:text-white transition-colors duration-150">See what's new →</a>
+  </div>
+
+  <!-- Nav -->
+  <header class="sticky top-0 z-30">
+    <nav class="glass">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+        <a href="#" class="flex items-center gap-2.5 font-display font-700 text-lg tracking-tight">
+          <span class="grid place-items-center w-8 h-8 rounded-lg grad-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24"/></svg>
+          </span>
+          Aurora
+        </a>
+
+        <div class="hidden md:flex items-center gap-8 text-sm text-ink-200">
+          <a href="#features" class="hover:text-white transition-colors duration-150">Features</a>
+          <a href="#how" class="hover:text-white transition-colors duration-150">How it works</a>
+          <a href="#pricing" class="hover:text-white transition-colors duration-150">Pricing</a>
+          <a href="#faq" class="hover:text-white transition-colors duration-150">FAQ</a>
+        </div>
+
+        <div class="hidden md:flex items-center gap-3">
+          <a href="#" class="text-sm text-ink-200 hover:text-white transition-colors duration-150 px-3 py-2">Sign in</a>
+          <a href="#pricing" class="text-sm font-medium text-white grad-btn px-4 py-2.5 rounded-xl cursor-pointer hover:opacity-90 transition-opacity duration-150">Get started</a>
+        </div>
+
+        <!-- Mobile toggle -->
+        <button id="navToggle" aria-label="Open menu" aria-expanded="false" class="md:hidden grid place-items-center w-10 h-10 rounded-lg glass cursor-pointer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+
+      <!-- Mobile menu -->
+      <div id="mobileMenu" class="md:hidden hidden border-t border-white/5 px-5 py-4 space-y-1 text-sm">
+        <a href="#features" class="block py-2.5 text-ink-200 hover:text-white">Features</a>
+        <a href="#how" class="block py-2.5 text-ink-200 hover:text-white">How it works</a>
+        <a href="#pricing" class="block py-2.5 text-ink-200 hover:text-white">Pricing</a>
+        <a href="#faq" class="block py-2.5 text-ink-200 hover:text-white">FAQ</a>
+        <a href="#pricing" class="block mt-2 text-center text-white grad-btn px-4 py-3 rounded-xl">Get started</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="glow w-[520px] h-[520px] bg-accent-600 -top-40 -left-24"></div>
+    <div class="glow w-[420px] h-[420px] bg-sky-500 top-10 right-0"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 pt-20 pb-16 text-center">
+      <a href="#" class="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 text-xs text-ink-200 mb-7 hover:text-white transition-colors duration-150">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400"></span>
+        Trusted by 4,000+ fast-moving teams
+      </a>
+
+      <h1 class="font-display font-700 tracking-tight text-4xl sm:text-6xl lg:text-7xl leading-[1.05] max-w-4xl mx-auto">
+        The workspace where<br class="hidden sm:block" />
+        teams <span class="grad-text">ship faster.</span>
+      </h1>
+
+      <p class="mt-6 text-lg text-ink-300 max-w-2xl mx-auto leading-relaxed">
+        Analytics, automation, and collaboration in one beautiful platform.
+        Replace five disconnected tools with a single source of truth your whole team will love.
+      </p>
+
+      <div class="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a href="#pricing" class="w-full sm:w-auto text-white grad-btn px-7 py-3.5 rounded-xl font-medium cursor-pointer hover:opacity-90 transition-opacity duration-150">
+          Start free — 14 days
+        </a>
+        <a href="#how" class="w-full sm:w-auto glass px-7 py-3.5 rounded-xl font-medium text-ink-100 cursor-pointer hover:bg-white/[0.07] transition-colors duration-150 inline-flex items-center justify-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Watch demo
+        </a>
+      </div>
+      <p class="mt-4 text-xs text-ink-400">No credit card required · Cancel anytime</p>
+
+      <!-- Product mockup -->
+      <div class="reveal mt-16 max-w-5xl mx-auto">
+        <div class="rounded-2xl glass ring-grad overflow-hidden text-left">
+          <!-- browser chrome -->
+          <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+            <span class="w-3 h-3 rounded-full bg-red-400/80"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-400/80"></span>
+            <span class="w-3 h-3 rounded-full bg-green-400/80"></span>
+            <span class="ml-3 text-xs text-ink-400 glass rounded-md px-3 py-1">app.aurora.io/dashboard</span>
+          </div>
+          <!-- faux dashboard -->
+          <div class="grid grid-cols-12 gap-4 p-5 bg-ink-900/60">
+            <aside class="hidden sm:flex col-span-3 flex-col gap-2 text-sm">
+              <div class="text-ink-400 text-xs uppercase tracking-wider px-3 mb-1">Workspace</div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent-600/20 text-white">
+                <span class="w-2 h-2 rounded-full bg-accent-400"></span> Overview
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-ink-300 hover:bg-white/5">Analytics</div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-ink-300 hover:bg-white/5">Automations</div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-ink-300 hover:bg-white/5">Team</div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-ink-300 hover:bg-white/5">Settings</div>
+            </aside>
+            <main class="col-span-12 sm:col-span-9 space-y-4">
+              <div class="grid grid-cols-3 gap-3">
+                <div class="glass rounded-xl p-4">
+                  <div class="text-xs text-ink-400">Revenue</div>
+                  <div class="font-display text-2xl font-700 mt-1">$48.2k</div>
+                  <div class="text-xs text-green-400 mt-1">▲ 12.4%</div>
+                </div>
+                <div class="glass rounded-xl p-4">
+                  <div class="text-xs text-ink-400">Active users</div>
+                  <div class="font-display text-2xl font-700 mt-1">9,318</div>
+                  <div class="text-xs text-green-400 mt-1">▲ 7.1%</div>
+                </div>
+                <div class="glass rounded-xl p-4">
+                  <div class="text-xs text-ink-400">Churn</div>
+                  <div class="font-display text-2xl font-700 mt-1">1.8%</div>
+                  <div class="text-xs text-red-400 mt-1">▼ 0.3%</div>
+                </div>
+              </div>
+              <div class="glass rounded-xl p-4">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="text-sm text-ink-200">Weekly growth</div>
+                  <div class="text-xs text-ink-400">Last 7 weeks</div>
+                </div>
+                <div class="flex items-end gap-2 h-28">
+                  <div class="flex-1 rounded-t-md bg-accent-500/40" style="height:40%"></div>
+                  <div class="flex-1 rounded-t-md bg-accent-500/50" style="height:55%"></div>
+                  <div class="flex-1 rounded-t-md bg-accent-500/60" style="height:48%"></div>
+                  <div class="flex-1 rounded-t-md bg-accent-500/70" style="height:70%"></div>
+                  <div class="flex-1 rounded-t-md bg-accent-500/80" style="height:62%"></div>
+                  <div class="flex-1 rounded-t-md grad-btn" style="height:88%"></div>
+                  <div class="flex-1 rounded-t-md bg-accent-500/90" style="height:78%"></div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logo cloud -->
+  <section class="max-w-6xl mx-auto px-5 sm:px-8 py-12">
+    <p class="text-center text-xs uppercase tracking-widest text-ink-400 mb-7">Powering product teams at</p>
+    <div class="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 opacity-70 font-display font-600 text-ink-300 text-lg">
+      <span>Northwind</span><span>Quanta</span><span>Lumen</span><span>Vertex</span><span>Monarch</span><span>Cobalt</span>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="max-w-7xl mx-auto px-5 sm:px-8 py-20">
+    <div class="max-w-2xl mb-14">
+      <p class="text-sm font-display font-600 grad-text mb-3">Everything in one place</p>
+      <h2 class="font-display font-700 text-3xl sm:text-4xl tracking-tight">Built for teams that move fast</h2>
+      <p class="mt-4 text-ink-300 text-lg">Stop stitching tools together. Aurora gives you the full picture and the controls to act on it — instantly.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- card -->
+      <div class="reveal glass rounded-2xl p-6 hover:bg-white/[0.06] transition-colors duration-200">
+        <div class="grid place-items-center w-11 h-11 rounded-xl bg-accent-600/20 text-accent-400 mb-4">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+        </div>
+        <h3 class="font-display font-600 text-lg">Real-time analytics</h3>
+        <p class="mt-2 text-ink-300 text-sm leading-relaxed">Live dashboards that update the moment your data changes. No more stale exports or waiting on reports.</p>
+      </div>
+      <div class="reveal glass rounded-2xl p-6 hover:bg-white/[0.06] transition-colors duration-200">
+        <div class="grid place-items-center w-11 h-11 rounded-xl bg-accent-600/20 text-accent-400 mb-4">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        </div>
+        <h3 class="font-display font-600 text-lg">Powerful automations</h3>
+        <p class="mt-2 text-ink-300 text-sm leading-relaxed">Trigger workflows on any event. Route, notify, and update across your stack without writing code.</p>
+      </div>
+      <div class="reveal glass rounded-2xl p-6 hover:bg-white/[0.06] transition-colors duration-200">
+        <div class="grid place-items-center w-11 h-11 rounded-xl bg-accent-600/20 text-accent-400 mb-4">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3 class="font-display font-600 text-lg">Seamless collaboration</h3>
+        <p class="mt-2 text-ink-300 text-sm leading-relaxed">Comments, mentions, and shared views keep everyone aligned — from engineering to the exec team.</p>
+      </div>
+      <div class="reveal glass rounded-2xl p-6 hover:bg-white/[0.06] transition-colors duration-200">
+        <div class="grid place-items-center w-11 h-11 rounded-xl bg-accent-600/20 text-accent-400 mb-4">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 class="font-display font-600 text-lg">Enterprise security</h3>
+        <p class="mt-2 text-ink-300 text-sm leading-relaxed">SSO, SCIM, audit logs and SOC 2 Type II. Your data is encrypted in transit and at rest, always.</p>
+      </div>
+      <div class="reveal glass rounded-2xl p-6 hover:bg-white/[0.06] transition-colors duration-200">
+        <div class="grid place-items-center w-11 h-11 rounded-xl bg-accent-600/20 text-accent-400 mb-4">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="11" rx="2"/></svg>
+        </div>
+        <h3 class="font-display font-600 text-lg">Open API & 80+ integrations</h3>
+        <p class="mt-2 text-ink-300 text-sm leading-relaxed">Connect the tools you already use, or build your own with a fully documented REST & webhook API.</p>
+      </div>
+      <div class="reveal glass rounded-2xl p-6 hover:bg-white/[0.06] transition-colors duration-200">
+        <div class="grid place-items-center w-11 h-11 rounded-xl bg-accent-600/20 text-accent-400 mb-4">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3 class="font-display font-600 text-lg">99.99% uptime</h3>
+        <p class="mt-2 text-ink-300 text-sm leading-relaxed">Globally distributed and battle-tested. Aurora stays up so your team never has to wait.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="max-w-7xl mx-auto px-5 sm:px-8 py-20">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <p class="text-sm font-display font-600 grad-text mb-3">Up and running in minutes</p>
+      <h2 class="font-display font-700 text-3xl sm:text-4xl tracking-tight">Three steps to your first insight</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="reveal relative glass rounded-2xl p-7">
+        <div class="font-display text-5xl font-700 text-white/10">01</div>
+        <h3 class="font-display font-600 text-lg mt-2">Connect your data</h3>
+        <p class="mt-2 text-ink-300 text-sm leading-relaxed">Plug in your databases, warehouses, and SaaS tools with one-click connectors.</p>
+      </div>
+      <div class="reveal relative glass rounded-2xl p-7">
+        <div class="font-display text-5xl font-700 text-white/10">02</div>
+        <h3 class="font-display font-600 text-lg mt-2">Build your view</h3>
+        <p class="mt-2 text-ink-300 text-sm leading-relaxed">Drag, drop, and filter to create dashboards that answer your exact questions.</p>
+      </div>
+      <div class="reveal relative glass rounded-2xl p-7">
+        <div class="font-display text-5xl font-700 text-white/10">03</div>
+        <h3 class="font-display font-600 text-lg mt-2">Automate & share</h3>
+        <p class="mt-2 text-ink-300 text-sm leading-relaxed">Set triggers, invite your team, and let Aurora keep everyone in the loop.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="max-w-7xl mx-auto px-5 sm:px-8 py-20">
+    <div class="grid lg:grid-cols-3 gap-5">
+      <div class="reveal glass rounded-2xl p-7">
+        <div class="flex gap-0.5 text-accent-400 mb-4" aria-label="5 out of 5 stars">★★★★★</div>
+        <p class="text-ink-100 leading-relaxed">"Aurora replaced three tools and saved our team about 10 hours a week. The dashboards are gorgeous and our execs actually use them."</p>
+        <div class="flex items-center gap-3 mt-6">
+          <span class="grid place-items-center w-10 h-10 rounded-full grad-btn font-display font-600 text-sm">SR</span>
+          <div><div class="text-sm font-600">Sara Reyes</div><div class="text-xs text-ink-400">VP Product, Quanta</div></div>
+        </div>
+      </div>
+      <div class="reveal glass rounded-2xl p-7">
+        <div class="flex gap-0.5 text-accent-400 mb-4" aria-label="5 out of 5 stars">★★★★★</div>
+        <p class="text-ink-100 leading-relaxed">"Setup took an afternoon. By day two we'd automated our entire weekly reporting. The ROI was obvious almost immediately."</p>
+        <div class="flex items-center gap-3 mt-6">
+          <span class="grid place-items-center w-10 h-10 rounded-full grad-btn font-display font-600 text-sm">MO</span>
+          <div><div class="text-sm font-600">Marcus Owens</div><div class="text-xs text-ink-400">Head of Ops, Lumen</div></div>
+        </div>
+      </div>
+      <div class="reveal glass rounded-2xl p-7">
+        <div class="flex gap-0.5 text-accent-400 mb-4" aria-label="5 out of 5 stars">★★★★★</div>
+        <p class="text-ink-100 leading-relaxed">"The API is a dream and the security review sailed through. This is the rare tool engineering and finance both love."</p>
+        <div class="flex items-center gap-3 mt-6">
+          <span class="grid place-items-center w-10 h-10 rounded-full grad-btn font-display font-600 text-sm">JL</span>
+          <div><div class="text-sm font-600">Jules Lambert</div><div class="text-xs text-ink-400">CTO, Vertex</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="max-w-7xl mx-auto px-5 sm:px-8 py-20">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <p class="text-sm font-display font-600 grad-text mb-3">Simple, transparent pricing</p>
+      <h2 class="font-display font-700 text-3xl sm:text-4xl tracking-tight">Plans that scale with you</h2>
+      <p class="mt-4 text-ink-300">Start free. Upgrade when you're ready. No surprises.</p>
+
+      <!-- toggle -->
+      <div class="inline-flex items-center gap-3 mt-7 glass rounded-full p-1 text-sm">
+        <button id="billMonthly" class="px-4 py-2 rounded-full cursor-pointer bg-white/10 text-white transition-colors duration-150">Monthly</button>
+        <button id="billAnnual" class="px-4 py-2 rounded-full cursor-pointer text-ink-300 hover:text-white transition-colors duration-150">Annual <span class="text-accent-400">-20%</span></button>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-5 items-stretch">
+      <!-- Starter -->
+      <div class="glass rounded-2xl p-7 flex flex-col">
+        <h3 class="font-display font-600 text-lg">Starter</h3>
+        <p class="text-ink-400 text-sm mt-1">For individuals getting started.</p>
+        <div class="mt-5"><span class="font-display text-4xl font-700 price" data-monthly="0" data-annual="0">$0</span><span class="text-ink-400 text-sm">/mo</span></div>
+        <a href="#" class="mt-6 glass text-center px-5 py-3 rounded-xl font-medium cursor-pointer hover:bg-white/[0.07] transition-colors duration-150">Get started</a>
+        <ul class="mt-6 space-y-3 text-sm text-ink-200">
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Up to 3 dashboards</li>
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>1 team member</li>
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Community support</li>
+        </ul>
+      </div>
+
+      <!-- Pro (featured) -->
+      <div class="relative rounded-2xl p-7 flex flex-col ring-grad bg-ink-900/80 border border-accent-500/30">
+        <span class="absolute -top-3 left-1/2 -translate-x-1/2 grad-btn text-xs font-medium px-3 py-1 rounded-full">Most popular</span>
+        <h3 class="font-display font-600 text-lg">Pro</h3>
+        <p class="text-ink-400 text-sm mt-1">For growing teams that need more.</p>
+        <div class="mt-5"><span class="font-display text-4xl font-700 price" data-monthly="29" data-annual="23">$29</span><span class="text-ink-400 text-sm">/mo</span></div>
+        <a href="#" class="mt-6 grad-btn text-center px-5 py-3 rounded-xl font-medium text-white cursor-pointer hover:opacity-90 transition-opacity duration-150">Start free trial</a>
+        <ul class="mt-6 space-y-3 text-sm text-ink-200">
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited dashboards</li>
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Up to 20 team members</li>
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Automations & API access</li>
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Priority support</li>
+        </ul>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="glass rounded-2xl p-7 flex flex-col">
+        <h3 class="font-display font-600 text-lg">Enterprise</h3>
+        <p class="text-ink-400 text-sm mt-1">For organizations at scale.</p>
+        <div class="mt-5"><span class="font-display text-4xl font-700">Custom</span></div>
+        <a href="#" class="mt-6 glass text-center px-5 py-3 rounded-xl font-medium cursor-pointer hover:bg-white/[0.07] transition-colors duration-150">Contact sales</a>
+        <ul class="mt-6 space-y-3 text-sm text-ink-200">
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Everything in Pro</li>
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>SSO, SCIM & audit logs</li>
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dedicated success manager</li>
+          <li class="flex gap-2.5"><svg class="text-accent-400 shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>99.99% uptime SLA</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="max-w-3xl mx-auto px-5 sm:px-8 py-20">
+    <div class="text-center mb-12">
+      <p class="text-sm font-display font-600 grad-text mb-3">FAQ</p>
+      <h2 class="font-display font-700 text-3xl sm:text-4xl tracking-tight">Questions, answered</h2>
+    </div>
+    <div class="space-y-3">
+      <details class="glass rounded-xl px-5 py-4">
+        <summary class="flex items-center justify-between font-medium text-ink-100">Can I cancel anytime?
+          <svg class="faq-icon transition-transform duration-200 text-accent-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </summary>
+        <p class="mt-3 text-ink-300 text-sm leading-relaxed">Yes. There are no long-term contracts on monthly plans — cancel in one click and you keep access until the end of your billing period.</p>
+      </details>
+      <details class="glass rounded-xl px-5 py-4">
+        <summary class="flex items-center justify-between font-medium text-ink-100">Do you offer a free trial?
+          <svg class="faq-icon transition-transform duration-200 text-accent-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </summary>
+        <p class="mt-3 text-ink-300 text-sm leading-relaxed">Every paid plan starts with a 14-day free trial. No credit card required to begin, and you can upgrade or downgrade at any time.</p>
+      </details>
+      <details class="glass rounded-xl px-5 py-4">
+        <summary class="flex items-center justify-between font-medium text-ink-100">Is my data secure?
+          <svg class="faq-icon transition-transform duration-200 text-accent-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </summary>
+        <p class="mt-3 text-ink-300 text-sm leading-relaxed">Absolutely. We're SOC 2 Type II certified, encrypt data in transit and at rest, and never sell or share your information.</p>
+      </details>
+      <details class="glass rounded-xl px-5 py-4">
+        <summary class="flex items-center justify-between font-medium text-ink-100">Can I integrate with my existing tools?
+          <svg class="faq-icon transition-transform duration-200 text-accent-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </summary>
+        <p class="mt-3 text-ink-300 text-sm leading-relaxed">Aurora ships with 80+ native integrations and a full REST & webhook API, so you can connect anything in your stack.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="max-w-7xl mx-auto px-5 sm:px-8 py-16">
+    <div class="relative overflow-hidden rounded-3xl glass ring-grad text-center px-6 py-16">
+      <div class="glow w-[360px] h-[360px] bg-accent-600 -top-24 left-1/4"></div>
+      <div class="relative z-10">
+        <h2 class="font-display font-700 text-3xl sm:text-5xl tracking-tight max-w-2xl mx-auto">Ready to ship faster?</h2>
+        <p class="mt-4 text-ink-300 text-lg max-w-xl mx-auto">Join thousands of teams already building with Aurora. Free for 14 days.</p>
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a href="#" class="w-full sm:w-auto text-white grad-btn px-7 py-3.5 rounded-xl font-medium cursor-pointer hover:opacity-90 transition-opacity duration-150">Start free trial</a>
+          <a href="#" class="w-full sm:w-auto glass px-7 py-3.5 rounded-xl font-medium cursor-pointer hover:bg-white/[0.07] transition-colors duration-150">Talk to sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 py-12 grid grid-cols-2 md:grid-cols-5 gap-8 text-sm">
+      <div class="col-span-2">
+        <a href="#" class="flex items-center gap-2.5 font-display font-700 text-lg">
+          <span class="grid place-items-center w-8 h-8 rounded-lg grad-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24"/></svg>
+          </span>
+          Aurora
+        </a>
+        <p class="mt-4 text-ink-400 max-w-xs leading-relaxed">The workspace where modern teams ship faster. Built with care.</p>
+      </div>
+      <div>
+        <div class="font-600 text-ink-200 mb-3">Product</div>
+        <ul class="space-y-2 text-ink-400">
+          <li><a href="#features" class="hover:text-white transition-colors duration-150">Features</a></li>
+          <li><a href="#pricing" class="hover:text-white transition-colors duration-150">Pricing</a></li>
+          <li><a href="#" class="hover:text-white transition-colors duration-150">Integrations</a></li>
+          <li><a href="#" class="hover:text-white transition-colors duration-150">Changelog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-600 text-ink-200 mb-3">Company</div>
+        <ul class="space-y-2 text-ink-400">
+          <li><a href="#" class="hover:text-white transition-colors duration-150">About</a></li>
+          <li><a href="#" class="hover:text-white transition-colors duration-150">Blog</a></li>
+          <li><a href="#" class="hover:text-white transition-colors duration-150">Careers</a></li>
+          <li><a href="#" class="hover:text-white transition-colors duration-150">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-600 text-ink-200 mb-3">Legal</div>
+        <ul class="space-y-2 text-ink-400">
+          <li><a href="#" class="hover:text-white transition-colors duration-150">Privacy</a></li>
+          <li><a href="#" class="hover:text-white transition-colors duration-150">Terms</a></li>
+          <li><a href="#" class="hover:text-white transition-colors duration-150">Security</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/5">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-ink-400">
+        <p>© <span id="year">2025</span> Aurora Inc. All rights reserved.</p>
+        <div class="flex items-center gap-5">
+          <a href="#" aria-label="Twitter" class="hover:text-white transition-colors duration-150"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="#" aria-label="GitHub" class="hover:text-white transition-colors duration-150"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.37.5 0 5.78 0 12.29c0 5.21 3.44 9.63 8.2 11.19.6.11.82-.25.82-.56v-2c-3.34.71-4.04-1.61-4.04-1.61-.55-1.36-1.34-1.73-1.34-1.73-1.09-.74.08-.72.08-.72 1.2.08 1.84 1.22 1.84 1.22 1.07 1.8 2.81 1.28 3.5.98.11-.77.42-1.28.76-1.58-2.67-.3-5.47-1.31-5.47-5.83 0-1.29.47-2.34 1.23-3.17-.12-.3-.53-1.52.12-3.16 0 0 1-.32 3.3 1.21a11.5 11.5 0 0 1 6 0c2.3-1.53 3.3-1.21 3.3-1.21.65 1.64.24 2.86.12 3.16.77.83 1.23 1.88 1.23 3.17 0 4.53-2.81 5.53-5.49 5.82.43.37.81 1.1.81 2.22v3.29c0 .31.22.68.83.56A12.3 12.3 0 0 0 24 12.29C24 5.78 18.63.5 12 .5z"/></svg></a>
+          <a href="#" aria-label="LinkedIn" class="hover:text-white transition-colors duration-150"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mobile menu
+    const navToggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    navToggle.addEventListener('click', () => {
+      const open = mobileMenu.classList.toggle('hidden') === false;
+      navToggle.setAttribute('aria-expanded', String(open));
+    });
+    mobileMenu.querySelectorAll('a').forEach(a =>
+      a.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+    // Pricing toggle
+    const monthly = document.getElementById('billMonthly');
+    const annual = document.getElementById('billAnnual');
+    const prices = document.querySelectorAll('.price');
+    function setBilling(isAnnual) {
+      prices.forEach(p => {
+        const v = isAnnual ? p.dataset.annual : p.dataset.monthly;
+        if (v !== undefined) p.firstChild ? p.textContent = '$' + v : null;
+      });
+      annual.classList.toggle('bg-white/10', isAnnual);
+      annual.classList.toggle('text-white', isAnnual);
+      annual.classList.toggle('text-ink-300', !isAnnual);
+      monthly.classList.toggle('bg-white/10', !isAnnual);
+      monthly.classList.toggle('text-white', !isAnnual);
+      monthly.classList.toggle('text-ink-300', isAnnual);
+    }
+    monthly.addEventListener('click', () => setBilling(false));
+    annual.addEventListener('click', () => setBilling(true));
+
+    // Reveal on scroll (respects reduced motion via CSS)
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
