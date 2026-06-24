@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frame — Creative Studio</title>
+  <meta name="description" content="Frame is an independent creative studio crafting brands, websites, and digital experiences that move people." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ivory: '#F7F4EF',
+            cream: '#EFEAE1',
+            ink: { 900: '#16140F', 700: '#3A352D', 500: '#6B6459', 300: '#A8A093' },
+            coral: { 500: '#E14B33', 600: '#C83B25' },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body { -webkit-font-smoothing: antialiased; background: #F7F4EF; }
+    .link-underline { background-image: linear-gradient(#E14B33,#E14B33); background-size: 0% 1.5px; background-repeat: no-repeat; background-position: left bottom; transition: background-size .3s ease; }
+    .link-underline:hover { background-size: 100% 1.5px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid #E14B33; outline-offset: 3px; }
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+    .reveal.in { opacity: 1; transform: none; }
+    .marquee { animation: scroll 28s linear infinite; }
+    @keyframes scroll { to { transform: translateX(-50%); } }
+    .work-thumb { transition: transform .5s cubic-bezier(.16,1,.3,1); }
+    .work-card:hover .work-thumb { transform: scale(1.04); }
+    .work-card:hover .work-arrow { transform: translate(4px,-4px); }
+    .work-arrow { transition: transform .35s ease; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1 !important; transform: none !important; transition: none; }
+      .marquee { animation: none; }
+      * { transition: none !important; }
+    }
+    ::selection { background: #E14B33; color: #fff; }
+  </style>
+</head>
+
+<body class="bg-ivory text-ink-900 font-sans">
+
+  <!-- Nav -->
+  <header class="sticky top-0 z-40 bg-ivory/80 backdrop-blur border-b border-ink-900/10">
+    <nav class="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+      <a href="#" class="font-display font-900 text-xl tracking-tight">Frame<span class="text-coral-500">.</span></a>
+      <div class="hidden md:flex items-center gap-9 text-sm font-medium">
+        <a href="#work" class="link-underline">Work</a>
+        <a href="#services" class="link-underline">Services</a>
+        <a href="#studio" class="link-underline">Studio</a>
+        <a href="#contact" class="link-underline">Contact</a>
+      </div>
+      <a href="#contact" class="hidden md:inline-flex items-center gap-2 text-sm font-medium bg-ink-900 text-ivory px-4 py-2.5 rounded-full cursor-pointer hover:bg-coral-500 transition-colors duration-300">
+        Start a project
+      </a>
+      <button id="navToggle" aria-label="Open menu" aria-expanded="false" class="md:hidden w-10 h-10 grid place-items-center rounded-full border border-ink-900/15 cursor-pointer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </nav>
+    <div id="mobileMenu" class="md:hidden hidden border-t border-ink-900/10 px-5 py-4 space-y-1 text-sm bg-ivory">
+      <a href="#work" class="block py-2.5">Work</a>
+      <a href="#services" class="block py-2.5">Services</a>
+      <a href="#studio" class="block py-2.5">Studio</a>
+      <a href="#contact" class="block py-2.5">Contact</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="max-w-7xl mx-auto px-5 sm:px-8 pt-20 pb-14">
+    <p class="font-mono text-xs uppercase tracking-[0.25em] text-ink-500 mb-8">Independent creative studio — est. 2014</p>
+    <h1 class="font-display font-500 tracking-tight text-[2.6rem] sm:text-7xl lg:text-[5.5rem] leading-[1.02]">
+      We build brands<br />
+      that <span class="italic text-coral-500">refuse</span> to be ignored.
+    </h1>
+    <div class="mt-10 flex flex-col sm:flex-row sm:items-end justify-between gap-8">
+      <p class="text-lg text-ink-700 max-w-md leading-relaxed">
+        Frame is a small team of designers and engineers crafting identities, websites, and digital products for ambitious companies.
+      </p>
+      <a href="#work" class="group inline-flex items-center gap-3 font-medium shrink-0 cursor-pointer">
+        <span class="w-14 h-14 grid place-items-center rounded-full bg-coral-500 text-ivory group-hover:bg-ink-900 transition-colors duration-300">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+        </span>
+        See selected work
+      </a>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <section class="border-y border-ink-900/10 py-5 overflow-hidden">
+    <div class="flex whitespace-nowrap font-display italic text-2xl sm:text-3xl text-ink-300">
+      <div class="marquee flex shrink-0">
+        <span class="mx-8">Branding</span><span class="mx-8 text-coral-500">✶</span><span class="mx-8">Web Design</span><span class="mx-8 text-coral-500">✶</span><span class="mx-8">Art Direction</span><span class="mx-8 text-coral-500">✶</span><span class="mx-8">Development</span><span class="mx-8 text-coral-500">✶</span><span class="mx-8">Strategy</span><span class="mx-8 text-coral-500">✶</span>
+      </div>
+      <div class="marquee flex shrink-0" aria-hidden="true">
+        <span class="mx-8">Branding</span><span class="mx-8 text-coral-500">✶</span><span class="mx-8">Web Design</span><span class="mx-8 text-coral-500">✶</span><span class="mx-8">Art Direction</span><span class="mx-8 text-coral-500">✶</span><span class="mx-8">Development</span><span class="mx-8 text-coral-500">✶</span><span class="mx-8">Strategy</span><span class="mx-8 text-coral-500">✶</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work -->
+  <section id="work" class="max-w-7xl mx-auto px-5 sm:px-8 py-20">
+    <div class="flex items-end justify-between mb-12">
+      <h2 class="font-display font-700 text-3xl sm:text-5xl tracking-tight">Selected work</h2>
+      <span class="font-mono text-xs text-ink-500 hidden sm:block">/ 2024 — 2025</span>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-x-6 gap-y-12">
+      <!-- card -->
+      <a href="#" class="work-card reveal group block">
+        <div class="overflow-hidden rounded-2xl aspect-[4/3]">
+          <div class="work-thumb w-full h-full" style="background:linear-gradient(135deg,#E14B33,#16140F);"></div>
+        </div>
+        <div class="flex items-start justify-between mt-5">
+          <div>
+            <h3 class="font-display font-700 text-2xl">Lumen Bank</h3>
+            <p class="text-ink-500 text-sm mt-1">Brand identity · Web · Product</p>
+          </div>
+          <span class="work-arrow mt-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></span>
+        </div>
+      </a>
+
+      <a href="#" class="work-card reveal group block sm:mt-16">
+        <div class="overflow-hidden rounded-2xl aspect-[4/3]">
+          <div class="work-thumb w-full h-full" style="background:linear-gradient(135deg,#2B6CB0,#0B1B2B);"></div>
+        </div>
+        <div class="flex items-start justify-between mt-5">
+          <div>
+            <h3 class="font-display font-700 text-2xl">Atlas Travel</h3>
+            <p class="text-ink-500 text-sm mt-1">Art direction · E-commerce</p>
+          </div>
+          <span class="work-arrow mt-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></span>
+        </div>
+      </a>
+
+      <a href="#" class="work-card reveal group block">
+        <div class="overflow-hidden rounded-2xl aspect-[4/3]">
+          <div class="work-thumb w-full h-full" style="background:linear-gradient(135deg,#D69E2E,#3A352D);"></div>
+        </div>
+        <div class="flex items-start justify-between mt-5">
+          <div>
+            <h3 class="font-display font-700 text-2xl">Mono Coffee</h3>
+            <p class="text-ink-500 text-sm mt-1">Branding · Packaging</p>
+          </div>
+          <span class="work-arrow mt-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></span>
+        </div>
+      </a>
+
+      <a href="#" class="work-card reveal group block sm:mt-16">
+        <div class="overflow-hidden rounded-2xl aspect-[4/3]">
+          <div class="work-thumb w-full h-full" style="background:linear-gradient(135deg,#38A169,#13261C);"></div>
+        </div>
+        <div class="flex items-start justify-between mt-5">
+          <div>
+            <h3 class="font-display font-700 text-2xl">Verdant</h3>
+            <p class="text-ink-500 text-sm mt-1">Web design · Development</p>
+          </div>
+          <span class="work-arrow mt-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="services" class="border-y border-ink-900/10 bg-cream/40">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 py-20">
+      <div class="grid lg:grid-cols-3 gap-12">
+        <div>
+          <p class="font-mono text-xs uppercase tracking-[0.25em] text-coral-500 mb-4">What we do</p>
+          <h2 class="font-display font-700 text-3xl sm:text-4xl tracking-tight leading-tight">A full toolkit, one focused team.</h2>
+        </div>
+        <div class="lg:col-span-2 divide-y divide-ink-900/10">
+          <div class="reveal flex items-baseline gap-6 py-6 group">
+            <span class="font-mono text-sm text-ink-300">01</span>
+            <div class="flex-1">
+              <h3 class="font-display font-700 text-2xl group-hover:text-coral-500 transition-colors duration-300">Brand Identity</h3>
+              <p class="text-ink-500 mt-2 max-w-lg">Naming, logo systems, typography, and guidelines that give your company a voice and a face.</p>
+            </div>
+          </div>
+          <div class="reveal flex items-baseline gap-6 py-6 group">
+            <span class="font-mono text-sm text-ink-300">02</span>
+            <div class="flex-1">
+              <h3 class="font-display font-700 text-2xl group-hover:text-coral-500 transition-colors duration-300">Web & Digital</h3>
+              <p class="text-ink-500 mt-2 max-w-lg">Sites and products designed and built end-to-end — fast, accessible, and unmistakably yours.</p>
+            </div>
+          </div>
+          <div class="reveal flex items-baseline gap-6 py-6 group">
+            <span class="font-mono text-sm text-ink-300">03</span>
+            <div class="flex-1">
+              <h3 class="font-display font-700 text-2xl group-hover:text-coral-500 transition-colors duration-300">Art Direction</h3>
+              <p class="text-ink-500 mt-2 max-w-lg">Campaigns, photography, and visual systems that carry your story across every channel.</p>
+            </div>
+          </div>
+          <div class="reveal flex items-baseline gap-6 py-6 group">
+            <span class="font-mono text-sm text-ink-300">04</span>
+            <div class="flex-1">
+              <h3 class="font-display font-700 text-2xl group-hover:text-coral-500 transition-colors duration-300">Strategy</h3>
+              <p class="text-ink-500 mt-2 max-w-lg">Positioning, research, and creative direction to make sure the work lands where it matters.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Studio / about -->
+  <section id="studio" class="max-w-5xl mx-auto px-5 sm:px-8 py-24 text-center">
+    <p class="font-mono text-xs uppercase tracking-[0.25em] text-ink-500 mb-8">The studio</p>
+    <p class="font-display font-500 text-2xl sm:text-4xl leading-[1.3] tracking-tight">
+      We're a <span class="text-coral-500">small studio</span> by choice. Fewer projects, deeper care — every detail considered, nothing on autopilot. We partner with people who believe design is how a company thinks, not how it decorates.
+    </p>
+    <div class="grid grid-cols-3 gap-6 mt-16 max-w-2xl mx-auto">
+      <div><div class="font-display font-900 text-4xl sm:text-5xl">120<span class="text-coral-500">+</span></div><div class="font-mono text-xs text-ink-500 mt-2 uppercase tracking-wider">Projects</div></div>
+      <div><div class="font-display font-900 text-4xl sm:text-5xl">11</div><div class="font-mono text-xs text-ink-500 mt-2 uppercase tracking-wider">Years</div></div>
+      <div><div class="font-display font-900 text-4xl sm:text-5xl">9</div><div class="font-mono text-xs text-ink-500 mt-2 uppercase tracking-wider">Awards</div></div>
+    </div>
+  </section>
+
+  <!-- Testimonial -->
+  <section class="border-y border-ink-900/10">
+    <div class="max-w-4xl mx-auto px-5 sm:px-8 py-20 text-center">
+      <div class="font-display text-6xl text-coral-500 leading-none mb-4">“</div>
+      <blockquote class="font-display font-500 italic text-2xl sm:text-3xl leading-snug tracking-tight">
+        Frame didn't just redesign our brand — they understood it better than we did. The new identity paid for itself in a quarter.
+      </blockquote>
+      <div class="mt-8 font-mono text-sm text-ink-500">— Dana Whitfield, CEO at Lumen Bank</div>
+    </div>
+  </section>
+
+  <!-- Contact CTA -->
+  <section id="contact" class="max-w-7xl mx-auto px-5 sm:px-8 py-24">
+    <div class="text-center">
+      <p class="font-mono text-xs uppercase tracking-[0.25em] text-ink-500 mb-6">Let's talk</p>
+      <h2 class="font-display font-700 text-4xl sm:text-7xl tracking-tight leading-[1.05]">
+        Have something<br />worth building?
+      </h2>
+      <a href="mailto:hello@frame.studio" class="inline-flex items-center gap-3 mt-10 bg-ink-900 text-ivory text-lg font-medium px-8 py-4 rounded-full cursor-pointer hover:bg-coral-500 transition-colors duration-300">
+        hello@frame.studio
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-ink-900/10">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <a href="#" class="font-display font-900 text-2xl">Frame<span class="text-coral-500">.</span></a>
+      <div class="flex items-center gap-7 font-mono text-xs uppercase tracking-wider text-ink-500">
+        <a href="#" class="hover:text-coral-500 transition-colors">Instagram</a>
+        <a href="#" class="hover:text-coral-500 transition-colors">Twitter</a>
+        <a href="#" class="hover:text-coral-500 transition-colors">LinkedIn</a>
+        <a href="#" class="hover:text-coral-500 transition-colors">Dribbble</a>
+      </div>
+      <p class="font-mono text-xs text-ink-300">© <span id="year">2025</span> Frame Studio</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const navToggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    navToggle.addEventListener('click', () => {
+      const open = mobileMenu.classList.toggle('hidden') === false;
+      navToggle.setAttribute('aria-expanded', String(open));
+    });
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
