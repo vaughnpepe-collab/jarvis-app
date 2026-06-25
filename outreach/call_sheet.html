@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>7-Day £500 Challenge — Call Sheet</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.5}
+.header{background:linear-gradient(135deg,#1e40af,#7c3aed);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.header h1{font-size:22px;font-weight:800;color:#fff}
+.header p{font-size:13px;color:rgba(255,255,255,.75);margin-top:4px}
+.goal-box{background:rgba(0,0,0,.25);border-radius:12px;padding:16px 24px;text-align:center;min-width:180px}
+.goal-box .amount{font-size:36px;font-weight:900;color:#4ade80}
+.goal-box .label{font-size:12px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px}
+
+.content{max-width:1100px;margin:0 auto;padding:32px}
+
+/* 7-day plan */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:40px}
+.day-card{background:#1e293b;border-radius:10px;padding:14px;border:1px solid #334155}
+.day-card.today{border-color:#3b82f6;background:#172554}
+.day-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748b;margin-bottom:6px}
+.day-card.today .day-label{color:#60a5fa}
+.day-card h3{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:8px}
+.day-card ul{list-style:none;font-size:12px;color:#94a3b8;display:flex;flex-direction:column;gap:4px}
+.day-card ul li::before{content:"→ ";color:#3b82f6}
+.day-revenue{font-size:16px;font-weight:800;color:#4ade80;margin-top:8px}
+
+/* Pipeline bar */
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#1e293b;border-radius:12px;overflow:hidden;margin-bottom:40px;border:1px solid #334155}
+.pipe-stage{padding:18px;text-align:center}
+.pipe-stage:nth-child(1){background:#1e3a5f}
+.pipe-stage:nth-child(2){background:#1e3551}
+.pipe-stage:nth-child(3){background:#1a3047}
+.pipe-stage:nth-child(4){background:#162c40}
+.pipe-stage:nth-child(5){background:#122639}
+.pipe-count{font-size:32px;font-weight:900;color:#f1f5f9}
+.pipe-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-top:4px}
+.pipe-target{font-size:11px;color:#3b82f6;margin-top:2px}
+
+/* Call sheet table */
+h2{font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+h2 .badge{font-size:11px;font-weight:600;background:#1d4ed8;color:#bfdbfe;padding:3px 10px;border-radius:20px}
+.table-wrap{overflow-x:auto;margin-bottom:40px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:#1e293b;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748b;border-bottom:2px solid #334155}
+tbody tr{border-bottom:1px solid #1e293b;transition:background .15s}
+tbody tr:hover{background:#1e293b}
+td{padding:12px 14px;vertical-align:middle}
+.score-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700}
+.score-high{background:#7f1d1d;color:#fca5a5}
+.score-med{background:#78350f;color:#fcd34d}
+.score-low{background:#14532d;color:#86efac}
+.flaw-tags{display:flex;flex-wrap:wrap;gap:4px}
+.flaw-tag{background:#0f172a;border:1px solid #334155;border-radius:4px;padding:2px 7px;font-size:11px;color:#94a3b8}
+.phone-link{color:#60a5fa;text-decoration:none;font-weight:600}
+.phone-link:hover{text-decoration:underline}
+.status-select{background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer}
+.niche-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.niche-restaurant{background:#f97316}
+.niche-dentist{background:#22d3ee}
+.niche-salon{background:#ec4899}
+.pitch{font-size:11px;color:#64748b;font-style:italic;max-width:300px}
+
+/* Priority tiers */
+.tier-header{background:#0f172a;padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#3b82f6;border-left:3px solid #3b82f6}
+
+/* Tips sidebar */
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:40px}
+.tip-card{background:#1e293b;border-radius:10px;padding:20px;border:1px solid #334155}
+.tip-card h3{font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:12px}
+.tip-card ol,.tip-card ul{padding-left:18px;font-size:13px;color:#94a3b8;display:flex;flex-direction:column;gap:6px}
+.tip-card li strong{color:#f1f5f9}
+.pricing-row{display:flex;gap:10px;margin-top:10px}
+.price-pill{flex:1;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px;text-align:center}
+.price-pill .price{font-size:20px;font-weight:900;color:#4ade80}
+.price-pill .name{font-size:11px;color:#64748b;margin-top:2px}
+
+footer{text-align:center;padding:24px;font-size:12px;color:#334155}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>7-Day £500–£1,000 Challenge</h1>
+    <p>High Wycombe Web Design — Local Business Outreach</p>
+  </div>
+  <div class="goal-box">
+    <div class="amount">£0</div>
+    <div class="label">Revenue / £500 Target</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Pipeline -->
+  <div class="pipeline">
+    <div class="pipe-stage"><div class="pipe-count">22</div><div class="pipe-label">Leads Found</div></div>
+    <div class="pipe-stage"><div class="pipe-count">18</div><div class="pipe-label">Callable</div><div class="pipe-target">Target: 18</div></div>
+    <div class="pipe-stage"><div class="pipe-count">0</div><div class="pipe-label">Contacted</div><div class="pipe-target">Target: 18+</div></div>
+    <div class="pipe-stage"><div class="pipe-count">0</div><div class="pipe-label">Meetings</div><div class="pipe-target">Target: 4</div></div>
+    <div class="pipe-stage"><div class="pipe-count">0</div><div class="pipe-label">Closed 💰</div><div class="pipe-target">Target: 2</div></div>
+  </div>
+
+  <!-- 7-day plan -->
+  <h2>7-Day Action Plan <span class="badge">Starts Jun 25</span></h2>
+  <div class="week-grid">
+    <div class="day-card today">
+      <div class="day-label">Day 1 · Wed</div>
+      <h3>Set Up & Prospect</h3>
+      <ul>
+        <li>Run call sheet through pipeline</li>
+        <li>Cold call top 5 Facebook-only leads</li>
+        <li>Send 10 outreach emails</li>
+        <li>Post on local Facebook groups</li>
+      </ul>
+    </div>
+    <div class="day-card">
+      <div class="day-label">Day 2 · Thu</div>
+      <h3>Phone Blitz</h3>
+      <ul>
+        <li>Call all 18 callable leads</li>
+        <li>Aim: 3 conversations</li>
+        <li>Prospect accountants &amp; gyms</li>
+        <li>Follow up Day 1 emails</li>
+      </ul>
+    </div>
+    <div class="day-card">
+      <div class="day-label">Day 3 · Fri</div>
+      <h3>Meetings &amp; Close</h3>
+      <ul>
+        <li>Follow up all calls</li>
+        <li>Book 2 meetings for weekend</li>
+        <li>Send free mockup to hot leads</li>
+        <li>Post before/after examples</li>
+      </ul>
+    </div>
+    <div class="day-card">
+      <div class="day-label">Day 4 · Sat</div>
+      <h3>Close Meetings</h3>
+      <ul>
+        <li>Meet interested prospects</li>
+        <li>Aim: 1 deposit taken (£199)</li>
+        <li>Second email batch (new niche)</li>
+        <li>Facebook DM outreach</li>
+      </ul>
+      <div class="day-revenue">Target: £199+</div>
+    </div>
+    <div class="day-card">
+      <div class="day-label">Day 5 · Sun</div>
+      <h3>Build &amp; Chase</h3>
+      <ul>
+        <li>Start building paid site(s)</li>
+        <li>Follow up all open leads</li>
+        <li>Prospect 2 more niches</li>
+      </ul>
+    </div>
+    <div class="day-card">
+      <div class="day-label">Day 6 · Mon</div>
+      <h3>Deliver &amp; Upsell</h3>
+      <ul>
+        <li>Deliver first site draft</li>
+        <li>Collect final payment</li>
+        <li>Upsell to £699 package</li>
+        <li>Ask for referrals</li>
+      </ul>
+      <div class="day-revenue">Target: £399–£699</div>
+    </div>
+    <div class="day-card">
+      <div class="day-label">Day 7 · Tue</div>
+      <h3>Close the Gap</h3>
+      <ul>
+        <li>Collect all outstanding payments</li>
+        <li>Close any pending deals</li>
+        <li>Celebrate &amp; keep momentum</li>
+      </ul>
+      <div class="day-revenue">Target: £500–£1,000</div>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <h2>Packages <span class="badge">Quick reference</span></h2>
+  <div class="tips-grid">
+    <div class="tip-card">
+      <h3>Pricing</h3>
+      <div class="pricing-row">
+        <div class="price-pill"><div class="price">£399</div><div class="name">Starter<br>5-page site</div></div>
+        <div class="price-pill"><div class="price">£699</div><div class="name">Growth<br>SEO + GBP</div></div>
+        <div class="price-pill"><div class="price">£1,199</div><div class="name">Pro<br>Booking system</div></div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <h3>Call Script (30-sec opener)</h3>
+      <ol>
+        <li><strong>Hook:</strong> "I was looking for a [niche] in High Wycombe and found you on [Facebook/Google]…"</li>
+        <li><strong>Pain:</strong> "I noticed your website [is Facebook / is slow on mobile / has no booking button]"</li>
+        <li><strong>Offer:</strong> "I build sites from £399, usually live in a week — can I send you a free mockup?"</li>
+        <li><strong>Close:</strong> "Brilliant — what's your email? I'll send it over today."</li>
+      </ol>
+    </div>
+    <div class="tip-card">
+      <h3>Facebook-Only Pitch (best angle)</h3>
+      <ul>
+        <li>"Facebook is great for existing fans — but new customers Google you first"</li>
+        <li>"If they can't find a website, many just move on to a competitor"</li>
+        <li>"A £399 site pays for itself with 1–2 extra bookings a month"</li>
+        <li>Use this for: Mezza House, Adils, Brooklyn Nails, Kings Barbers, Moon's Nails</li>
+      </ul>
+    </div>
+    <div class="tip-card">
+      <h3>Objection Handlers</h3>
+      <ul>
+        <li><strong>"Too expensive"</strong> → "I can start for £199 deposit, rest on completion"</li>
+        <li><strong>"Already have one"</strong> → "I know — I checked. Would you like a free audit of what's holding it back?"</li>
+        <li><strong>"Not now"</strong> → "No problem — when's a better time? I'll call back exactly then."</li>
+        <li><strong>"DIY it"</strong> → "Totally — but my sites rank on Google, yours won't without the right setup."</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Call Sheet Table -->
+  <h2>Priority Call Sheet <span class="badge">Sort: hottest first</span></h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Priority</th>
+          <th>Business</th>
+          <th>Niche</th>
+          <th>Phone</th>
+          <th>Issues Found</th>
+          <th>Best Pitch Angle</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- TIER 1: No/broken website + phone -->
+        <tr><td colspan="7" class="tier-header">🔥 TIER 1 — Facebook/Instagram only (easiest close, £399)</td></tr>
+        <tr>
+          <td><span class="score-badge score-high">85</span></td>
+          <td><strong>Mezza House</strong></td>
+          <td><span class="niche-dot niche-restaurant"></span>Restaurant</td>
+          <td><a class="phone-link" href="tel:+441494445592">+44 1494 445592</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Facebook only</span></div></td>
+          <td class="pitch">"New customers Google you — Facebook alone loses you bookings every week"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-high">85</span></td>
+          <td><strong>Adils Cutting Edge</strong></td>
+          <td><span class="niche-dot niche-salon"></span>Barber</td>
+          <td><a class="phone-link" href="tel:+447765950330">+44 7765 950330</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Facebook only</span></div></td>
+          <td class="pitch">"People search 'barber near me' — without a website you're invisible to Google"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-high">85</span></td>
+          <td><strong>Brooklyn Nails</strong></td>
+          <td><span class="niche-dot niche-salon"></span>Nails</td>
+          <td><a class="phone-link" href="tel:+441494458000">+44 1494 458000</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Facebook only</span></div></td>
+          <td class="pitch">"A booking widget alone would fill your calendar — £399 all-in"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-high">85</span></td>
+          <td><strong>Kings Barbers</strong></td>
+          <td><span class="niche-dot niche-salon"></span>Barber</td>
+          <td><a class="phone-link" href="tel:+447552184571">+44 7552 184571</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Facebook only</span></div></td>
+          <td class="pitch">"Google 'barber High Wycombe' — do you come up? A site fixes that in a week"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-high">85</span></td>
+          <td><strong>Moon's Nails</strong></td>
+          <td><span class="niche-dot niche-salon"></span>Nails</td>
+          <td><a class="phone-link" href="tel:+441494436700">+44 1494 436700</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Facebook only</span></div></td>
+          <td class="pitch">"Your Facebook looks great — imagine that online booking going to a real website"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+
+        <!-- TIER 2: Bad website + phone -->
+        <tr><td colspan="7" class="tier-header">⚡ TIER 2 — Broken / outdated website (upgrade pitch, £399–£699)</td></tr>
+        <tr>
+          <td><span class="score-badge score-high">50</span></td>
+          <td><strong>Love Nails</strong></td>
+          <td><span class="niche-dot niche-salon"></span>Nails</td>
+          <td><a class="phone-link" href="tel:+447476182888">+44 7476 182888</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">No HTTPS</span><span class="flaw-tag">No CTA</span><span class="flaw-tag">No Google Business</span></div></td>
+          <td class="pitch">"Your site has no booking button and fails Google's security check — quick fix"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-high">40</span></td>
+          <td><strong>Historia Meze &amp; Grill</strong></td>
+          <td><span class="niche-dot niche-restaurant"></span>Restaurant</td>
+          <td><a class="phone-link" href="tel:+441494533176">+44 1494 533176</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Not mobile</span><span class="flaw-tag">Slow load</span><span class="flaw-tag">No CTA</span></div></td>
+          <td class="pitch">"Your site takes 3 seconds to load on mobile — customers leave before they book"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-med">30</span></td>
+          <td><strong>Caipirao</strong></td>
+          <td><span class="niche-dot niche-restaurant"></span>Restaurant</td>
+          <td><a class="phone-link" href="tel:+441494441999">+44 1494 441999</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Generic template</span><span class="flaw-tag">No CTA</span></div></td>
+          <td class="pitch">"Your site is a basic template with no Google Business link — I can do better for £399"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-med">30</span></td>
+          <td><strong>La Luna Ceylon</strong></td>
+          <td><span class="niche-dot niche-restaurant"></span>Restaurant</td>
+          <td><a class="phone-link" href="tel:+441494504278">+44 1494 504278</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Instagram only</span></div></td>
+          <td class="pitch">"Instagram is for discovery — you need a site for people who want to book"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+
+        <!-- TIER 3: Minor issues, dentists -->
+        <tr><td colspan="7" class="tier-header">💡 TIER 3 — Minor issues (SEO/GBP upsell, £399–£699)</td></tr>
+        <tr>
+          <td><span class="score-badge score-med">20</span></td>
+          <td><strong>Scandic Dental Care</strong></td>
+          <td><span class="niche-dot niche-dentist"></span>Dentist</td>
+          <td><a class="phone-link" href="tel:+441494526566">+44 1494 526566</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">No meta desc</span><span class="flaw-tag">No GBP</span></div></td>
+          <td class="pitch">"Missing Google Business linkage is costing you new patient referrals every week"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-med">20</span></td>
+          <td><strong>The Willows Dental Surgery</strong></td>
+          <td><span class="niche-dot niche-dentist"></span>Dentist</td>
+          <td><a class="phone-link" href="tel:+441494522368">+44 1494 522368</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Slow load</span><span class="flaw-tag">No GBP</span></div></td>
+          <td class="pitch">"3-second load on mobile — Google penalises that with lower search ranking"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-med">20</span></td>
+          <td><strong>Luxe Spa Land</strong></td>
+          <td><span class="niche-dot niche-salon"></span>Spa</td>
+          <td><a class="phone-link" href="tel:+447732359999">+44 7732 359999</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">No meta desc</span><span class="flaw-tag">No GBP</span></div></td>
+          <td class="pitch">"I can get you onto Google's map pack for spas in High Wycombe — huge for bookings"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-low">15</span></td>
+          <td><strong>Adorn Beauty</strong></td>
+          <td><span class="niche-dot niche-salon"></span>Beauty</td>
+          <td><a class="phone-link" href="tel:+441494535089">+44 1494 535089</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Verify manually</span></div></td>
+          <td class="pitch">"I checked your site — worth a 5-minute call to discuss what's holding back Google ranking"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-low">15</span></td>
+          <td><strong>Cutlers</strong></td>
+          <td><span class="niche-dot niche-salon"></span>Salon</td>
+          <td><a class="phone-link" href="tel:+441494452888">+44 1494 452888</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">Verify manually</span></div></td>
+          <td class="pitch">"Quick free audit of your site — found a couple of things holding back Google traffic"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-low">10</span></td>
+          <td><strong>JD Dental Care</strong></td>
+          <td><span class="niche-dot niche-dentist"></span>Dentist</td>
+          <td><a class="phone-link" href="tel:+441494528700">+44 1494 528700</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">No GBP linkage</span></div></td>
+          <td class="pitch">"One change to your website would put you on the Google Business map — quick win"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-low">10</span></td>
+          <td><strong>Octagon Orthodontics</strong></td>
+          <td><span class="niche-dot niche-dentist"></span>Orthodontist</td>
+          <td><a class="phone-link" href="tel:+441494513797">+44 1494 513797</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">No meta desc</span></div></td>
+          <td class="pitch">"Missing meta description — Google doesn't know what to show when people search for you"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-low">10</span></td>
+          <td><strong>Enhance Dental</strong></td>
+          <td><span class="niche-dot niche-dentist"></span>Dentist</td>
+          <td><a class="phone-link" href="tel:+441494524455">+44 1494 524455</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">No GBP linkage</span></div></td>
+          <td class="pitch">"Google Business linkage is missing — it's the #1 thing for local search ranking"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+        <tr>
+          <td><span class="score-badge score-low">10</span></td>
+          <td><strong>Wycombe Dental Clinic</strong></td>
+          <td><span class="niche-dot niche-dentist"></span>Dentist</td>
+          <td><a class="phone-link" href="tel:+441494465241">+44 1494 465241</a></td>
+          <td><div class="flaw-tags"><span class="flaw-tag">No meta desc</span></div></td>
+          <td class="pitch">"Your site's missing the snippet Google shows — easy fix that boosts click-through rate"</td>
+          <td><select class="status-select"><option>new</option><option>called</option><option>voicemail</option><option>meeting</option><option>closed</option><option>lost</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>HW Web Design · 7-Day Challenge · Generated by JARVIS Prospector · Jun 25, 2026</footer>
+
+</body>
+</html>

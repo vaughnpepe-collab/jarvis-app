@@ -1,0 +1,435 @@
+[
+  {
+    "id": "res_historiamezegrill",
+    "name": "Historia Meze & Grill",
+    "niche": "restaurant",
+    "location": "High Wycombe, UK",
+    "website": "https://historiamezegrill.co.uk/",
+    "phone": "+44 1494 533176",
+    "email": "",
+    "audit": {
+      "score": 40,
+      "flaws": [
+        "slow load",
+        "not mobile-responsive",
+        "missing meta description",
+        "no clear call-to-action"
+      ]
+    },
+    "score": 40,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "res_mezzahouse",
+    "name": "Mezza House",
+    "niche": "restaurant",
+    "location": "High Wycombe, UK",
+    "website": null,
+    "phone": "+44 1494 445592",
+    "email": "",
+    "audit": {
+      "score": 85,
+      "flaws": [
+        "Facebook only \u2014 no real website"
+      ]
+    },
+    "score": 85,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "res_caipirao",
+    "name": "Caipirao",
+    "niche": "restaurant",
+    "location": "High Wycombe, UK",
+    "website": "https://sitelift.site/caipiraosouthamericansteakhouse/",
+    "phone": "+44 1494 441999",
+    "email": "",
+    "audit": {
+      "score": 30,
+      "flaws": [
+        "missing meta description",
+        "no clear call-to-action",
+        "no Google Business linkage"
+      ]
+    },
+    "score": 30,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "res_lalunaceylon",
+    "name": "La Luna Ceylon",
+    "niche": "restaurant",
+    "location": "High Wycombe, UK",
+    "website": "https://www.instagram.com/laluna.ceylon/",
+    "phone": "+44 1494 504278",
+    "email": "",
+    "audit": {
+      "score": 30,
+      "flaws": [
+        "Instagram only \u2014 no real website"
+      ]
+    },
+    "score": 30,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "res_dlunapaodequeijaria",
+    "name": "DLuna Pao de Queijaria",
+    "niche": "restaurant",
+    "location": "High Wycombe, UK",
+    "website": "https://www.instagram.com/dlunapaodequeijaria/",
+    "phone": null,
+    "email": "",
+    "audit": {
+      "score": 30,
+      "flaws": [
+        "Instagram only \u2014 no real website"
+      ]
+    },
+    "score": 30,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "den_valleydentalcare",
+    "name": "Valley Dental Care",
+    "niche": "dentist",
+    "location": "High Wycombe, UK",
+    "website": "http://valleydentalcare.co.uk/",
+    "phone": null,
+    "email": "",
+    "audit": {
+      "score": 40,
+      "flaws": [
+        "no HTTPS",
+        "missing meta description",
+        "no Google Business linkage"
+      ]
+    },
+    "score": 40,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "den_cressexdentalpractic",
+    "name": "Cressex Dental Practice",
+    "niche": "dentist",
+    "location": "High Wycombe, UK",
+    "website": "https://www.cressexdental.com/",
+    "phone": null,
+    "email": "",
+    "audit": {
+      "score": 30,
+      "flaws": [
+        "slow load (6897ms)",
+        "missing meta description",
+        "no Google Business linkage"
+      ]
+    },
+    "score": 30,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "den_scandicdentalcare",
+    "name": "Scandic Dental Care",
+    "niche": "dentist",
+    "location": "High Wycombe, UK",
+    "website": "https://www.scandicdentalcare.co.uk/",
+    "phone": "+44 1494 526566",
+    "email": "",
+    "audit": {
+      "score": 20,
+      "flaws": [
+        "missing meta description",
+        "no Google Business linkage"
+      ]
+    },
+    "score": 20,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "den_thewillowsdentalsurg",
+    "name": "The Willows Dental Surgery",
+    "niche": "dentist",
+    "location": "High Wycombe, UK",
+    "website": "https://willowsdentalsurgery.com/",
+    "phone": "+44 1494 522368",
+    "email": "",
+    "audit": {
+      "score": 20,
+      "flaws": [
+        "slow load",
+        "no Google Business linkage"
+      ]
+    },
+    "score": 20,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "den_jddentalcare",
+    "name": "JD Dental Care",
+    "niche": "dentist",
+    "location": "High Wycombe, UK",
+    "website": "https://jddentalcare.co.uk/",
+    "phone": "+44 1494 528700",
+    "email": "",
+    "audit": {
+      "score": 10,
+      "flaws": [
+        "no Google Business linkage"
+      ]
+    },
+    "score": 10,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "den_octagonorthodontics",
+    "name": "Octagon Orthodontics",
+    "niche": "dentist",
+    "location": "High Wycombe, UK",
+    "website": "https://octagonorthodontics.com/",
+    "phone": "+44 1494 513797",
+    "email": "",
+    "audit": {
+      "score": 10,
+      "flaws": [
+        "missing meta description"
+      ]
+    },
+    "score": 10,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "den_enhancedental",
+    "name": "Enhance Dental",
+    "niche": "dentist",
+    "location": "High Wycombe, UK",
+    "website": "https://enhancedental.co.uk/",
+    "phone": "+44 1494 524455",
+    "email": "",
+    "audit": {
+      "score": 10,
+      "flaws": [
+        "no Google Business linkage"
+      ]
+    },
+    "score": 10,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "den_wycombedentalclinic",
+    "name": "Wycombe Dental Clinic",
+    "niche": "dentist",
+    "location": "High Wycombe, UK",
+    "website": "https://wycombedentist.co.uk/",
+    "phone": "+44 1494 465241",
+    "email": "",
+    "audit": {
+      "score": 10,
+      "flaws": [
+        "missing meta description"
+      ]
+    },
+    "score": 10,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "sal_hairbeautyboutique",
+    "name": "Hair & Beauty Boutique",
+    "niche": "salon",
+    "location": "High Wycombe, UK",
+    "website": null,
+    "phone": null,
+    "email": "",
+    "audit": {
+      "score": 88,
+      "flaws": [
+        "site down \u2014 needs new website"
+      ]
+    },
+    "score": 88,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "sal_adilscuttingedge",
+    "name": "Adils Cutting Edge",
+    "niche": "salon",
+    "location": "High Wycombe, UK",
+    "website": null,
+    "phone": "+44 7765 950330",
+    "email": "",
+    "audit": {
+      "score": 85,
+      "flaws": [
+        "Facebook only \u2014 no real website"
+      ]
+    },
+    "score": 85,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "sal_brooklynnails",
+    "name": "Brooklyn Nails",
+    "niche": "salon",
+    "location": "High Wycombe, UK",
+    "website": null,
+    "phone": "+44 1494 458000",
+    "email": "",
+    "audit": {
+      "score": 85,
+      "flaws": [
+        "Facebook only \u2014 no real website"
+      ]
+    },
+    "score": 85,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "sal_kingsbarbers",
+    "name": "Kings Barbers",
+    "niche": "salon",
+    "location": "High Wycombe, UK",
+    "website": null,
+    "phone": "+44 7552 184571",
+    "email": "",
+    "audit": {
+      "score": 85,
+      "flaws": [
+        "Facebook only \u2014 no real website"
+      ]
+    },
+    "score": 85,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "sal_moonsnails",
+    "name": "Moon's Nails",
+    "niche": "salon",
+    "location": "High Wycombe, UK",
+    "website": null,
+    "phone": "+44 1494 436700",
+    "email": "",
+    "audit": {
+      "score": 85,
+      "flaws": [
+        "Facebook only \u2014 no real website"
+      ]
+    },
+    "score": 85,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "sal_lovenails",
+    "name": "Love Nails",
+    "niche": "salon",
+    "location": "High Wycombe, UK",
+    "website": "http://lovenailseden.co.uk/",
+    "phone": "+44 7476 182888",
+    "email": "",
+    "audit": {
+      "score": 50,
+      "flaws": [
+        "no HTTPS",
+        "missing meta description",
+        "no CTA",
+        "no Google Business"
+      ]
+    },
+    "score": 50,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "sal_luxespaland",
+    "name": "Luxe Spa Land",
+    "niche": "salon",
+    "location": "High Wycombe, UK",
+    "website": "https://myluxland.com/",
+    "phone": "+44 7732 359999",
+    "email": "",
+    "audit": {
+      "score": 20,
+      "flaws": [
+        "missing meta description",
+        "no Google Business linkage"
+      ]
+    },
+    "score": 20,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "sal_adornbeauty",
+    "name": "Adorn Beauty",
+    "niche": "salon",
+    "location": "High Wycombe, UK",
+    "website": "https://highwycombe.adorn-beauty.com/",
+    "phone": "+44 1494 535089",
+    "email": "",
+    "audit": {
+      "score": 15,
+      "flaws": [
+        "verify manually"
+      ]
+    },
+    "score": 15,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  },
+  {
+    "id": "sal_cutlers",
+    "name": "Cutlers",
+    "niche": "salon",
+    "location": "High Wycombe, UK",
+    "website": "https://cutlers.edan.io/",
+    "phone": "+44 1494 452888",
+    "email": "",
+    "audit": {
+      "score": 15,
+      "flaws": [
+        "verify manually"
+      ]
+    },
+    "score": 15,
+    "status": "new",
+    "added": "2026-06-25",
+    "notes": ""
+  }
+]
