@@ -3,7 +3,10 @@ __pycache__/
 *.py[cod]
 *.pyo
 
-# Scraped contact data & generated drafts — keep private, do not commit
-leads/lead_emails.csv
+# Prospect data — repo is PUBLIC, so never commit leads/contacts/outreach.
+# (Generated locally by the scripts; the code stays, the data stays private.)
+leads/*.csv
+leads/leads_*.md
+leads/outreach_pack_*.md
 leads/email_drafts.json
 leads/email_drafts.md
