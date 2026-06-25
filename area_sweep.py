@@ -211,6 +211,10 @@ def _impacts(flaws):
     return [v for k, v in IMPACT.items() if k in flaws]
 
 
+def _art(noun):
+    return "an" if noun[:1].lower() in "aeiou" else "a"
+
+
 def render_outreach_from_csv(csv_path, out_path, area="High Wycombe & area",
                              base_url=BASE_URL):
     """Build the outreach pack from the saved CSV (no network). Each callable
@@ -259,7 +263,7 @@ your name if it isn't *Vaughn*.
 
 Hi there,
 
-I was looking for a {niche} in {town} and noticed {b} doesn't have a website yet.
+I was looking for {_art(niche)} {niche} in {town} and noticed {b} doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
 {mockup(r)}
 
@@ -301,7 +305,7 @@ _Audit found: {flaws}_
 
 Hi there,
 
-I came across {b} while looking for a {niche} in {town}. I had a quick look at
+I came across {b} while looking for {_art(niche)} {niche} in {town}. I had a quick look at
 your website and noticed a couple of things that might quietly be costing you
 customers — {line}.
 

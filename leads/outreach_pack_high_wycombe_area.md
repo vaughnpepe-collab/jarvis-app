@@ -179,7 +179,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 Hi there,
 
-I was looking for a electrician in High Wycombe and noticed Electric Installations doesn't have a website yet.
+I was looking for an electrician in High Wycombe and noticed Electric Installations doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
 https://hwwebdesign.co.uk/mockups/electric-installations-high-wycombe/
 
@@ -832,7 +832,7 @@ _Audit found: missing meta description, no Google Business linkage_
 
 Hi there,
 
-I came across Elite Electrical while looking for a electrician in High Wycombe. I had a quick look at
+I came across Elite Electrical while looking for an electrician in High Wycombe. I had a quick look at
 your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 
@@ -894,7 +894,7 @@ _Audit found: missing meta description, no Google Business linkage_
 
 Hi there,
 
-I came across HK Accountax while looking for a accountant in High Wycombe. I had a quick look at
+I came across HK Accountax while looking for an accountant in High Wycombe. I had a quick look at
 your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 
@@ -925,7 +925,7 @@ _Audit found: not mobile-responsive (no viewport), no Google Business linkage_
 
 Hi there,
 
-I came across Scholtke & Co. Ltd. while looking for a accountant in High Wycombe. I had a quick look at
+I came across Scholtke & Co. Ltd. while looking for an accountant in High Wycombe. I had a quick look at
 your website and noticed a couple of things that might quietly be costing you
 customers — it doesn't display properly on phones, where most of your customers are searching, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 

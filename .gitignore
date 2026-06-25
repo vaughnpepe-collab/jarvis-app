@@ -2,3 +2,8 @@
 __pycache__/
 *.py[cod]
 *.pyo
+
+# Scraped contact data & generated drafts — keep private, do not commit
+leads/lead_emails.csv
+leads/email_drafts.json
+leads/email_drafts.md
