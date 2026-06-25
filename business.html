@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stark Digital — Business Operations</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060a0f;--panel:#0c1420;--border:#1a2a3a;--accent:#39c7ff;
+  --green:#52ffb8;--red:#ff4d4d;--orange:#ffb347;--purple:#b347ff;
+  --text:#c8e0f0;--dim:#4a6a7a;--pepper:#ffd700;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',monospace;
+  min-height:100vh;padding:0}
+/* ── header ── */
+#header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 24px;background:var(--panel);
+  border-bottom:1px solid var(--border);
+}
+#header h1{font-size:1.1rem;letter-spacing:3px;color:var(--accent)}
+#header .sub{font-size:.7rem;color:var(--dim);letter-spacing:2px}
+.nav-links{display:flex;gap:12px}
+.nav-links a{color:var(--dim);text-decoration:none;font-size:.75rem;
+  letter-spacing:1px;padding:4px 10px;border:1px solid var(--border);border-radius:3px}
+.nav-links a:hover,.nav-links a.active{color:var(--accent);border-color:var(--accent)}
+/* ── grid ── */
+#grid{
+  display:grid;
+  grid-template-columns:280px 1fr 280px;
+  grid-template-rows:auto 1fr;
+  gap:12px;padding:12px;min-height:calc(100vh - 56px);
+}
+/* ── panels ── */
+.panel{
+  background:var(--panel);border:1px solid var(--border);border-radius:6px;
+  padding:14px;overflow:hidden;
+}
+.panel-title{
+  font-size:.65rem;letter-spacing:2px;color:var(--dim);
+  border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px;
+  text-transform:uppercase;
+}
+/* ── PEPPER status ── */
+#pepper-panel{grid-column:1;grid-row:1/3}
+.pepper-indicator{
+  display:flex;align-items:center;gap:10px;padding:10px;
+  background:#111a08;border:1px solid var(--pepper);border-radius:5px;
+  margin-bottom:12px;
+}
+.pepper-dot{width:10px;height:10px;border-radius:50%;background:var(--pepper);
+  animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--pepper)}
+  50%{opacity:.5;box-shadow:0 0 2px var(--pepper)}}
+.pepper-dot.idle{background:var(--dim);animation:none;box-shadow:none}
+.pepper-label{font-size:.75rem;color:var(--pepper);letter-spacing:1px}
+.task-schedule{display:flex;flex-direction:column;gap:6px}
+.task-card{
+  padding:8px 10px;background:#080e14;border:1px solid var(--border);
+  border-radius:4px;cursor:pointer;transition:border-color .2s;
+}
+.task-card:hover{border-color:var(--pepper)}
+.task-card.ran{border-color:var(--green)}
+.task-name{font-size:.72rem;color:var(--text);margin-bottom:2px}
+.task-meta{font-size:.6rem;color:var(--dim)}
+.task-agent{font-size:.6rem;padding:1px 5px;border-radius:2px;
+  display:inline-block;margin-top:3px}
+.agent-dum_e{background:#0a2030;color:#39c7ff}
+.agent-vision{background:#1a0a30;color:#b347ff}
+.agent-friday{background:#0a2015;color:#52ffb8}
+.agent-edith{background:#2a0808;color:#ff4d4d}
+.agent-homer{background:#2a1a08;color:#ffb347}
+.ran-badge{font-size:.55rem;color:var(--green);float:right}
+.trigger-btn{
+  font-size:.6rem;padding:2px 6px;background:transparent;
+  border:1px solid var(--pepper);color:var(--pepper);border-radius:2px;
+  cursor:pointer;float:right;margin-top:2px;
+}
+.trigger-btn:hover{background:rgba(255,215,0,.1)}
+/* ── metrics ── */
+#metrics-panel{grid-column:2;grid-row:1}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.metric-box{
+  background:#080e14;border:1px solid var(--border);border-radius:5px;
+  padding:12px 10px;text-align:center;
+}
+.metric-val{font-size:1.5rem;font-weight:700;color:var(--accent);
+  font-variant-numeric:tabular-nums}
+.metric-val.green{color:var(--green)}
+.metric-val.orange{color:var(--orange)}
+.metric-label{font-size:.62rem;color:var(--dim);letter-spacing:1px;margin-top:3px}
+.shopify-status{
+  display:flex;align-items:center;gap:8px;margin-top:10px;
+  padding:8px 12px;background:#080e14;border-radius:4px;
+  border:1px solid var(--border);font-size:.7rem;
+}
+.status-dot{width:8px;height:8px;border-radius:50%}
+.status-dot.ok{background:var(--green)}
+.status-dot.err{background:var(--red)}
+.status-dot.unconfigured{background:var(--dim)}
+/* ── activity feed ── */
+#activity-panel{grid-column:2;grid-row:2}
+.activity-log{display:flex;flex-direction:column;gap:4px;overflow-y:auto;max-height:400px}
+.log-row{
+  display:flex;align-items:flex-start;gap:8px;padding:8px;
+  background:#080e14;border-radius:4px;border-left:2px solid var(--dim);
+  font-size:.7rem;animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.log-row.done{border-left-color:var(--green)}
+.log-row.error{border-left-color:var(--red)}
+.log-row.dispatched{border-left-color:var(--pepper)}
+.log-ts{color:var(--dim);white-space:nowrap;min-width:50px}
+.log-name{font-weight:600;min-width:80px}
+.log-text{color:#8aacbc;flex:1}
+/* ── output panel ── */
+#output-panel{grid-column:3;grid-row:1/3}
+.output-area{
+  background:#080e14;border:1px solid var(--border);border-radius:4px;
+  padding:12px;font-size:.72rem;line-height:1.6;color:var(--text);
+  min-height:200px;max-height:60vh;overflow-y:auto;white-space:pre-wrap;
+  word-break:break-word;
+}
+.output-label{font-size:.65rem;color:var(--dim);margin-bottom:6px;letter-spacing:1px}
+.output-meta{font-size:.6rem;color:var(--pepper);margin-bottom:8px}
+/* ── command ── */
+#cmd-row{
+  grid-column:1/4;display:flex;gap:10px;padding:0 0 4px;
+}
+#cmd-input{
+  flex:1;background:#080e14;border:1px solid var(--border);border-radius:4px;
+  color:var(--text);padding:9px 14px;font-size:.8rem;font-family:inherit;
+  outline:none;
+}
+#cmd-input:focus{border-color:var(--pepper)}
+#cmd-btn{
+  padding:9px 20px;background:transparent;border:1px solid var(--pepper);
+  color:var(--pepper);border-radius:4px;cursor:pointer;font-family:inherit;
+  font-size:.8rem;letter-spacing:1px;
+}
+#cmd-btn:hover{background:rgba(255,215,0,.08)}
+/* ── product panel ── */
+#products-panel{grid-column:2;grid-row:2}
+.product-list{display:flex;flex-direction:column;gap:6px}
+.product-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 10px;background:#080e14;border:1px solid var(--border);border-radius:4px;
+}
+.product-title{font-size:.72rem;color:var(--text)}
+.product-price{font-size:.72rem;color:var(--green);font-weight:700}
+.product-status{font-size:.58rem;padding:2px 6px;border-radius:2px;background:#0a2015;color:var(--green)}
+/* recent tasks */
+.recent-list{display:flex;flex-direction:column;gap:5px;overflow-y:auto;max-height:350px}
+.recent-row{
+  padding:7px 10px;background:#080e14;border-radius:4px;
+  border-left:2px solid var(--dim);
+}
+.recent-row.done{border-left-color:var(--green)}
+.recent-row.error{border-left-color:var(--red)}
+.recent-name{font-size:.7rem;color:var(--text)}
+.recent-preview{font-size:.63rem;color:var(--dim);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.recent-ts{font-size:.58rem;color:var(--dim);float:right}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div>
+    <h1>STARK DIGITAL — BUSINESS OPS</h1>
+    <div class="sub">Autonomous Commerce Platform · Powered by PEPPER + Agent Team</div>
+  </div>
+  <div class="nav-links">
+    <a href="/">HUD</a>
+    <a href="/dashboard">AGENTS</a>
+    <a href="/business" class="active">BUSINESS</a>
+  </div>
+</div>
+
+<div id="grid">
+
+  <!-- PEPPER PANEL -->
+  <div class="panel" id="pepper-panel">
+    <div class="panel-title">P.E.P.P.E.R. COORDINATOR</div>
+    <div class="pepper-indicator">
+      <div class="pepper-dot idle" id="pepper-dot"></div>
+      <div>
+        <div class="pepper-label" id="pepper-label">STANDBY</div>
+        <div style="font-size:.6rem;color:var(--dim)" id="pepper-task">Initializing…</div>
+      </div>
+    </div>
+
+    <div class="panel-title" style="margin-top:8px">DAILY SCHEDULE</div>
+    <div class="task-schedule" id="task-schedule">
+      <div style="color:var(--dim);font-size:.7rem">Loading schedule…</div>
+    </div>
+
+    <div class="panel-title" style="margin-top:12px">RECENT TASKS</div>
+    <div class="recent-list" id="recent-list">
+      <div style="color:var(--dim);font-size:.7rem">No tasks run yet.</div>
+    </div>
+  </div>
+
+  <!-- METRICS PANEL -->
+  <div class="panel" id="metrics-panel">
+    <div class="panel-title">SHOPIFY METRICS — LAST 7 DAYS</div>
+    <div class="metrics-grid">
+      <div class="metric-box">
+        <div class="metric-val green" id="m-revenue">—</div>
+        <div class="metric-label">REVENUE</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="m-orders">—</div>
+        <div class="metric-label">ORDERS</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val orange" id="m-aov">—</div>
+        <div class="metric-label">AVG ORDER</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="m-customers">—</div>
+        <div class="metric-label">CUSTOMERS</div>
+      </div>
+    </div>
+    <div class="shopify-status">
+      <div class="status-dot unconfigured" id="shopify-dot"></div>
+      <div id="shopify-status-text" style="color:var(--dim)">Checking Shopify connection…</div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS PANEL -->
+  <div class="panel" id="products-panel" style="grid-column:2;grid-row:2">
+    <div class="panel-title">ACTIVE PRODUCTS</div>
+    <div class="product-list" id="product-list">
+      <div style="color:var(--dim);font-size:.7rem">Loading products…</div>
+    </div>
+    <div class="panel-title" style="margin-top:12px">AGENT ACTIVITY</div>
+    <div class="activity-log" id="activity-log">
+      <div style="color:var(--dim);font-size:.7rem">No recent activity.</div>
+    </div>
+  </div>
+
+  <!-- OUTPUT PANEL -->
+  <div class="panel" id="output-panel">
+    <div class="panel-title">TASK OUTPUT</div>
+    <div class="output-label" id="output-label">LAST AGENT RESPONSE</div>
+    <div class="output-meta" id="output-meta"></div>
+    <div class="output-area" id="output-area">Waiting for task output…</div>
+
+    <div class="panel-title" style="margin-top:14px">MANUAL COMMAND</div>
+    <div id="cmd-row" style="padding:0;margin-top:8px">
+      <input id="cmd-input" placeholder="Ask the business team anything…" />
+      <button id="cmd-btn" onclick="sendCmd()">SEND</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// ── utility ────────────────────────────────────────────────────────────────────
+const AGENT_COLORS = {
+  friday:'#52ffb8', edith:'#ff4d4d', homer:'#ffb347',
+  vision:'#b347ff', dum_e:'#39c7ff', jarvis:'#39c7ff', pepper:'#ffd700'
+};
+const AGENT_NAMES = {
+  friday:'F.R.I.D.A.Y.', edith:'E.D.I.T.H.', homer:'H.O.M.E.R.',
+  vision:'V.I.S.I.O.N.', dum_e:'D.U.M.E.', jarvis:'JARVIS', pepper:'PEPPER'
+};
+
+function fmt(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/`([^`]+)`/g,'<code style="background:#0a1a2a;padding:0 3px;border-radius:2px">$1</code>')
+    .replace(/\n/g,'<br>');
+}
+
+// ── PEPPER status ──────────────────────────────────────────────────────────────
+let lastTaskCount = 0;
+
+async function refreshPepper() {
+  try {
+    const r = await fetch('/pepper/status');
+    const d = await r.json();
+
+    const dot = $('pepper-dot');
+    const lbl = $('pepper-label');
+    const tsk = $('pepper-task');
+    if (d.active) {
+      dot.classList.remove('idle');
+      lbl.textContent = 'RUNNING';
+      tsk.textContent = d.active_task || 'Processing…';
+    } else {
+      dot.classList.add('idle');
+      lbl.textContent = 'STANDBY';
+      tsk.textContent = 'Waiting for scheduled task…';
+    }
+
+    // Render schedule
+    const sched = $('task-schedule');
+    sched.innerHTML = '';
+    (d.schedule || []).forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'task-card' + (t.ran_today ? ' ran' : '');
+      div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <div class="task-name">${t.name}</div>
+          ${t.ran_today ? '<span class="ran-badge">✓ done</span>' : ''}
+        </div>
+        <div class="task-meta">${t.schedule}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+          <span class="task-agent agent-${t.agent}">${AGENT_NAMES[t.agent]||t.agent}</span>
+          ${!t.ran_today ? `<button class="trigger-btn" onclick="triggerTask('${t.id}','${t.name}')">▶ RUN</button>` : ''}
+        </div>`;
+      sched.appendChild(div);
+    });
+
+    // Recent task log
+    const rlist = $('recent-list');
+    const recent = d.recent || [];
+    if (recent.length === 0) {
+      rlist.innerHTML = '<div style="color:var(--dim);font-size:.7rem">No tasks run yet.</div>';
+    } else {
+      if (recent.length !== lastTaskCount) {
+        lastTaskCount = recent.length;
+        rlist.innerHTML = '';
+        recent.slice(0,8).forEach(t => {
+          const div = document.createElement('div');
+          div.className = 'recent-row ' + t.status;
+          div.innerHTML = `
+            <span class="recent-ts">${t.completed_at}</span>
+            <div class="recent-name">${t.name}</div>
+            <div class="recent-preview">${t.result_preview || '…'}</div>`;
+          rlist.appendChild(div);
+        });
+      }
+    }
+
+  } catch(e) { console.warn('PEPPER status error:', e); }
+}
+
+// ── Shopify metrics ────────────────────────────────────────────────────────────
+async function refreshShopify() {
+  try {
+    const sr = await fetch('/shopify/status');
+    const sd = await sr.json();
+    const dot = $('shopify-dot');
+    const txt = $('shopify-status-text');
+    if (sd.ok) {
+      dot.className = 'status-dot ok';
+      txt.textContent = `${sd.shop_name} · ${sd.currency} · ${sd.plan}`;
+      txt.style.color = 'var(--green)';
+    } else if (sd.error && sd.error.includes('Not configured')) {
+      dot.className = 'status-dot unconfigured';
+      txt.textContent = 'Not configured — set SHOPIFY_SHOP + SHOPIFY_TOKEN';
+      txt.style.color = 'var(--dim)';
+    } else {
+      dot.className = 'status-dot err';
+      txt.textContent = sd.error || 'Connection error';
+      txt.style.color = 'var(--red)';
+    }
+  } catch(e) {}
+
+  try {
+    const mr = await fetch('/shopify/stats');
+    const md = await mr.json();
+    if (md.ok) {
+      $('m-revenue').textContent = '$' + md.total_revenue.toFixed(2);
+      $('m-orders').textContent = md.total_orders;
+      $('m-aov').textContent = '$' + md.avg_order_value.toFixed(2);
+    }
+  } catch(e) {}
+
+  try {
+    const pr = await fetch('/shopify/products');
+    const pd = await pr.json();
+    const plist = $('product-list');
+    if (pd.ok && pd.products.length > 0) {
+      plist.innerHTML = '';
+      pd.products.slice(0,6).forEach(p => {
+        const price = p.variants?.[0]?.price || '—';
+        const div = document.createElement('div');
+        div.className = 'product-row';
+        div.innerHTML = `
+          <div class="product-title">${p.title}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="product-price">$${price}</span>
+            <span class="product-status">${p.status||'active'}</span>
+          </div>`;
+        plist.appendChild(div);
+      });
+    } else if (!pd.ok) {
+      plist.innerHTML = `<div style="color:var(--dim);font-size:.7rem">
+        Shopify not connected — add your keys to start selling.</div>
+        <div style="margin-top:8px;padding:10px;background:#080e14;border-radius:4px;
+        border:1px dashed var(--border);font-size:.68rem;color:var(--dim)">
+        Run with:<br><code style="color:var(--orange)">
+        set SHOPIFY_SHOP=your-store.myshopify.com<br>
+        set SHOPIFY_TOKEN=shpat_xxxx<br>
+        python jarvis_server.py</code></div>`;
+    }
+  } catch(e) {}
+}
+
+// ── agent activity log ─────────────────────────────────────────────────────────
+let lastLogTs = 0;
+
+async function refreshAgentLog() {
+  try {
+    const r = await fetch('/agent-log');
+    const d = await r.json();
+    const log = (d.log || []).filter(e => e.ts > lastLogTs);
+    if (log.length === 0) return;
+    lastLogTs = d.log[0]?.ts || lastLogTs;
+
+    const alog = $('activity-log');
+    if (alog.querySelector('div[style*="dim"]')) alog.innerHTML = '';
+
+    log.slice(0,5).forEach(e => {
+      if (['routing','pipeline_start'].includes(e.event)) return;
+      const div = document.createElement('div');
+      const cls = e.event === 'done' || e.event === 'pipeline_done' ? 'done'
+                : e.event === 'error' ? 'error' : '';
+      div.className = 'log-row ' + cls;
+      const color = AGENT_COLORS[e.agent_id] || '#39c7ff';
+      div.innerHTML = `
+        <span class="log-ts">${e.ts_str}</span>
+        <span class="log-name" style="color:${color}">${e.agent_emoji} ${e.agent_name}</span>
+        <span class="log-text">${(e.reply || e.query || '').substring(0,80)}…</span>`;
+      alog.insertBefore(div, alog.firstChild);
+    });
+
+    // trim to 20 rows
+    while (alog.children.length > 20) alog.removeChild(alog.lastChild);
+
+    // show latest output in output panel
+    const done = (d.log || []).find(e => e.event === 'done' || e.event === 'pipeline_done');
+    if (done && done.reply) {
+      const color = AGENT_COLORS[done.agent_id] || '#39c7ff';
+      $('output-label').textContent = done.agent_name + ' — ' + done.ts_str;
+      $('output-label').style.color = color;
+      $('output-meta').textContent = done.event === 'pipeline_done' ? '⚡ PIPELINE RESULT' : '';
+      $('output-area').innerHTML = fmt(done.reply);
+    }
+
+  } catch(e) {}
+}
+
+// ── manual command ─────────────────────────────────────────────────────────────
+async function sendCmd() {
+  const inp = $('cmd-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  $('output-area').textContent = 'Processing…';
+  $('output-label').textContent = 'PROCESSING';
+  $('output-label').style.color = 'var(--pepper)';
+  $('output-meta').textContent = '';
+  try {
+    const r = await fetch('/ask', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({text})
+    });
+    const d = await r.json();
+    const color = AGENT_COLORS[d.agent] || '#39c7ff';
+    $('output-label').textContent = (d.agent_name || 'JARVIS') + ' — ' + new Date().toLocaleTimeString();
+    $('output-label').style.color = color;
+    $('output-meta').textContent = d.pipeline ? '⚡ PIPELINE: ' + (d.pipeline_agents||[]).join(' → ') : '';
+    $('output-area').innerHTML = fmt(d.reply || '(no response)');
+  } catch(e) {
+    $('output-area').textContent = 'Error: ' + e.message;
+  }
+}
+
+$('cmd-input').addEventListener('keydown', e => { if(e.key==='Enter') sendCmd(); });
+
+// ── trigger task ───────────────────────────────────────────────────────────────
+async function triggerTask(taskId, taskName) {
+  try {
+    const r = await fetch('/pepper/trigger', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({task_id: taskId})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      $('output-area').textContent = `⚡ "${taskName}" dispatched — check activity log for output.`;
+      $('output-label').textContent = 'PEPPER DISPATCH';
+      $('output-label').style.color = 'var(--pepper)';
+    } else {
+      $('output-area').textContent = 'Error: ' + d.error;
+    }
+  } catch(e) {
+    $('output-area').textContent = 'Error: ' + e.message;
+  }
+}
+
+// ── poll loop ──────────────────────────────────────────────────────────────────
+async function tick() {
+  await Promise.all([refreshPepper(), refreshAgentLog()]);
+}
+
+async function slowTick() {
+  await refreshShopify();
+}
+
+tick();
+slowTick();
+setInterval(tick, 3000);
+setInterval(slowTick, 30000);
+</script>
+</body>
+</html>

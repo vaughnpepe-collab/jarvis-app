@@ -29,6 +29,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import agents as agent_team
+import pepper as pepper_coordinator
+import shopify_agent
 
 # ---------------------------------------------------------------- config
 HOST = os.environ.get("JARVIS_HOST", "127.0.0.1")
@@ -463,6 +465,45 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(200, f.read_bytes(), "text/html; charset=utf-8")
             else:
                 self._send(404, b"dashboard.html not found", "text/plain")
+        elif self.path in ("/business", "/business.html"):
+            f = HERE / "business.html"
+            if f.exists():
+                self._send(200, f.read_bytes(), "text/html; charset=utf-8")
+            else:
+                self._send(404, b"business.html not found", "text/plain")
+        elif self.path == "/pepper/status":
+            self._send(200, json.dumps(pepper_coordinator.status()))
+        elif self.path == "/shopify/status":
+            result = shopify_agent.get_client().ping()
+            self._send(200, json.dumps(result))
+        elif self.path == "/shopify/stats":
+            if not shopify_agent.is_configured():
+                self._send(200, json.dumps({"ok": False, "error": "Shopify not configured"}))
+                return
+            try:
+                summary = shopify_agent.get_client().sales_summary(since_days=7)
+                summary["ok"] = True
+                self._send(200, json.dumps(summary))
+            except Exception as e:
+                self._send(200, json.dumps({"ok": False, "error": str(e)}))
+        elif self.path == "/shopify/orders":
+            if not shopify_agent.is_configured():
+                self._send(200, json.dumps({"ok": False, "error": "Shopify not configured"}))
+                return
+            try:
+                orders = shopify_agent.get_client().list_orders(limit=10)
+                self._send(200, json.dumps({"ok": True, "orders": orders}))
+            except Exception as e:
+                self._send(200, json.dumps({"ok": False, "error": str(e)}))
+        elif self.path == "/shopify/products":
+            if not shopify_agent.is_configured():
+                self._send(200, json.dumps({"ok": False, "error": "Shopify not configured"}))
+                return
+            try:
+                products = shopify_agent.get_client().list_products(limit=20)
+                self._send(200, json.dumps({"ok": True, "products": products}))
+            except Exception as e:
+                self._send(200, json.dumps({"ok": False, "error": str(e)}))
         else:
             self._send(404, json.dumps({"error": "not found"}))
 
@@ -481,6 +522,35 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(400, json.dumps({"ok": False, "reply": "You said nothing, Sir."}))
                 return
             self._send(200, json.dumps(ask_claude(text)))
+
+        elif self.path == "/pepper/trigger":
+            try:
+                p = self._read_json()
+                task_id = (p.get("task_id") or "").strip()
+            except Exception:
+                self._send(400, json.dumps({"ok": False, "error": "bad request"}))
+                return
+            if not task_id:
+                self._send(400, json.dumps({"ok": False, "error": "task_id required"}))
+                return
+            result = pepper_coordinator.trigger_task(task_id)
+            self._send(200, json.dumps(result))
+
+        elif self.path == "/shopify/create-product":
+            if not shopify_agent.is_configured():
+                self._send(200, json.dumps({"ok": False, "error": "Shopify not configured"}))
+                return
+            try:
+                p = self._read_json()
+                product = shopify_agent.get_client().create_product(
+                    title=p.get("title", ""),
+                    body_html=p.get("body_html", ""),
+                    price=p.get("price", 27),
+                    tags=p.get("tags", ""),
+                )
+                self._send(200, json.dumps({"ok": True, "product": product}))
+            except Exception as e:
+                self._send(200, json.dumps({"ok": False, "error": str(e)}))
 
         elif self.path == "/prospect":
             try:
@@ -506,6 +576,12 @@ class Handler(BaseHTTPRequestHandler):
             self._send(404, json.dumps({"error": "not found"}))
 
 
+def _pepper_llm(prompt: str, agent_override: str = None) -> str:
+    """LLM call adapter for PEPPER — routes through the specialist team."""
+    result = ask_claude(prompt)
+    return result.get("reply", "")
+
+
 def main():
     print(f"\n  J.A.R.V.I.S. backend online")
     print(f"  Model    : {MODEL}  (Claude subscription — no API key)")
@@ -513,12 +589,21 @@ def main():
     print(f"  OpenClaw : {' '.join(OPENCLAW_CMD)}")
     print(f"  Team     : JARVIS + {len(agent_team.TEAM)} specialists "
           f"({', '.join(a['name'] for a in agent_team.TEAM.values())})")
+    shopify_status = "configured" if shopify_agent.is_configured() else "not configured (set SHOPIFY_SHOP + SHOPIFY_TOKEN)"
+    print(f"  Shopify  : {shopify_status}")
+    print(f"  PEPPER   : autonomous scheduler starting…")
     print(f"  Serving  : http://{HOST}:{PORT}\n")
+
+    # Start PEPPER autonomous coordinator
+    shopify_fn = shopify_agent.get_client().ping if shopify_agent.is_configured() else None
+    pepper_coordinator.start(_pepper_llm, shopify_fn)
+
     srv = ThreadingHTTPServer((HOST, PORT), Handler)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:
         print("\n  Shutting down. Goodbye, Sir.")
+        pepper_coordinator.stop()
         srv.shutdown()
 
 
