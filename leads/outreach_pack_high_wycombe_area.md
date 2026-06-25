@@ -11,7 +11,7 @@ your name if it isn't *Vaughn*.
 ## 🟢 No-website leads
 
 ### Ego at The Pomeroy Inn — restaurant, Amersham  ·  📞 +44 1494 766845
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/ego-at-the-pomeroy-inn-amersham/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/ego-at-the-pomeroy-inn-amersham/
 
 **Call opener:**
 > "Hi, is that Ego at The Pomeroy Inn? My name's Vaughn — I'm a web designer based locally in Amersham.
@@ -26,7 +26,7 @@ Hi there,
 
 I was looking for a restaurant in Amersham and noticed Ego at The Pomeroy Inn doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/ego-at-the-pomeroy-inn-amersham/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/ego-at-the-pomeroy-inn-amersham/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -42,7 +42,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 ---
 
 ### Gatsby and Miller — salon, Amersham  ·  📞 +44 1494 728899
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/gatsby-and-miller-amersham/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/gatsby-and-miller-amersham/
 
 **Call opener:**
 > "Hi, is that Gatsby and Miller? My name's Vaughn — I'm a web designer based locally in Amersham.
@@ -57,7 +57,7 @@ Hi there,
 
 I was looking for a salon in Amersham and noticed Gatsby and Miller doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/gatsby-and-miller-amersham/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/gatsby-and-miller-amersham/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -73,7 +73,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 ---
 
 ### Hairdressing for Men — salon, Amersham  ·  📞 +44 1494 764999
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/hairdressing-for-men-amersham/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/hairdressing-for-men-amersham/
 
 **Call opener:**
 > "Hi, is that Hairdressing for Men? My name's Vaughn — I'm a web designer based locally in Amersham.
@@ -88,7 +88,7 @@ Hi there,
 
 I was looking for a salon in Amersham and noticed Hairdressing for Men doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/hairdressing-for-men-amersham/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/hairdressing-for-men-amersham/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -104,7 +104,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 ---
 
 ### Mangal Express — restaurant, Amersham  ·  📞 +44 1491 765353
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/mangal-express-amersham/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/mangal-express-amersham/
 
 **Call opener:**
 > "Hi, is that Mangal Express? My name's Vaughn — I'm a web designer based locally in Amersham.
@@ -119,7 +119,7 @@ Hi there,
 
 I was looking for a restaurant in Amersham and noticed Mangal Express doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/mangal-express-amersham/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/mangal-express-amersham/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -135,7 +135,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 ---
 
 ### Ozzy's Traditional Barbers — salon, Amersham  ·  📞 +44 1494 724760
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/ozzy-s-traditional-barbers-amersham/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/ozzy-s-traditional-barbers-amersham/
 
 **Call opener:**
 > "Hi, is that Ozzy's Traditional Barbers? My name's Vaughn — I'm a web designer based locally in Amersham.
@@ -150,7 +150,7 @@ Hi there,
 
 I was looking for a salon in Amersham and noticed Ozzy's Traditional Barbers doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/ozzy-s-traditional-barbers-amersham/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/ozzy-s-traditional-barbers-amersham/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -166,7 +166,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 ---
 
 ### Electric Installations — electrician, High Wycombe  ·  📞 +44 1494 888600
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/electric-installations-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/electric-installations-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Electric Installations? My name's Vaughn — I'm a web designer based locally in High Wycombe.
@@ -181,7 +181,7 @@ Hi there,
 
 I was looking for an electrician in High Wycombe and noticed Electric Installations doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/electric-installations-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/electric-installations-high-wycombe/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -197,7 +197,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 ---
 
 ### Angel Nails Spa — salon, Marlow  ·  📞 +44 1628 488522
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/angel-nails-spa-marlow/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/angel-nails-spa-marlow/
 
 **Call opener:**
 > "Hi, is that Angel Nails Spa? My name's Vaughn — I'm a web designer based locally in Marlow.
@@ -212,7 +212,7 @@ Hi there,
 
 I was looking for a salon in Marlow and noticed Angel Nails Spa doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/angel-nails-spa-marlow/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/angel-nails-spa-marlow/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -228,7 +228,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 ---
 
 ### The Art of Turkish barbering — salon, Marlow  ·  📞 +44 1628 473341
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/the-art-of-turkish-barbering-marlow/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/the-art-of-turkish-barbering-marlow/
 
 **Call opener:**
 > "Hi, is that The Art of Turkish barbering? My name's Vaughn — I'm a web designer based locally in Marlow.
@@ -243,7 +243,7 @@ Hi there,
 
 I was looking for a salon in Marlow and noticed The Art of Turkish barbering doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/the-art-of-turkish-barbering-marlow/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/the-art-of-turkish-barbering-marlow/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -259,7 +259,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 ---
 
 ### The Hairology Centre — salon, Marlow  ·  📞 +44 1344 620211
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/the-hairology-centre-marlow/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/the-hairology-centre-marlow/
 
 **Call opener:**
 > "Hi, is that The Hairology Centre? My name's Vaughn — I'm a web designer based locally in Marlow.
@@ -274,7 +274,7 @@ Hi there,
 
 I was looking for a salon in Marlow and noticed The Hairology Centre doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/the-hairology-centre-marlow/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/the-hairology-centre-marlow/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -290,7 +290,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 ---
 
 ### Youngmans Oxford — salon, Marlow  ·  📞 +44 1628 486600
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/youngmans-oxford-marlow/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/youngmans-oxford-marlow/
 
 **Call opener:**
 > "Hi, is that Youngmans Oxford? My name's Vaughn — I'm a web designer based locally in Marlow.
@@ -305,7 +305,7 @@ Hi there,
 
 I was looking for a salon in Marlow and noticed Youngmans Oxford doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/youngmans-oxford-marlow/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/youngmans-oxford-marlow/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -321,7 +321,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 ---
 
 ### cut UK — salon, Marlow  ·  📞 +44 1628 482550
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/cut-uk-marlow/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/cut-uk-marlow/
 
 **Call opener:**
 > "Hi, is that cut UK? My name's Vaughn — I'm a web designer based locally in Marlow.
@@ -336,7 +336,7 @@ Hi there,
 
 I was looking for a salon in Marlow and noticed cut UK doesn't have a website yet.
 So I put together a quick **free mockup** of what one could look like for you:
-https://hwwebdesign.co.uk/mockups/cut-uk-marlow/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/cut-uk-marlow/
 
 A proper site would help people find you on Google, see what you offer, and get in
 touch — without every enquiry having to be a phone call. I build these for local
@@ -355,7 +355,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Love Nails — salon, High Wycombe  ·  📞 +44 7476 182888
 _Audit found: no HTTPS, missing meta description, no clear call-to-action, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/love-nails-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/love-nails-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Love Nails? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -372,7 +372,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — it isn't showing as secure (no padlock), which makes browsers warn people off and pushes you down Google's rankings, and there's no description for Google to show under your listing, so you look less appealing than competitors in the search results.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/love-nails-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/love-nails-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -386,7 +386,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Anytime Fitness — gym, High Wycombe  ·  📞 +44 1494 372068
 _Audit found: not mobile-responsive (no viewport), missing/empty title tag, missing meta description, no clear call-to-action, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/anytime-fitness-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/anytime-fitness-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Anytime Fitness? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -403,7 +403,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — it doesn't display properly on phones, where most of your customers are searching, and the page is missing a proper title, one of the first things Google uses to decide where you rank.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/anytime-fitness-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/anytime-fitness-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -417,7 +417,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Historia Meze & Grill — restaurant, High Wycombe  ·  📞 +44 1494 533176
 _Audit found: slow load (5687ms), not mobile-responsive (no viewport), missing meta description, no clear call-to-action_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/historia-meze-grill-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/historia-meze-grill-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Historia Meze & Grill? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -434,7 +434,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — it doesn't display properly on phones, where most of your customers are searching, and there's no description for Google to show under your listing, so you look less appealing than competitors in the search results.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/historia-meze-grill-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/historia-meze-grill-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -448,7 +448,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Caipirao — restaurant, High Wycombe  ·  📞 +44 1494 441999
 _Audit found: missing meta description, no clear call-to-action, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/caipirao-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/caipirao-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Caipirao? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -465,7 +465,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and there's no clear 'call now' or 'book' button, so interested visitors don't have an easy next step.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/caipirao-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/caipirao-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -479,7 +479,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### La Luna Ceylon — restaurant, High Wycombe  ·  📞 +44 1494 504278
 _Audit found: missing meta description, no clear call-to-action, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/la-luna-ceylon-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/la-luna-ceylon-high-wycombe/
 
 **Call opener:**
 > "Hi, is that La Luna Ceylon? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -496,7 +496,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and there's no clear 'call now' or 'book' button, so interested visitors don't have an easy next step.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/la-luna-ceylon-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/la-luna-ceylon-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -510,7 +510,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### The Vanilla Pod — restaurant, High Wycombe  ·  📞 +44 1494 531510
 _Audit found: missing meta description, no clear call-to-action, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/the-vanilla-pod-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/the-vanilla-pod-high-wycombe/
 
 **Call opener:**
 > "Hi, is that The Vanilla Pod? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -527,7 +527,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and there's no clear 'call now' or 'book' button, so interested visitors don't have an easy next step.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/the-vanilla-pod-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/the-vanilla-pod-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -541,7 +541,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Quinto and Mario — salon, High Wycombe  ·  📞 +44 1494 533849
 _Audit found: slow load (4734ms), missing meta description, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/quinto-and-mario-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/quinto-and-mario-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Quinto and Mario? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -558,7 +558,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it's slow to load, and a lot of visitors give up if a site takes more than about three seconds.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/quinto-and-mario-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/quinto-and-mario-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -572,7 +572,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Studio Barbara Luiza — salon, High Wycombe  ·  📞 +44 1494 527289
 _Audit found: missing meta description, no clear call-to-action, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/studio-barbara-luiza-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/studio-barbara-luiza-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Studio Barbara Luiza? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -589,7 +589,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and there's no clear 'call now' or 'book' button, so interested visitors don't have an easy next step.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/studio-barbara-luiza-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/studio-barbara-luiza-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -603,7 +603,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Supercuts — salon, High Wycombe  ·  📞 +44 1494 444770
 _Audit found: missing meta description, no clear call-to-action, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/supercuts-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/supercuts-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Supercuts? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -620,7 +620,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and there's no clear 'call now' or 'book' button, so interested visitors don't have an easy next step.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/supercuts-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/supercuts-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -634,7 +634,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Shahin's Indian Cuisine — restaurant, Amersham  ·  📞 +44 1494 764038
 _Audit found: slow load (24145ms), missing meta description, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/shahin-s-indian-cuisine-amersham/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/shahin-s-indian-cuisine-amersham/
 
 **Call opener:**
 > "Hi, is that Shahin's Indian Cuisine? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -651,7 +651,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it's slow to load, and a lot of visitors give up if a site takes more than about three seconds.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/shahin-s-indian-cuisine-amersham/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/shahin-s-indian-cuisine-amersham/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -665,7 +665,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Eatnua — restaurant, High Wycombe  ·  📞 +44 1494 268914
 _Audit found: missing meta description, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/eatnua-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/eatnua-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Eatnua? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -682,7 +682,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/eatnua-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/eatnua-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -696,7 +696,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Noodle Nation — restaurant, High Wycombe  ·  📞 +44 1494 447555
 _Audit found: no clear call-to-action, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/noodle-nation-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/noodle-nation-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Noodle Nation? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -713,7 +713,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no clear 'call now' or 'book' button, so interested visitors don't have an easy next step, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/noodle-nation-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/noodle-nation-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -727,7 +727,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Hair Cut Sklep — salon, High Wycombe  ·  📞 +44 7466 999772
 _Audit found: missing meta description, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/hair-cut-sklep-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/hair-cut-sklep-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Hair Cut Sklep? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -744,7 +744,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/hair-cut-sklep-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/hair-cut-sklep-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -758,7 +758,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Luxe Spa Land — salon, High Wycombe  ·  📞 +44 7732 359999
 _Audit found: missing meta description, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/luxe-spa-land-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/luxe-spa-land-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Luxe Spa Land? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -775,7 +775,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/luxe-spa-land-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/luxe-spa-land-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -789,7 +789,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Roccola Hair — salon, High Wycombe  ·  📞 +44 1494 526648
 _Audit found: slow load (3334ms), missing meta description_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/roccola-hair-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/roccola-hair-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Roccola Hair? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -806,7 +806,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it's slow to load, and a lot of visitors give up if a site takes more than about three seconds.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/roccola-hair-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/roccola-hair-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -820,7 +820,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Elite Electrical — electrician, High Wycombe  ·  📞 +44 1494 259192
 _Audit found: missing meta description, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/elite-electrical-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/elite-electrical-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Elite Electrical? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -837,7 +837,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/elite-electrical-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/elite-electrical-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -851,7 +851,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Temple End Veterinary Surgery — vet, High Wycombe  ·  📞 +44 1494 522956
 _Audit found: missing meta description, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/temple-end-veterinary-surgery-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/temple-end-veterinary-surgery-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Temple End Veterinary Surgery? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -868,7 +868,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/temple-end-veterinary-surgery-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/temple-end-veterinary-surgery-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -882,7 +882,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### HK Accountax — accountant, High Wycombe  ·  📞 +44 1494 700404
 _Audit found: missing meta description, no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/hk-accountax-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/hk-accountax-high-wycombe/
 
 **Call opener:**
 > "Hi, is that HK Accountax? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -899,7 +899,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — there's no description for Google to show under your listing, so you look less appealing than competitors in the search results, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/hk-accountax-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/hk-accountax-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -913,7 +913,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Scholtke & Co. Ltd. — accountant, High Wycombe  ·  📞 +44 1494 474422
 _Audit found: not mobile-responsive (no viewport), no Google Business linkage_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/scholtke-co-ltd-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/scholtke-co-ltd-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Scholtke & Co. Ltd.? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -930,7 +930,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — it doesn't display properly on phones, where most of your customers are searching, and it isn't linked to your Google Business listing, which is how most locals will actually find you.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/scholtke-co-ltd-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/scholtke-co-ltd-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
@@ -944,7 +944,7 @@ HW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk
 
 ### Bombay Palace — restaurant, High Wycombe  ·  📞 +44 1494 444752
 _Audit found: slow load (23260ms)_
-**🎨 Free mockup:** https://hwwebdesign.co.uk/mockups/bombay-palace-high-wycombe/
+**🎨 Free mockup:** https://vaughnpepe-collab.github.io/jarvis-app/mockups/bombay-palace-high-wycombe/
 
 **Call opener:**
 > "Hi, is that Bombay Palace? My name's Vaughn, I'm a local web designer in High Wycombe —
@@ -961,7 +961,7 @@ your website and noticed a couple of things that might quietly be costing you
 customers — it's slow to load, and a lot of visitors give up if a site takes more than about three seconds.
 
 So I put together a **free mockup** of how a refreshed version could look:
-https://hwwebdesign.co.uk/mockups/bombay-palace-high-wycombe/
+https://vaughnpepe-collab.github.io/jarvis-app/mockups/bombay-palace-high-wycombe/
 
 I build fast, modern, mobile-friendly sites for local businesses around High
 Wycombe from £399, usually live within a week. No cost or obligation for the
