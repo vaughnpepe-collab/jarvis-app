@@ -136,16 +136,22 @@ JARVIS_PERSONA = (
 _PRIORITY = {"edith": 3, "homer": 3, "vision": 3, "friday": 2, "dum_e": 2}
 
 # Multi-agent pipeline patterns: (compiled_regex, [agent_id_stage1, agent_id_stage2, ...])
-# Ordered from most-specific to least-specific
+# More-specific patterns MUST come before broader ones — first match wins.
 _PIPELINE_PATTERNS = [
+    # Security intel → formatted write-up (checked before generic research+write)
+    (re.compile(r"\b(security|threat|vulnerabilit|exploit|breach).{3,80}(report|write|draft|document)\b", re.I | re.S),
+     ["edith", "vision"]),
+    # Code review → security audit of that code
+    (re.compile(r"\b(review|audit|check).{3,60}(code|script|program)\b.{0,60}(security|vulnerabilit)\b", re.I | re.S),
+     ["homer", "edith"]),
+    (re.compile(r"\b(code|script|program).{3,60}(security\s+audit|security\s+review|security\s+check)\b", re.I | re.S),
+     ["homer", "edith"]),
+    # Data crunch → written report
+    (re.compile(r"\b(analyze|analyse|analytics|data|metrics|numbers).{5,80}(write|report|draft|summarize)\b", re.I | re.S),
+     ["dum_e", "vision"]),
+    # General research → write something (broadest, last)
     (re.compile(r"\b(research|find|look\s+up|gather).{5,80}(write|draft|compose|email)\b", re.I | re.S),
      ["friday", "vision"]),
-    (re.compile(r"\b(analyze|analyse|data).{5,80}(write|report|draft|summarize)\b", re.I | re.S),
-     ["dum_e", "vision"]),
-    (re.compile(r"\b(security|threat|vulnerability).{5,80}(report|write|draft)\b", re.I | re.S),
-     ["edith", "vision"]),
-    (re.compile(r"\b(code|script|program).{5,80}(analyze|review|security\s+audit)\b", re.I | re.S),
-     ["homer", "edith"]),
 ]
 
 
