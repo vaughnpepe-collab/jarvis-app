@@ -35,6 +35,22 @@ SLEEP = 1.3  # be polite to the free OSM endpoints (~1 req/sec policy)
 
 SHAKY = ("unreachable", "returns http", "blocked automated", "audit error")
 SIGNATURE = "Vaughn\nHW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk"
+BASE_URL = "https://hwwebdesign.co.uk"  # where mockups go live once merged to main
+WARM_LIMIT = 20  # how many has-a-website leads get a ready mockup + outreach block
+
+
+def slugify(text):
+    out = []
+    for ch in text.lower().strip():
+        if ch.isalnum():
+            out.append(ch)
+        elif out and out[-1] != "-":
+            out.append("-")
+    return "".join(out).strip("-") or "lead"
+
+
+def lead_slug(name, town):
+    return slugify(f"{name}-{town}")
 
 # flaw fragment -> (short phrase for a call, customer-impact line for an email)
 IMPACT = {
@@ -195,41 +211,64 @@ def _impacts(flaws):
     return [v for k, v in IMPACT.items() if k in flaws]
 
 
-def write_outreach(path, area, hot, warm):
+def render_outreach_from_csv(csv_path, out_path, area="High Wycombe & area",
+                             base_url=BASE_URL):
+    """Build the outreach pack from the saved CSV (no network). Each callable
+    lead gets a personalised opener + email and a link to its own mockup."""
+    rows = []
+    with open(csv_path) as f:
+        for r in csv.DictReader(f):
+            r["score"] = int(r.get("score") or 0)
+            r["phone"] = (r.get("phone") or "").strip()
+            r["nosite"] = "no website at all" in r.get("flaws", "")
+            r["verified"] = r.get("verified_flaw") == "yes"
+            rows.append(r)
+    hot = [r for r in rows if r["nosite"] and r["phone"]]
+    warm = [r for r in rows if r["verified"] and not r["nosite"] and r["phone"]]
+    hot.sort(key=lambda r: (r["town"], r["name"]))
+    warm.sort(key=lambda r: -r["score"])
+
+    def mockup(r):
+        return f"{base_url}/mockups/{lead_slug(r['name'], r['town'])}/"
+
     out = [f"""# HW Web Design — Outreach Pack ({area})
 
 Personalised opener + email for your top callable leads, built from the live
-audit. **Swap in** your real phone number (placeholder `07XXX XXX XXX`) and your
-name if it isn't *Vaughn*. Channel is phone-first; for email, grab each
-business's address from their Google/Facebook page.
+audit. Each lead has a **ready-made mockup** — generate them with
+`python mockup_gen.py`, and they go live at the link below once this is merged
+to `main`. **Swap in** your real phone number (placeholder `07XXX XXX XXX`) and
+your name if it isn't *Vaughn*.
 
 ---
 
 ## 🟢 No-website leads
 """]
     for r in hot:
-        b, niche, town = r["name"], r["_niche"], r["_town"]
+        b, niche, town = r["name"], r["niche"], r["town"]
         out.append(f"""### {b} — {niche}, {town}  ·  📞 {r['phone']}
+**🎨 Free mockup:** {mockup(r)}
 
 **Call opener:**
 > "Hi, is that {b}? My name's Vaughn — I'm a web designer based locally in {town}.
-> I'll keep this quick: I noticed {b} doesn't have a website yet, and I build
-> sites for local businesses in the area. Open to a quick chat about it?"
+> I'll keep this quick: I noticed {b} doesn't have a website yet, so I actually
+> built a quick sample of what one could look like for you — happy to send it over.
+> Worth a two-minute look?"
 
 **Email** *(once you have their address)*
-**Subject:** Quick question about {b}
+**Subject:** Built {b} a sample website (free to look at)
 
 Hi there,
 
 I was looking for a {niche} in {town} and noticed {b} doesn't have a website yet.
-A simple, professional site would help people find you on Google, see what you
-offer, and get in touch — without every enquiry having to be a phone call.
+So I put together a quick **free mockup** of what one could look like for you:
+{mockup(r)}
 
-I build clean, fast websites for local businesses around High Wycombe from £399,
-usually live within a week. Some of my work: https://hwwebdesign.co.uk
+A proper site would help people find you on Google, see what you offer, and get in
+touch — without every enquiry having to be a phone call. I build these for local
+businesses around High Wycombe from £399, usually live within a week.
 
-I'm happy to put together a **free mockup for {b} specifically** — no cost, no
-obligation. Worth a quick chat?
+No cost and no obligation for the mockup — if you like it, we go from there. Worth
+a quick chat?
 
 Best,
 {SIGNATURE}
@@ -237,9 +276,9 @@ Best,
 ---
 """)
     out.append("## 🟡 Has-a-website leads (real flaws to quote)\n")
-    for r in warm[:20]:
-        b, niche, town = r["name"], r["_niche"], r["_town"]
-        flaws = ", ".join(r["audit"]["flaws"])
+    for r in warm[:WARM_LIMIT]:
+        b, niche, town = r["name"], r["niche"], r["town"]
+        flaws = r["flaws"].replace("; ", ", ")
         imp = _impacts(flaws)
         short = imp[0][0] if imp else "could do with a refresh"
         if len(imp) >= 2:
@@ -250,14 +289,15 @@ Best,
             line = "a few things that are likely costing you enquiries"
         out.append(f"""### {b} — {niche}, {town}  ·  📞 {r['phone']}
 _Audit found: {flaws}_
+**🎨 Free mockup:** {mockup(r)}
 
 **Call opener:**
 > "Hi, is that {b}? My name's Vaughn, I'm a local web designer in High Wycombe —
-> I'll be quick. I had a look at your website and noticed it {short}. I build
-> modern sites for local {niche}s that sort exactly that out. Open to a quick chat?"
+> I'll be quick. I had a look at your website and noticed it {short}, so I mocked
+> up a fresh version for you to see. Can I send you the link?"
 
 **Email** *(once you have their address)*
-**Subject:** A quick thought about {b}'s website
+**Subject:** A fresh look for {b}'s website (free mockup)
 
 Hi there,
 
@@ -265,20 +305,21 @@ I came across {b} while looking for a {niche} in {town}. I had a quick look at
 your website and noticed a couple of things that might quietly be costing you
 customers — {line}.
 
-I build fast, modern, mobile-friendly websites for local businesses around High
-Wycombe. Prices start at £399 and most sites are live within a week — some of my
-work: https://hwwebdesign.co.uk
+So I put together a **free mockup** of how a refreshed version could look:
+{mockup(r)}
 
-If it'd help, I'll put together a **free mockup** of what {b}'s new site could
-look like — no cost, no obligation. Worth a quick chat?
+I build fast, modern, mobile-friendly sites for local businesses around High
+Wycombe from £399, usually live within a week. No cost or obligation for the
+mockup — if you like the direction, we take it from there. Worth a quick chat?
 
 Best,
 {SIGNATURE}
 
 ---
 """)
-    with open(path, "w") as f:
+    with open(out_path, "w") as f:
         f.write("\n".join(out))
+    return len(hot), min(len(warm), WARM_LIMIT)
 
 
 def main():
@@ -303,7 +344,7 @@ def main():
     pack_path = f"leads/outreach_pack_{slug}.md"
     write_csv(csv_path, rows)
     write_callsheet(md_path, area, hot, warm, verify, nophone, len(rows))
-    write_outreach(pack_path, area, hot, warm)
+    render_outreach_from_csv(csv_path, pack_path, area)
 
     print(f"\n  {len(rows)} businesses  |  🟢 {len(hot)} no-site+phone  "
           f"🟡 {len(warm)} flaws+phone  🔵 {len(verify)} verify  ⚪ {len(nophone)} no-phone")
