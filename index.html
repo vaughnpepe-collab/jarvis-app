@@ -4,6 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HW Web Design | Professional Websites for High Wycombe Businesses</title>
+<meta name="description" content="Affordable, mobile-friendly websites for small businesses in High Wycombe, Marlow, Beaconsfield & Amersham. Sites from £399, live within a week. Free no-obligation mockup.">
+<link rel="canonical" href="https://vaughnpepe-collab.github.io/jarvis-app/">
+<meta name="theme-color" content="#2563eb">
+<meta property="og:type" content="website">
+<meta property="og:title" content="HW Web Design — Websites That Win Customers for Local Businesses">
+<meta property="og:description" content="Affordable, mobile-friendly websites for High Wycombe & Buckinghamshire businesses. From £399, live in a week. Free mockup, no obligation.">
+<meta property="og:url" content="https://vaughnpepe-collab.github.io/jarvis-app/">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232563eb'/><text x='16' y='23' font-family='Segoe UI,Arial' font-size='16' font-weight='800' fill='white' text-anchor='middle'>HW</text></svg>">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "HW Web Design",
+  "description": "Web design for small businesses in High Wycombe and Buckinghamshire. Mobile-friendly websites from £399, live within a week.",
+  "url": "https://vaughnpepe-collab.github.io/jarvis-app/",
+  "email": "hello@hwwebdesign.co.uk",
+  "priceRange": "££",
+  "areaServed": ["High Wycombe", "Marlow", "Beaconsfield", "Amersham", "Buckinghamshire"],
+  "address": {"@type": "PostalAddress", "addressLocality": "High Wycombe", "addressRegion": "Buckinghamshire", "addressCountry": "GB"},
+  "makesOffer": {"@type": "Offer", "priceCurrency": "GBP", "price": "399", "itemOffered": {"@type": "Service", "name": "Small business website"}}
+}
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -126,16 +150,16 @@ footer strong{color:#fff}
     <li><a href="#process">How It Works</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
-  <a href="#contact" class="nav-cta">Get a Free Quote</a>
+  <a href="#mockup" class="nav-cta">Get a Free Mockup</a>
 </nav>
 
 <section class="hero" id="home">
   <div class="hero-content">
     <div class="hero-badge">📍 Based in High Wycombe · Serving Buckinghamshire</div>
     <h1>Websites That <span>Win Customers</span> for Local Businesses</h1>
-    <p>Professional, modern websites built for businesses in High Wycombe and surrounding areas. No templates. No agencies. Just results.</p>
+    <p>Professional, modern websites for businesses in High Wycombe and across Buckinghamshire — from £399, live within a week. No templates, no agencies, just results. See yours first with a <strong>free, no-obligation mockup</strong>.</p>
     <div class="hero-btns">
-      <a href="#contact" class="btn-primary">Get a Free Quote →</a>
+      <a href="#mockup" class="btn-primary">Get a Free Mockup →</a>
       <a href="#work" class="btn-secondary">See Our Work</a>
     </div>
     <div class="hero-proof">
@@ -186,11 +210,18 @@ footer strong{color:#fff}
       <div class="portfolio-info">
         <span class="portfolio-tag">Beauty</span>
         <h3>Bloom Beauty Studio</h3>
-        <p>Elegant salon website with service menu, price list, Instagram gallery, and online booking button.</p>
-        <a href="#contact" class="portfolio-link">Coming Soon</a>
+        <p>Elegant salon website with service menu, price list, reviews, and an online booking call-to-action.</p>
+        <a href="demos/beauty/" target="_blank" class="portfolio-link">View Demo →</a>
       </div>
     </div>
   </div>
+</section>
+
+<section id="mockup" style="background:linear-gradient(135deg,var(--blue),var(--indigo));color:#fff;text-align:center">
+  <div class="section-tag" style="color:#bfdbfe">See It Before You Buy</div>
+  <h2 style="color:#fff">Get a Free Mockup of Your New Website</h2>
+  <p style="font-size:18px;color:rgba(255,255,255,.92);max-width:620px;margin:0 auto 32px;line-height:1.7">No commitment, no catch. Tell us about your business and we'll design a <strong>free, no-obligation mockup</strong> of what your new site could look like — usually within a couple of days. Love it? We build it. Not for you? No problem at all.</p>
+  <a href="#contact" class="btn-secondary" style="background:#fff;color:var(--blue);border:none">Get My Free Mockup →</a>
 </section>
 
 <section id="pricing" class="light-bg">
@@ -269,18 +300,21 @@ footer strong{color:#fff}
       <p>Based in High Wycombe, we work with businesses across Buckinghamshire. Get in touch for a free, no-obligation quote — we'll get back to you the same day.</p>
       <div class="contact-pills">
         <div class="contact-pill"><div class="cp-icon">📞</div><div><div class="cp-label">Call or WhatsApp</div><div class="cp-value">07XXX XXX XXX</div></div></div>
-        <div class="contact-pill"><div class="cp-icon">📧</div><div><div class="cp-label">Email</div><div class="cp-value">hello@hwwebdesign.co.uk</div></div></div>
+        <div class="contact-pill"><div class="cp-icon">📧</div><div><div class="cp-label">Email</div><div class="cp-value"><a href="mailto:hello@hwwebdesign.co.uk" style="color:inherit;text-decoration:none">hello@hwwebdesign.co.uk</a></div></div></div>
         <div class="contact-pill"><div class="cp-icon">📍</div><div><div class="cp-label">Based In</div><div class="cp-value">High Wycombe, Buckinghamshire</div></div></div>
       </div>
     </div>
-    <form onsubmit="return false">
+    <!-- Zero-backend: submits via the visitor's email client. To collect
+         enquiries automatically instead, swap this for a free Formspree or
+         Web3Forms endpoint (set the form action + method="POST"). -->
+    <form id="enquiry" onsubmit="return sendEnquiry(event)">
       <div class="form-row">
-        <input type="text" placeholder="Your Name">
-        <input type="tel" placeholder="Phone Number">
+        <input id="f-name" type="text" placeholder="Your Name" required>
+        <input id="f-phone" type="tel" placeholder="Phone Number">
       </div>
-      <input type="email" placeholder="Email Address">
-      <input type="text" placeholder="Business Name">
-      <select>
+      <input id="f-email" type="email" placeholder="Email Address" required>
+      <input id="f-biz" type="text" placeholder="Business Name">
+      <select id="f-type">
         <option value="">What type of business are you?</option>
         <option>Trades (Plumber, Electrician, Builder etc.)</option>
         <option>Restaurant / Café / Takeaway</option>
@@ -290,8 +324,9 @@ footer strong{color:#fff}
         <option>Fitness / Gym</option>
         <option>Other</option>
       </select>
-      <textarea placeholder="Tell us a bit about what you need — do you have a website already?"></textarea>
+      <textarea id="f-msg" placeholder="Tell us a bit about what you need — do you have a website already?"></textarea>
       <button type="submit" class="form-submit">Send My Enquiry →</button>
+      <p style="font-size:13px;color:var(--grey);text-align:center">Prefer to talk? Call or WhatsApp <strong>07XXX XXX XXX</strong>.</p>
     </form>
   </div>
 </section>
@@ -306,5 +341,16 @@ footer strong{color:#fff}
   <div>© 2025 HW Web Design. All rights reserved.</div>
 </footer>
 
+<script>
+function sendEnquiry(e){
+  e.preventDefault();
+  var v=function(id){var el=document.getElementById(id);return el?(el.value||'').trim():'';};
+  var name=v('f-name'),phone=v('f-phone'),email=v('f-email'),biz=v('f-biz'),type=v('f-type'),msg=v('f-msg');
+  var subject='Website enquiry'+(biz?(' — '+biz):'');
+  var body=['Name: '+name,'Business: '+biz,'Phone: '+phone,'Email: '+email,'Type: '+type,'','Message:',msg].join('\n');
+  window.location.href='mailto:hello@hwwebdesign.co.uk?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  return false;
+}
+</script>
 </body>
 </html>
