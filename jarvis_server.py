@@ -5,11 +5,12 @@ J.A.R.V.I.S. — local backend for the desktop HUD app.
 Serves the UI and bridges the command console to Claude via OpenClaw's
 `claude-cli` provider (your Claude.ai subscription — NO API KEY required).
 
-Brain command:
-    openclaw infer model run --model <MODEL> --prompt "<...>" --local
-
-Dependencies: standard library only. `psutil` is optional (real CPU/RAM);
-without it the app falls back to lightweight estimates.
+Specialist agent team (see agents.py):
+  F.R.I.D.A.Y.  — Research & Intelligence
+  E.D.I.T.H.    — Security & Threat Analysis
+  H.O.M.E.R.    — Code & Engineering
+  V.I.S.I.O.N.  — Writing & Communications
+  D.U.M.E.      — Data & Analytics
 
 Run:  python jarvis_server.py   (or use JARVIS.bat)
 """
@@ -26,42 +27,28 @@ import urllib.error
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+import agents as agent_team
+
 # ---------------------------------------------------------------- config
 HOST = os.environ.get("JARVIS_HOST", "127.0.0.1")
 PORT = int(os.environ.get("JARVIS_PORT", "8765"))
-# Candidate models, tried in order until one answers. This makes JARVIS work
-# whether the authenticated provider is `anthropic` (OAuth subscription) or
-# `claude-cli`. Override with JARVIS_MODELS="prov/model,prov/model".
 MODELS = [m.strip() for m in os.environ.get(
     "JARVIS_MODELS",
     "claude-cli/claude-opus-4-8,anthropic/claude-opus-4-8"
 ).split(",") if m.strip()]
-MODEL = MODELS[0]  # shown in the UI
+MODEL = MODELS[0]
 ASK_TIMEOUT = int(os.environ.get("JARVIS_TIMEOUT", "240"))
 HERE = Path(__file__).resolve().parent
 UI_FILE = HERE / "ui.html"
-
-JARVIS_PERSONA = (
-    "You are JARVIS, the executive AI assistant from Iron Man — a composed, "
-    "refined British majordomo serving your principal, whom you address as 'Sir'. "
-    "You are calm, dryly witty, anticipatory and loyal. Keep replies concise and "
-    "conversational (1-4 sentences unless asked for detail), since they are spoken "
-    "aloud. Offer opinions and gently flag risks. Never break character, but never "
-    "let the persona compromise accuracy. If something is beyond your reach, say so "
-    "plainly in character and offer the real alternative."
-)
 
 # Try optional psutil
 try:
     import psutil  # type: ignore
     HAVE_PSUTIL = True
-    psutil.cpu_percent(interval=None)  # prime the meter
+    psutil.cpu_percent(interval=None)
 except Exception:
     HAVE_PSUTIL = False
 
-# Resolve how to invoke OpenClaw. We prefer calling the node entrypoint directly:
-# the .cmd/.ps1 shims route through cmd.exe, which mangles multi-line prompt
-# arguments and drops flags like --json. node.exe receives argv intact.
 def _find_openclaw_cmd():
     node = shutil.which("node")
     npm_shim = shutil.which("openclaw.cmd") or shutil.which("openclaw")
@@ -74,21 +61,19 @@ def _find_openclaw_cmd():
         for mjs in candidates:
             if mjs.exists():
                 return [node, str(mjs)]
-    return [npm_shim or "openclaw"]  # fallback (may mangle long prompts)
+    return [npm_shim or "openclaw"]
 
 OPENCLAW_CMD = _find_openclaw_cmd()
 
-# --- subscription token auto-refresh (keeps Claude alive without re-login) ---
+# --- subscription token auto-refresh ---
 CRED_FILE = Path(os.path.expanduser("~/.claude/.credentials.json"))
 AUTH_PROFILES = Path(os.path.expanduser("~/.openclaw/agents/main/agent/auth-profiles.json"))
-OAUTH_CLIENT_ID = "9d1c250a-e61b-44d9-88ed-5944d1962f5e"   # Claude Code public client
+OAUTH_CLIENT_ID = "9d1c250a-e61b-44d9-88ed-5944d1962f5e"
 OAUTH_TOKEN_URL = "https://api.anthropic.com/v1/oauth/token"
 _refresh_lock = threading.Lock()
 
 
 def _refresh_token():
-    """Use the stored refresh token to mint a fresh access token, write it back
-    to both the Claude credentials file and OpenClaw's auth profile. Returns bool."""
     with _refresh_lock:
         try:
             cred = json.loads(CRED_FILE.read_text(encoding="utf-8"))
@@ -112,7 +97,6 @@ def _refresh_token():
             if resp.get("expires_in"):
                 oa["expiresAt"] = int(time.time() * 1000 + resp["expires_in"] * 1000)
             CRED_FILE.write_text(json.dumps(cred), encoding="utf-8")
-            # mirror into OpenClaw's auth profile if present
             try:
                 ap = json.loads(AUTH_PROFILES.read_text(encoding="utf-8"))
                 prof = ap.get("profiles", {}).get("anthropic:claude-cli")
@@ -130,23 +114,24 @@ def _refresh_token():
             return False
 
 
-# rolling conversation memory (kept short)
-_history = []  # list of (speaker, text)
+# rolling conversation memory
+_history = []
 _history_lock = threading.Lock()
 
+# active agent state (for /status polling)
+_active_agent = {"id": "jarvis", "name": "JARVIS", "title": "Executive AI", "color": "#39c7ff"}
+_active_lock = threading.Lock()
 
-def _build_prompt(user_text):
-    with _history_lock:
-        convo = _history[-12:]
-    lines = [JARVIS_PERSONA, ""]
-    if convo:
-        lines.append("Conversation so far:")
-        for who, txt in convo:
-            lines.append(f"{who}: {txt}")
-        lines.append("")
-    lines.append(f"Sir: {user_text}")
-    lines.append("JARVIS:")
-    return "\n".join(lines)
+
+def _set_active(agent_id: str):
+    with _active_lock:
+        if agent_id == "jarvis":
+            _active_agent.update({"id": "jarvis", "name": "JARVIS",
+                                   "title": "Executive AI", "color": "#39c7ff"})
+        else:
+            a = agent_team.TEAM[agent_id]
+            _active_agent.update({"id": agent_id, "name": a["name"],
+                                   "title": a["title"], "color": a["color"]})
 
 
 _META_PREFIXES = ("model.run via", "provider:", "model:", "outputs:", "attempts:",
@@ -154,7 +139,6 @@ _META_PREFIXES = ("model.run via", "provider:", "model:", "outputs:", "attempts:
 
 
 def _strip_preamble(s):
-    """Drop OpenClaw's leading metadata lines, keep the actual reply."""
     lines = s.splitlines()
     i = 0
     while i < len(lines):
@@ -168,11 +152,9 @@ def _strip_preamble(s):
 
 
 def _extract_text(stdout):
-    """Pull the reply text out of openclaw output (json or plain)."""
     s = (stdout or "").strip()
     if not s:
         return ""
-    # try JSON first; if stdout has a preamble, grab the embedded JSON object
     data = None
     try:
         data = json.loads(s)
@@ -185,18 +167,16 @@ def _extract_text(stdout):
             except Exception:
                 data = None
     if data is None:
-        return _strip_preamble(s)  # human-format output
-    # search common shapes
+        return _strip_preamble(s)
     for key in ("outputs", "text", "output", "reply", "response", "content", "message"):
         v = data.get(key) if isinstance(data, dict) else None
         if isinstance(v, str) and v.strip():
             return v.strip()
-        if isinstance(v, list):  # e.g. content blocks
+        if isinstance(v, list):
             parts = [b.get("text", "") for b in v if isinstance(b, dict)]
             joined = "".join(parts).strip()
             if joined:
                 return joined
-    # fallback: longest string value anywhere
     best = ""
     def walk(o):
         nonlocal best
@@ -214,7 +194,6 @@ def _extract_text(stdout):
 
 
 def _run_model(model, prompt):
-    """One subprocess call for a single model. Returns (text, blob, fatal_msg)."""
     cmd = OPENCLAW_CMD + ["infer", "model", "run",
                           "--model", model, "--prompt", prompt, "--local", "--json"]
     try:
@@ -239,8 +218,6 @@ _AUTH_MARKERS = ("authentication_error", "Invalid authentication", "401",
 
 
 def _attempt(prompt):
-    """Try each candidate model. Returns (kind, payload):
-    ('ok', text) | ('fatal', msg) | ('auth', blob) | ('fail', blob)."""
     auth_problem = False
     last_blob = ""
     for model in MODELS:
@@ -252,32 +229,107 @@ def _attempt(prompt):
             return ("ok", text)
         if any(s in blob for s in _AUTH_MARKERS):
             auth_problem = True
-        # try the next candidate model regardless
     return ("auth", last_blob) if auth_problem else ("fail", last_blob)
 
 
+def _agent_result_or_error(kind, payload, agent_id):
+    """Convert an _attempt result into the final response dict."""
+    if kind == "ok":
+        return kind, payload
+    if kind == "fatal":
+        return "fatal", payload
+    return kind, payload
+
+
 def ask_claude(user_text):
-    """Run one turn; auto-refresh the subscription token and retry once on auth failure."""
-    prompt = _build_prompt(user_text)
+    """Route the request to the right specialist and run it."""
+    with _history_lock:
+        convo = list(_history[-12:])
+
+    # ── check for multi-agent pipeline first ──────────────────────────────
+    pipeline = agent_team.route_pipeline(user_text)
+    if pipeline:
+        return _run_pipeline(user_text, convo, pipeline)
+
+    # ── single-agent routing ───────────────────────────────────────────────
+    agent_id = agent_team.route(user_text)
+    _set_active(agent_id)
+
+    prompt = agent_team.build_prompt(user_text, convo, agent_id)
     kind, payload = _attempt(prompt)
     if kind == "auth" and _refresh_token():
-        kind, payload = _attempt(prompt)  # retry with fresh token
+        kind, payload = _attempt(prompt)
+
+    _set_active("jarvis")  # back to idle
 
     if kind == "ok":
+        agent_info = agent_team.TEAM.get(agent_id, {})
+        speaker = agent_info.get("name", "JARVIS")
         with _history_lock:
             _history.append(("Sir", user_text))
-            _history.append(("JARVIS", payload))
+            _history.append((speaker, payload))
             del _history[:-24]
-        return {"ok": True, "reply": payload}
+        return {
+            "ok": True,
+            "reply": payload,
+            "agent": agent_id,
+            "agent_name": agent_info.get("name", "JARVIS"),
+            "agent_title": agent_info.get("title", "Executive AI"),
+            "agent_color": agent_info.get("color", "#39c7ff"),
+            "pipeline": False,
+        }
+
     if kind == "fatal":
         return {"ok": False, "reply": payload}
     if kind == "auth":
         return {"ok": False, "reply":
-                "My link to Claude won't authenticate even after a refresh, Sir. The "
-                "subscription login may need redoing:  openclaw.cmd infer model auth "
-                "login --provider anthropic"}
+                "My link to Claude won't authenticate even after a refresh, Sir. "
+                "Re-run: openclaw.cmd infer model auth login --provider anthropic"}
     snippet = payload.strip().splitlines()[-1] if payload.strip() else "no output"
     return {"ok": False, "reply": f"Something went awry, Sir: {snippet[:300]}"}
+
+
+def _run_pipeline(user_text: str, convo: list, pipeline: list) -> dict:
+    """Run a multi-agent pipeline: each agent's output feeds the next."""
+    prior_output = ""
+    last_agent_id = pipeline[-1]
+    all_names = [agent_team.TEAM[a]["name"] for a in pipeline]
+
+    for stage, agent_id in enumerate(pipeline, 1):
+        _set_active(agent_id)
+        if stage == 1:
+            prompt = agent_team.build_prompt(user_text, convo, agent_id)
+        else:
+            prompt = agent_team.build_pipeline_prompt(user_text, prior_output, agent_id, stage)
+
+        kind, payload = _attempt(prompt)
+        if kind == "auth" and _refresh_token():
+            kind, payload = _attempt(prompt)
+
+        if kind != "ok":
+            _set_active("jarvis")
+            snippet = payload.strip().splitlines()[-1] if payload.strip() else "no output"
+            return {"ok": False,
+                    "reply": f"Pipeline failed at stage {stage} ({agent_team.TEAM[agent_id]['name']}): {snippet[:200]}"}
+        prior_output = payload
+
+    _set_active("jarvis")
+    final_agent = agent_team.TEAM[last_agent_id]
+    with _history_lock:
+        _history.append(("Sir", user_text))
+        _history.append((final_agent["name"], prior_output))
+        del _history[:-24]
+
+    return {
+        "ok": True,
+        "reply": prior_output,
+        "agent": last_agent_id,
+        "agent_name": final_agent["name"],
+        "agent_title": final_agent["title"],
+        "agent_color": final_agent["color"],
+        "pipeline": True,
+        "pipeline_agents": all_names,
+    }
 
 
 def get_stats():
@@ -289,7 +341,6 @@ def get_stats():
         except Exception:
             pass
     if cpu is None:
-        # cheap fallback estimate
         cpu = round(20 + (time.time() * 7) % 40, 1)
     if mem is None:
         mem = round(45 + (time.time() * 3) % 25, 1)
@@ -303,7 +354,7 @@ def get_stats():
 
 # ---------------------------------------------------------------- HTTP
 class Handler(BaseHTTPRequestHandler):
-    def log_message(self, *a):  # quiet
+    def log_message(self, *a):
         pass
 
     def _send(self, code, body, ctype="application/json"):
@@ -322,10 +373,17 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send(404, "ui.html not found", "text/plain")
         elif self.path == "/health":
-            self._send(200, json.dumps({"ok": True, "model": MODEL,
-                                        "psutil": HAVE_PSUTIL}))
+            self._send(200, json.dumps({"ok": True, "model": MODEL, "psutil": HAVE_PSUTIL}))
         elif self.path == "/stats":
             self._send(200, json.dumps(get_stats()))
+        elif self.path == "/agents":
+            # Return full team roster + current active agent
+            with _active_lock:
+                active = dict(_active_agent)
+            self._send(200, json.dumps({
+                "team": agent_team.team_summary(),
+                "active": active,
+            }))
         else:
             self._send(404, json.dumps({"error": "not found"}))
 
@@ -371,9 +429,11 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     print(f"\n  J.A.R.V.I.S. backend online")
-    print(f"  Model   : {MODEL}  (Claude subscription — no API key)")
+    print(f"  Model    : {MODEL}  (Claude subscription — no API key)")
     print(f"  Telemetry: {'psutil (real)' if HAVE_PSUTIL else 'estimated (install psutil for real)'}")
     print(f"  OpenClaw : {' '.join(OPENCLAW_CMD)}")
+    print(f"  Team     : JARVIS + {len(agent_team.TEAM)} specialists "
+          f"({', '.join(a['name'] for a in agent_team.TEAM.values())})")
     print(f"  Serving  : http://{HOST}:{PORT}\n")
     srv = ThreadingHTTPServer((HOST, PORT), Handler)
     try:
