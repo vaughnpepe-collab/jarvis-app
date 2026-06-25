@@ -123,7 +123,7 @@ export function ProductCard({ product, index = 0 }: Props) {
         {/* Info */}
         <div className="space-y-1">
           <p className="text-[10px] tracking-widest uppercase text-verra-ash">
-            {product.niche ?? product.category}
+            {product.category}
           </p>
           <h3 className="font-serif text-lg text-verra-ivory group-hover:text-verra-gold transition-colors duration-300 leading-tight">
             {product.name}
