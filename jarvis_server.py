@@ -15,6 +15,7 @@ Specialist agent team (see agents.py):
 Run:  python jarvis_server.py   (or use JARVIS.bat)
 """
 
+import collections
 import json
 import os
 import shutil
@@ -121,6 +122,44 @@ _history_lock = threading.Lock()
 # active agent state (for /status polling)
 _active_agent = {"id": "jarvis", "name": "JARVIS", "title": "Executive AI", "color": "#39c7ff"}
 _active_lock = threading.Lock()
+
+# ── activity log & per-agent stats ────────────────────────────────────────────
+_activity_log = collections.deque(maxlen=150)
+_activity_lock = threading.Lock()
+
+_agent_stats = {aid: {"tasks": 0, "last_ts": "", "last_query": ""}
+                for aid in list(agent_team.TEAM.keys()) + ["jarvis"]}
+_stats_lock = threading.Lock()
+
+_current_pipeline: list = []
+_pipeline_lock = threading.Lock()
+
+
+def _log_event(agent_id: str, event: str,
+               query: str = "", reply: str = "", pipeline: list | None = None):
+    """Append one entry to the activity log and update per-agent stats."""
+    now = time.time()
+    a = agent_team.TEAM.get(agent_id, {})
+    entry = {
+        "ts": now,
+        "ts_str": time.strftime("%H:%M:%S"),
+        "agent_id": agent_id,
+        "agent_name": a.get("name", "JARVIS"),
+        "agent_color": a.get("color", "#39c7ff"),
+        "agent_emoji": a.get("emoji", "🤖"),
+        "event": event,      # routing|start|done|error|pipeline_start|pipeline_stage|pipeline_done
+        "query": query[:80],
+        "reply": reply[:140],
+        "pipeline": pipeline,
+    }
+    with _activity_lock:
+        _activity_log.appendleft(entry)
+    if event in ("done", "pipeline_done"):
+        sid = agent_id if agent_id in _agent_stats else "jarvis"
+        with _stats_lock:
+            _agent_stats[sid]["tasks"] += 1
+            _agent_stats[sid]["last_ts"] = entry["ts_str"]
+            _agent_stats[sid]["last_query"] = query[:60]
 
 
 def _set_active(agent_id: str):
@@ -246,6 +285,8 @@ def ask_claude(user_text):
     with _history_lock:
         convo = list(_history[-12:])
 
+    _log_event("jarvis", "routing", query=user_text)
+
     # ── check for multi-agent pipeline first ──────────────────────────────
     pipeline = agent_team.route_pipeline(user_text)
     if pipeline:
@@ -254,6 +295,7 @@ def ask_claude(user_text):
     # ── single-agent routing ───────────────────────────────────────────────
     agent_id = agent_team.route(user_text)
     _set_active(agent_id)
+    _log_event(agent_id, "start", query=user_text)
 
     prompt = agent_team.build_prompt(user_text, convo, agent_id)
     kind, payload = _attempt(prompt)
@@ -265,6 +307,7 @@ def ask_claude(user_text):
     if kind == "ok":
         agent_info = agent_team.TEAM.get(agent_id, {})
         speaker = agent_info.get("name", "JARVIS")
+        _log_event(agent_id, "done", query=user_text, reply=payload)
         with _history_lock:
             _history.append(("Sir", user_text))
             _history.append((speaker, payload))
@@ -279,6 +322,7 @@ def ask_claude(user_text):
             "pipeline": False,
         }
 
+    _log_event(agent_id, "error", query=user_text, reply=str(payload)[:120])
     if kind == "fatal":
         return {"ok": False, "reply": payload}
     if kind == "auth":
@@ -295,8 +339,14 @@ def _run_pipeline(user_text: str, convo: list, pipeline: list) -> dict:
     last_agent_id = pipeline[-1]
     all_names = [agent_team.TEAM[a]["name"] for a in pipeline]
 
+    _log_event("jarvis", "pipeline_start", query=user_text, pipeline=pipeline)
+    with _pipeline_lock:
+        _current_pipeline.clear()
+        _current_pipeline.extend(pipeline)
+
     for stage, agent_id in enumerate(pipeline, 1):
         _set_active(agent_id)
+        _log_event(agent_id, "start", query=user_text, pipeline=pipeline)
         if stage == 1:
             prompt = agent_team.build_prompt(user_text, convo, agent_id)
         else:
@@ -308,13 +358,21 @@ def _run_pipeline(user_text: str, convo: list, pipeline: list) -> dict:
 
         if kind != "ok":
             _set_active("jarvis")
+            _log_event(agent_id, "error", query=user_text, reply=str(payload)[:120], pipeline=pipeline)
+            with _pipeline_lock:
+                _current_pipeline.clear()
             snippet = payload.strip().splitlines()[-1] if payload.strip() else "no output"
             return {"ok": False,
                     "reply": f"Pipeline failed at stage {stage} ({agent_team.TEAM[agent_id]['name']}): {snippet[:200]}"}
+        _log_event(agent_id, "pipeline_stage", query=user_text, reply=payload, pipeline=pipeline)
         prior_output = payload
 
     _set_active("jarvis")
+    with _pipeline_lock:
+        _current_pipeline.clear()
+
     final_agent = agent_team.TEAM[last_agent_id]
+    _log_event(last_agent_id, "pipeline_done", query=user_text, reply=prior_output, pipeline=pipeline)
     with _history_lock:
         _history.append(("Sir", user_text))
         _history.append((final_agent["name"], prior_output))
@@ -377,13 +435,34 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/stats":
             self._send(200, json.dumps(get_stats()))
         elif self.path == "/agents":
-            # Return full team roster + current active agent
             with _active_lock:
                 active = dict(_active_agent)
             self._send(200, json.dumps({
                 "team": agent_team.team_summary(),
                 "active": active,
             }))
+        elif self.path == "/agent-log":
+            with _activity_lock:
+                log = list(_activity_log)[:60]
+            with _stats_lock:
+                stats = {k: dict(v) for k, v in _agent_stats.items()}
+            with _active_lock:
+                active = dict(_active_agent)
+            with _pipeline_lock:
+                cur_pipeline = list(_current_pipeline)
+            self._send(200, json.dumps({
+                "log": log,
+                "stats": stats,
+                "active": active,
+                "current_pipeline": cur_pipeline,
+                "team": agent_team.team_summary(),
+            }))
+        elif self.path in ("/dashboard", "/dashboard.html"):
+            f = HERE / "dashboard.html"
+            if f.exists():
+                self._send(200, f.read_bytes(), "text/html; charset=utf-8")
+            else:
+                self._send(404, b"dashboard.html not found", "text/plain")
         else:
             self._send(404, json.dumps({"error": "not found"}))
 

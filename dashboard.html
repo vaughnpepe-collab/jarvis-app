@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>J.A.R.V.I.S. · Agent Command Center</title>
+<style>
+:root{
+  --bg:#01060c; --bg2:#020912; --bg3:rgba(12,34,52,.6);
+  --cyan:#39c7ff; --cyan-d:#1b6f93; --cyan-g:rgba(57,199,255,.5);
+  --green:#52ffb8; --red:#ff4d4d; --amber:#ffb347; --purple:#b347ff;
+  --text:#cfeeff; --mut:#6fa9c4; --line:rgba(57,199,255,.22);
+  --font:"Segoe UI","Consolas",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:radial-gradient(1400px 900px at 50% 30%,#04203a 0%,#020912 55%,#01060c 100%);
+  color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:50;
+  background:repeating-linear-gradient(0deg,rgba(57,199,255,.03) 0 1px,transparent 1px 3px);
+  mix-blend-mode:screen;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.14;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:46px 46px;
+  mask-image:radial-gradient(circle at 50% 40%,#000 0%,transparent 75%);
+}
+/* ── layout ─────────────────────────────────────────── */
+.wrap{
+  display:grid;
+  grid-template-rows:54px auto 1fr;
+  height:100vh;gap:12px;padding:12px;
+}
+/* ── header ─────────────────────────────────────────── */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  border:1px solid var(--line);border-radius:10px;
+  background:linear-gradient(90deg,rgba(12,34,52,.65),rgba(4,16,26,.3));
+  padding:0 20px;
+}
+.hbrand{display:flex;align-items:center;gap:14px}
+.mini-arc{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle,#bff0ff 0%,var(--cyan) 40%,#0a4a6b 78%,transparent 80%);
+  box-shadow:0 0 12px var(--cyan-g);animation:spin 8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hbrand h1{font-size:15px;letter-spacing:6px;color:#eaf7ff;font-weight:600}
+.hbrand small{font-size:8px;letter-spacing:3px;color:var(--mut)}
+.hright{display:flex;align-items:center;gap:24px}
+.hclock{text-align:right;font-size:22px;letter-spacing:3px;color:#eaf7ff}
+.hdate{font-size:8px;letter-spacing:2px;color:var(--mut);text-align:right}
+#back-link{
+  font-size:9px;letter-spacing:2px;color:var(--cyan-d);text-decoration:none;
+  border:1px solid var(--line);border-radius:5px;padding:4px 10px;transition:.2s;
+}
+#back-link:hover{color:var(--cyan);border-color:var(--cyan)}
+/* ── agent strip ─────────────────────────────────────── */
+.agent-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.ac{
+  border:1px solid var(--line);border-radius:10px;padding:12px;
+  background:linear-gradient(180deg,rgba(12,34,52,.55),rgba(4,16,26,.35));
+  transition:all .35s;position:relative;overflow:hidden;cursor:default;
+}
+.ac::before{
+  content:"";position:absolute;inset:0;border-radius:10px;opacity:0;
+  background:radial-gradient(circle at 50% 0%,currentColor 0%,transparent 70%);
+  transition:opacity .35s;
+}
+.ac.active::before{opacity:.08}
+.ac.active{border-color:currentColor;box-shadow:0 0 18px currentColor,inset 0 0 20px rgba(255,255,255,.03)}
+.ac-emoji{font-size:22px;margin-bottom:5px}
+.ac-name{font-size:10px;letter-spacing:1.5px;color:#eaf7ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-title{font-size:8.5px;letter-spacing:1px;color:var(--mut);text-transform:uppercase;margin:2px 0 8px}
+.ac-status{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:8px;letter-spacing:1.5px;padding:2px 7px;border-radius:4px;
+  border:1px solid rgba(255,255,255,.12);color:var(--mut);transition:.35s;
+}
+.ac.active .ac-status{color:#000;font-weight:700;border-color:transparent}
+.ac-meta{margin-top:8px;font-size:8.5px;color:var(--mut)}
+.ac-meta .tasks{font-size:18px;color:currentColor;font-weight:700;line-height:1;display:block;margin-bottom:2px}
+.ac-meta .last{font-size:8px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@keyframes pulse{50%{opacity:.3}}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.active .dot{animation:pulse .7s infinite}
+/* ── main area ───────────────────────────────────────── */
+.main{display:grid;grid-template-columns:1fr 360px;gap:12px;min-height:0}
+/* ── mission log ─────────────────────────────────────── */
+.log-panel{
+  border:1px solid var(--line);border-radius:10px;
+  background:rgba(4,16,26,.5);
+  display:flex;flex-direction:column;min-height:0;
+}
+.panel-title{
+  font-size:10px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;
+  padding:9px 14px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:pulse 2s infinite}
+.log-body{flex:1;overflow-y:auto;padding:6px 0;font-size:11.5px}
+.log-entry{
+  display:grid;grid-template-columns:68px 20px 90px 70px 1fr;
+  gap:0 8px;padding:5px 14px;border-bottom:1px solid rgba(57,199,255,.06);
+  align-items:baseline;transition:background .2s;
+}
+.log-entry:hover{background:rgba(57,199,255,.04)}
+.le-time{color:var(--mut);font-size:10px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.le-emoji{text-align:center}
+.le-name{font-size:10px;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.le-event{
+  font-size:8.5px;letter-spacing:1.5px;padding:1px 5px;border-radius:3px;
+  text-align:center;white-space:nowrap;
+}
+.le-event.routing {background:rgba(57,199,255,.1); color:var(--cyan)}
+.le-event.start   {background:rgba(255,179,71,.12); color:var(--amber)}
+.le-event.done    {background:rgba(82,255,184,.12); color:var(--green)}
+.le-event.error   {background:rgba(255,77,77,.15);  color:var(--red)}
+.le-event.pipeline_start{background:rgba(179,71,255,.15);color:var(--purple)}
+.le-event.pipeline_stage{background:rgba(179,71,255,.1); color:var(--purple)}
+.le-event.pipeline_done {background:rgba(82,255,184,.12);color:var(--green)}
+.le-text{color:var(--mut);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-entry.new{animation:fade-in .4s forwards}
+@keyframes fade-in{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+/* ── right column ────────────────────────────────────── */
+.right-col{display:flex;flex-direction:column;gap:12px;min-height:0}
+/* pipeline panel */
+.pipeline-panel{
+  border:1px solid var(--line);border-radius:10px;
+  background:rgba(4,16,26,.5);flex-shrink:0;
+}
+.pipeline-body{padding:14px}
+.pipeline-idle{font-size:10px;letter-spacing:2px;color:var(--mut);text-align:center;padding:8px 0}
+.pipeline-chain{display:flex;align-items:center;gap:0;justify-content:center}
+.pa{
+  border:1px solid currentColor;border-radius:8px;padding:8px 12px;text-align:center;
+  min-width:80px;transition:all .4s;
+}
+.pa.active-stage{box-shadow:0 0 14px currentColor}
+.pa .pa-emoji{font-size:18px}
+.pa .pa-name{font-size:9px;letter-spacing:1px;margin-top:3px;white-space:nowrap}
+.pa .pa-status{font-size:8px;margin-top:2px;opacity:.7}
+.pipe-arrow{
+  font-size:20px;color:var(--mut);padding:0 4px;flex-shrink:0;
+  animation:arrow-flow 1.2s ease-in-out infinite;
+}
+@keyframes arrow-flow{0%,100%{opacity:.3;transform:translateX(-3px)}50%{opacity:1;transform:translateX(3px)}}
+/* command console */
+.cmd-panel{
+  border:1px solid var(--line);border-radius:10px;
+  background:rgba(4,16,26,.5);display:flex;flex-direction:column;flex:1;min-height:0;
+}
+.cmd-log{flex:1;overflow-y:auto;padding:10px 14px;font-size:12px;line-height:1.6}
+.cmd-log .you{color:#bfe9ff}.cmd-log .you::before{content:"▸ SIR  ";color:var(--mut);font-size:9px}
+.cmd-log .agent-r{}.cmd-log .sys{color:var(--mut);font-style:italic;font-size:10.5px}
+.cmd-bar{
+  display:flex;gap:8px;border-top:1px solid var(--line);padding:10px;flex-shrink:0;
+}
+.cmd-bar input{
+  flex:1;background:rgba(2,12,20,.7);border:1px solid var(--line);border-radius:7px;
+  color:var(--text);font-family:var(--font);font-size:12px;padding:9px 12px;outline:none;
+}
+.cmd-bar input:focus{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan-g)}
+.cmd-bar button{
+  background:linear-gradient(180deg,#0c5d85,#073549);color:#eaf7ff;
+  border:1px solid var(--cyan);border-radius:7px;padding:0 18px;
+  letter-spacing:2px;font-size:10px;cursor:pointer;font-family:var(--font);transition:.2s;
+  white-space:nowrap;
+}
+.cmd-bar button:hover{background:var(--cyan);color:#021018}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--cyan-d);border-radius:3px}
+/* task-count bump animation */
+@keyframes bump{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
+.bump{animation:bump .35s ease}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ── Header ──────────────────────────────────────────── -->
+  <header>
+    <div class="hbrand">
+      <div class="mini-arc"></div>
+      <div>
+        <h1>J.A.R.V.I.S.</h1>
+        <small>AGENT COMMAND CENTER · LIVE DASHBOARD</small>
+      </div>
+    </div>
+    <div class="hright">
+      <a id="back-link" href="/">← HUD</a>
+      <div>
+        <div class="hclock" id="clock">--:--:--</div>
+        <div class="hdate" id="date">—</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Agent strip ─────────────────────────────────────── -->
+  <div class="agent-strip" id="agent-strip">
+    <!-- Injected by JS -->
+  </div>
+
+  <!-- ── Main area ───────────────────────────────────────── -->
+  <div class="main">
+
+    <!-- Mission log -->
+    <div class="log-panel">
+      <div class="panel-title"><span class="live-dot"></span>MISSION LOG <span style="color:var(--mut);font-size:8px;margin-left:4px">REAL-TIME</span></div>
+      <div class="log-body" id="log-body">
+        <div style="padding:20px;text-align:center;color:var(--mut);font-size:10px;letter-spacing:2px">
+          AWAITING ACTIVITY…
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div class="right-col">
+
+      <!-- Pipeline visualizer -->
+      <div class="pipeline-panel">
+        <div class="panel-title"><span class="live-dot" style="background:var(--purple);box-shadow:0 0 7px var(--purple)"></span>PIPELINE STATUS</div>
+        <div class="pipeline-body" id="pipeline-body">
+          <div class="pipeline-idle">NO ACTIVE PIPELINE</div>
+        </div>
+      </div>
+
+      <!-- Command console -->
+      <div class="cmd-panel">
+        <div class="panel-title"><span class="live-dot" style="background:var(--amber);box-shadow:0 0 7px var(--amber)"></span>COMMAND CONSOLE</div>
+        <div class="cmd-log" id="cmd-log">
+          <div class="sys">Dashboard online. Dispatch commands below or use the main HUD.</div>
+        </div>
+        <div class="cmd-bar">
+          <input id="cmd-input" autocomplete="off" placeholder="Dispatch a task to the team…" />
+          <button id="cmd-send">DISPATCH</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const API=location.origin;
+const pad=n=>String(n).padStart(2,'0');
+
+/* ── clock ── */
+function tick(){
+  const d=new Date();
+  $('clock').textContent=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  $('date').textContent=d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'}).toUpperCase();
+}
+setInterval(tick,1000);tick();
+
+/* ── esc helper ── */
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ── State ── */
+let teamData=[];      // [{id,name,title,emoji,color},…]
+let taskCounts={};    // {agent_id: count}
+let lastLogTs=0;      // to detect new entries and animate them
+let currentActiveId='jarvis';
+let prevActiveId='jarvis';
+
+/* ── Agent strip ── */
+function agentCardId(id){return 'ac-'+id}
+
+function buildStrip(team){
+  const strip=$('agent-strip');
+  // JARVIS + all specialists
+  const all=[
+    {id:'jarvis',name:'JARVIS',title:'Executive Orchestrator',emoji:'🤖',color:'#39c7ff'},
+    ...team
+  ];
+  strip.innerHTML=all.map(a=>`
+    <div class="ac" id="${agentCardId(a.id)}" style="color:${a.color}">
+      <div class="ac-emoji">${a.emoji}</div>
+      <div class="ac-name">${esc(a.name)}</div>
+      <div class="ac-title">${esc(a.title)}</div>
+      <div class="ac-status" id="ac-status-${a.id}"><span class="dot"></span>IDLE</div>
+      <div class="ac-meta">
+        <span class="tasks" id="ac-tasks-${a.id}">0</span>
+        <span class="last" id="ac-last-${a.id}">No tasks yet</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateStrip(active, stats){
+  const newId=active?.id||'jarvis';
+  if(newId!==prevActiveId){
+    // deactivate old
+    const old=$('ac-'+prevActiveId);
+    if(old){
+      old.classList.remove('active');
+      const sb=$(`ac-status-${prevActiveId}`);
+      if(sb){sb.innerHTML='<span class="dot"></span>IDLE';}
+    }
+    prevActiveId=newId;
+  }
+  // activate current
+  const card=$('ac-'+newId);
+  if(card){
+    card.classList.add('active');
+    const sb=$(`ac-status-${newId}`);
+    if(sb){sb.innerHTML=`<span class="dot"></span>${newId==='jarvis'?'COORD':'ACTIVE'}`;}
+    const styleColor=active?.color||'#39c7ff';
+    card.style.color=styleColor;
+    const statusEl=$(`ac-status-${newId}`);
+    if(statusEl&&newId!=='jarvis'){statusEl.style.background=styleColor;}
+  }
+  // update stats on all cards
+  if(stats){
+    for(const [aid,s] of Object.entries(stats)){
+      const el=$(`ac-tasks-${aid}`);
+      const newCount=s.tasks||0;
+      if(el&&newCount!==(taskCounts[aid]||0)){
+        el.textContent=newCount;
+        el.classList.remove('bump');
+        void el.offsetWidth; // reflow
+        el.classList.add('bump');
+        taskCounts[aid]=newCount;
+      }
+      const last=$(`ac-last-${aid}`);
+      if(last&&s.last_query) last.textContent=s.last_query.slice(0,30)+'…';
+    }
+  }
+}
+
+/* ── Mission log ── */
+const EVENT_LABELS={
+  routing:'ROUTING',
+  start:'START',
+  done:'DONE',
+  error:'ERROR',
+  pipeline_start:'PIPELINE',
+  pipeline_stage:'STAGE',
+  pipeline_done:'DONE',
+};
+
+function renderLog(entries){
+  const body=$('log-body');
+  if(!entries||!entries.length){
+    body.innerHTML='<div style="padding:20px;text-align:center;color:var(--mut);font-size:10px;letter-spacing:2px">AWAITING ACTIVITY…</div>';
+    return;
+  }
+  const newEntries=entries.filter(e=>e.ts>lastLogTs);
+  if(newEntries.length) lastLogTs=entries[0].ts;
+
+  body.innerHTML=entries.map((e,i)=>{
+    const isNew=newEntries.includes(e);
+    const evClass=e.event||'routing';
+    const evLabel=EVENT_LABELS[e.event]||e.event.toUpperCase();
+    const text=e.event==='done'||e.event==='pipeline_done'||e.event==='pipeline_stage'
+      ?e.reply:e.query;
+    const aColor=e.agent_color||'var(--cyan)';
+    return `<div class="log-entry${isNew?' new':''}" style="--ac:${aColor}">
+      <span class="le-time">${esc(e.ts_str)}</span>
+      <span class="le-emoji">${esc(e.agent_emoji||'🤖')}</span>
+      <span class="le-name" style="color:${aColor}">${esc(e.agent_name)}</span>
+      <span class="le-event ${evClass}">${evLabel}</span>
+      <span class="le-text">${esc((text||'').slice(0,80))}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ── Pipeline visualizer ── */
+function renderPipeline(currentPipeline, active){
+  const body=$('pipeline-body');
+  if(!currentPipeline||!currentPipeline.length){
+    body.innerHTML='<div class="pipeline-idle">NO ACTIVE PIPELINE</div>';
+    return;
+  }
+  const teamMap=Object.fromEntries(teamData.map(a=>[a.id,a]));
+  const items=currentPipeline.map((aid,i)=>{
+    const a=teamMap[aid]||{name:aid,emoji:'🤖',color:'#39c7ff'};
+    const isActive=active?.id===aid;
+    const isDone=!isActive&&i<currentPipeline.indexOf(active?.id||'');
+    return `<div class="pa${isActive?' active-stage':''}" style="color:${a.color};border-color:${a.color};${isActive?`box-shadow:0 0 16px ${a.color}`:'opacity:.6'}">
+      <div class="pa-emoji">${a.emoji}</div>
+      <div class="pa-name" style="color:${a.color}">${esc(a.name)}</div>
+      <div class="pa-status">${isActive?'▶ ACTIVE':isDone?'✓ DONE':'● QUEUED'}</div>
+    </div>`;
+  });
+  const withArrows=items.flatMap((item,i)=>
+    i<items.length-1?[item,'<span class="pipe-arrow">→</span>']:[item]
+  ).join('');
+  body.innerHTML=`<div class="pipeline-chain">${withArrows}</div>`;
+}
+
+/* ── Command console ── */
+const cmdLog=$('cmd-log');
+function cmdAdd(cls,txt,color){
+  const r=document.createElement('div');
+  r.className=cls;
+  if(color) r.style.color=color;
+  r.textContent=txt;
+  cmdLog.appendChild(r);
+  cmdLog.scrollTop=cmdLog.scrollHeight;
+  return r;
+}
+
+async function dispatch(text){
+  cmdAdd('you',text);
+  const ph=cmdAdd('sys','Routing…');
+  try{
+    const r=await fetch(API+'/ask',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text})
+    });
+    const d=await r.json();
+    ph.remove();
+    const aColor=d.agent_color||'var(--cyan)';
+    const aName=d.agent_name||'JARVIS';
+    const prefix=document.createElement('div');
+    prefix.style.cssText=`font-size:9px;letter-spacing:1px;color:${aColor};margin-top:4px`;
+    prefix.textContent=`◉ ${aName}${d.pipeline?' · PIPELINE':''}`;
+    cmdLog.appendChild(prefix);
+    const reply=document.createElement('div');
+    reply.className='agent-r';
+    reply.style.color=aColor;
+    reply.textContent=d.reply||'No reply.';
+    cmdLog.appendChild(reply);
+    cmdLog.scrollTop=cmdLog.scrollHeight;
+  }catch(e){
+    ph.remove();
+    cmdAdd('sys','Cannot reach backend — is the server running?');
+  }
+}
+
+$('cmd-send').onclick=()=>{
+  const v=$('cmd-input').value.trim();
+  if(!v)return;
+  $('cmd-input').value='';
+  dispatch(v);
+};
+$('cmd-input').addEventListener('keydown',e=>{if(e.key==='Enter')$('cmd-send').click();});
+
+/* ── Polling ── */
+async function poll(){
+  try{
+    const r=await fetch(API+'/agent-log');
+    const d=await r.json();
+    teamData=d.team||[];
+    if(!$('ac-jarvis')) buildStrip(teamData); // first render
+    updateStrip(d.active, d.stats);
+    renderLog(d.log||[]);
+    renderPipeline(d.current_pipeline, d.active);
+    currentActiveId=d.active?.id||'jarvis';
+  }catch(e){/* server not running */}
+}
+
+// initial load then 1.5s interval
+poll().then(()=>{
+  if(!$('ac-jarvis')) buildStrip([]);
+});
+setInterval(poll,1500);
+
+})();
+</script>
+</body>
+</html>
