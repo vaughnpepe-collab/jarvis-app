@@ -17,15 +17,18 @@ export function AddToBagForm({ product }: Props) {
 
   const handleAdd = () => {
     if (!size) { setError("Please select a size"); return; }
+    const variantId = product.shopifyVariants[size];
+    if (!variantId) { setError("Size unavailable"); return; }
     setError("");
     addItem({
-      id:    product.id,
-      slug:  product.slug,
-      name:  product.name,
-      price: product.price,
+      id:        product.id,
+      slug:      product.slug,
+      name:      product.name,
+      price:     product.price,
       size,
       color,
-      image: product.images[0],
+      image:     product.images[0],
+      variantId,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 3000);

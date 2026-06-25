@@ -3,17 +3,9 @@
 import React, { useState } from "react";
 import Image    from "next/image";
 import { Footer } from "@/components/Footer";
-import { Calendar, User, Scissors, Lock } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 
 const services = [
-  {
-    icon:     Scissors,
-    title:    "Bespoke Tailoring",
-    price:    "From £4,000",
-    duration: "8–12 weeks",
-    desc:     "A garment made entirely to your measurements. One consultation, two fittings, one masterpiece.",
-    includes: ["Full pattern creation", "Two fittings", "Fabric consultation", "Lifetime alterations"],
-  },
   {
     icon:     User,
     title:    "Wardrobe Consultation",
@@ -29,14 +21,6 @@ const services = [
     duration: "By appointment",
     desc:     "See the full collection in private before it reaches the public. Champagne included.",
     includes: ["Full collection access", "Styling assistance", "Pre-order privileges", "Exclusive pieces"],
-  },
-  {
-    icon:     Lock,
-    title:    "Private Commission",
-    price:    "From £8,000",
-    duration: "12–20 weeks",
-    desc:     "Something no one else will ever own. We create it together, from concept to cloth.",
-    includes: ["Concept development", "Fabric sourcing", "Full bespoke construction", "Certificate of authenticity"],
   },
 ];
 
@@ -59,8 +43,8 @@ export default function AtelierPage() {
             The<br /><span className="italic">Atelier</span>
           </h1>
           <p className="text-base text-verra-ash/80 mt-6 max-w-md leading-8">
-            An experience as rare as the garment. Everything at VÉRRA is available to be
-            made exactly as you imagine it.
+            A space apart. Private appointments with VÉRRA styling directors, and exclusive
+            access to the full collection before it reaches the world.
           </p>
         </div>
       </div>

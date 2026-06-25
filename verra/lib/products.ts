@@ -17,6 +17,7 @@ export interface Product {
   inStock: boolean;
   isNew?: boolean;
   isBestSeller?: boolean;
+  shopifyVariants: Record<string, string>;
 }
 
 export const products: Product[] = [
@@ -42,6 +43,13 @@ export const products: Product[] = [
     colors:      [{ name: "Onyx", hex: "#0A0A0A" }, { name: "Ivory", hex: "#F8F7F4" }, { name: "Camel", hex: "#C19A6B" }],
     inStock:     true,
     isNew:       true,
+    shopifyVariants: {
+      XS: "gid://shopify/ProductVariant/59972412670286",
+      S:  "gid://shopify/ProductVariant/59972412703054",
+      M:  "gid://shopify/ProductVariant/59972412735822",
+      L:  "gid://shopify/ProductVariant/59972412768590",
+      XL: "gid://shopify/ProductVariant/59972412801358",
+    },
   },
   {
     id:          "002",
@@ -64,6 +72,13 @@ export const products: Product[] = [
     colors:      [{ name: "Charcoal", hex: "#1B1B1B" }, { name: "Bone", hex: "#E8E0D0" }, { name: "Mushroom", hex: "#9B8B79" }],
     inStock:     true,
     isBestSeller: true,
+    shopifyVariants: {
+      S:   "gid://shopify/ProductVariant/59972413522254",
+      M:   "gid://shopify/ProductVariant/59972413555022",
+      L:   "gid://shopify/ProductVariant/59972413587790",
+      XL:  "gid://shopify/ProductVariant/59972413620558",
+      XXL: "gid://shopify/ProductVariant/59972413653326",
+    },
   },
   {
     id:          "003",
@@ -86,6 +101,13 @@ export const products: Product[] = [
     ],
     colors:      [{ name: "Noir", hex: "#0A0A0A" }, { name: "Cognac", hex: "#7B4E2D" }],
     inStock:     true,
+    shopifyVariants: {
+      XS: "gid://shopify/ProductVariant/59972413915470",
+      S:  "gid://shopify/ProductVariant/59972413948238",
+      M:  "gid://shopify/ProductVariant/59972413981006",
+      L:  "gid://shopify/ProductVariant/59972414013774",
+      XL: "gid://shopify/ProductVariant/59972414046542",
+    },
   },
   {
     id:          "004",
@@ -109,6 +131,12 @@ export const products: Product[] = [
     colors:      [{ name: "Ivory", hex: "#F8F7F4" }, { name: "Midnight", hex: "#1a1a2e" }, { name: "Sand", hex: "#C2A882" }],
     inStock:     true,
     isNew:       true,
+    shopifyVariants: {
+      XS: "gid://shopify/ProductVariant/59972414538062",
+      S:  "gid://shopify/ProductVariant/59972414570830",
+      M:  "gid://shopify/ProductVariant/59972414603598",
+      L:  "gid://shopify/ProductVariant/59972414636366",
+    },
   },
   {
     id:          "005",
@@ -131,6 +159,13 @@ export const products: Product[] = [
     colors:      [{ name: "Slate", hex: "#475569" }, { name: "Espresso", hex: "#3B1F0E" }, { name: "Sage", hex: "#7C9070" }],
     inStock:     true,
     isBestSeller: true,
+    shopifyVariants: {
+      S:   "gid://shopify/ProductVariant/59972414800206",
+      M:   "gid://shopify/ProductVariant/59972414832974",
+      L:   "gid://shopify/ProductVariant/59972414865742",
+      XL:  "gid://shopify/ProductVariant/59972414898510",
+      XXL: "gid://shopify/ProductVariant/59972414931278",
+    },
   },
   {
     id:          "006",
@@ -153,6 +188,13 @@ export const products: Product[] = [
     colors:      [{ name: "Ecru", hex: "#E8E0D0" }, { name: "Black", hex: "#0A0A0A" }, { name: "Bordeaux", hex: "#5C1A1A" }],
     inStock:     true,
     isNew:       true,
+    shopifyVariants: {
+      XS: "gid://shopify/ProductVariant/59972415291726",
+      S:  "gid://shopify/ProductVariant/59972415324494",
+      M:  "gid://shopify/ProductVariant/59972415357262",
+      L:  "gid://shopify/ProductVariant/59972415390030",
+      XL: "gid://shopify/ProductVariant/59972415422798",
+    },
   },
 ];
 

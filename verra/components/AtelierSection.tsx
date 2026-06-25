@@ -3,14 +3,9 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Scissors, User, Calendar, Lock } from "lucide-react";
+import { User, Calendar, Star, Gift } from "lucide-react";
 
 const services = [
-  {
-    icon:        Scissors,
-    title:       "Custom Tailoring",
-    description: "A garment built entirely to your measurements, in fabrics chosen with you. Takes 8–12 weeks.",
-  },
   {
     icon:        User,
     title:       "Personal Styling",
@@ -22,9 +17,14 @@ const services = [
     description: "Private showroom access. See the full collection before it goes public, with champagne on arrival.",
   },
   {
-    icon:        Lock,
-    title:       "Private Collections",
-    description: "Exclusive pieces never seen online — created for clients who want something that cannot be found elsewhere.",
+    icon:        Star,
+    title:       "Priority Access",
+    description: "Be first to know about new arrivals, limited drops, and members-only editorial events.",
+  },
+  {
+    icon:        Gift,
+    title:       "Gift Curation",
+    description: "Let us select the perfect VÉRRA piece for someone extraordinary. Complimentary wrapping included.",
   },
 ];
 

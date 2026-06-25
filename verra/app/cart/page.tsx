@@ -9,7 +9,7 @@ import { formatPrice } from "@/lib/products";
 import { Footer }    from "@/components/Footer";
 
 export default function CartPage() {
-  const { items, removeItem, updateQty, subtotal, itemCount } = useCart();
+  const { items, removeItem, updateQty, subtotal, itemCount, checkout, isCheckingOut } = useCart();
   const [promo,   setPromo]   = useState("");
   const [applied, setApplied] = useState("");
 
@@ -128,8 +128,12 @@ export default function CartPage() {
                 <span className="font-serif text-2xl text-verra-ivory">{formatPrice(total)}</span>
               </div>
 
-              <button className="w-full bg-verra-gold text-verra-black text-[11px] tracking-widest2 uppercase font-semibold py-4 hover:bg-verra-gold-light transition-all duration-300">
-                Proceed to Checkout
+              <button
+                onClick={checkout}
+                disabled={isCheckingOut}
+                className="w-full bg-verra-gold text-verra-black text-[11px] tracking-widest2 uppercase font-semibold py-4 hover:bg-verra-gold-light transition-all duration-300 disabled:opacity-60 disabled:cursor-wait"
+              >
+                {isCheckingOut ? "Redirecting..." : "Proceed to Checkout"}
               </button>
               <Link href="/collections" className="block text-center text-[10px] tracking-widest uppercase text-verra-ash hover:text-verra-ivory transition-colors py-2">
                 Continue Shopping
