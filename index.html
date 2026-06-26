@@ -13,7 +13,9 @@
 <meta property="og:url" content="https://hwwebdesign.co.uk/">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232563eb'/><text x='16' y='23' font-family='Segoe UI,Arial' font-size='16' font-weight='800' fill='white' text-anchor='middle'>HW</text></svg>">
+<link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
+<link rel="alternate icon" href="/assets/logo-icon-512.png">
+<link rel="apple-touch-icon" href="/assets/logo-icon-512.png">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -46,7 +48,21 @@ img{max-width:100%}
 /* ---------- nav ---------- */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;transition:background .35s,box-shadow .35s,border-color .35s;border-bottom:1px solid transparent}
 nav.solid{background:rgba(255,255,255,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 4px 24px rgba(2,6,23,.06)}
-.nav-logo{font-size:19px;font-weight:800;letter-spacing:-.3px;color:#fff;transition:color .35s}
+.nav-logo{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;font-size:19px;font-weight:800;letter-spacing:-.3px;color:#fff;transition:color .35s}
+.nav-logo span{margin-left:2px}
+.nav-logo .logo-mark{width:30px;height:30px;flex-shrink:0;transition:transform .25s cubic-bezier(.2,.7,.2,1)}
+.nav-logo:hover .logo-mark{transform:translateY(-1px) scale(1.08)}
+.logo-mark .ln{transform-box:fill-box;transform-origin:left center;animation:lnDraw .6s cubic-bezier(.2,.7,.2,1) both}
+.logo-mark .lines .ln:nth-child(1){animation-delay:.25s}
+.logo-mark .lines .ln:nth-child(2){animation-delay:.38s}
+.logo-mark .lines .ln:nth-child(3){animation-delay:.51s}
+.logo-mark .dots circle{transform-box:fill-box;transform-origin:center}
+.nav-logo:hover .dots circle{animation:dotPulse .6s ease}
+.nav-logo:hover .dots circle:nth-child(2){animation-delay:.08s}
+.nav-logo:hover .dots circle:nth-child(3){animation-delay:.16s}
+@keyframes lnDraw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes dotPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.55)}}
+@media(max-width:980px){.nav-links{display:none}.nav-toggle{display:flex}.nav-cta{display:none}}
 nav.solid .nav-logo{color:var(--ink)}
 .nav-logo span{color:#7dd3fc}
 nav.solid .nav-logo span{color:var(--blue)}
@@ -282,7 +298,7 @@ nav.solid .nav-toggle span{background:var(--ink)}
 <div class="progress" id="progress"></div>
 
 <nav id="nav">
-  <a href="#home" class="nav-logo">HW <span>Web Design</span></a>
+  <a href="#home" class="nav-logo"><svg class="logo-mark" viewBox="0 0 60 60" aria-hidden="true"><defs><linearGradient id="nlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><rect x=".5" y=".5" width="59" height="59" rx="14" fill="#0b1220" stroke="#94a3b8" stroke-opacity=".3"/><g class="dots"><circle cx="12" cy="13" r="2.4" fill="#ff5f57"/><circle cx="21" cy="13" r="2.4" fill="#febc2e"/><circle cx="30" cy="13" r="2.4" fill="#28c840"/></g><rect x="8" y="22" width="44" height="30" rx="6" fill="url(#nlg)"/><g class="lines"><rect class="ln" x="14" y="29" width="20" height="4" rx="2" fill="#fff" opacity=".95"/><rect class="ln" x="14" y="37" width="32" height="3" rx="1.5" fill="#fff" opacity=".55"/><rect class="ln" x="14" y="43" width="14" height="6" rx="3" fill="#fff"/></g></svg>HW <span>Web Design</span></a>
   <ul class="nav-links">
     <li><a href="#included">What's Included</a></li>
     <li><a href="#pricing">Pricing</a></li>
