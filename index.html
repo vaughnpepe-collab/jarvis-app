@@ -274,6 +274,16 @@ nav.solid .nav-toggle span{background:var(--ink)}
   *{animation:none!important;transition:none!important}
   .reveal,.stagger>*{opacity:1!important;transform:none!important}
 }
+/* form success */
+.form-ok{text-align:center;padding:40px 20px}
+.fok-icon{width:64px;height:64px;border-radius:50%;background:#dcfce7;color:#16a34a;font-size:30px;display:grid;place-items:center;margin:0 auto 18px;font-weight:700;line-height:1}
+.form-ok h4{font-size:20px;font-weight:800;color:var(--ink);margin-bottom:10px}
+.form-ok p{color:var(--grey);font-size:15px;line-height:1.65}
+.form-ok a{color:var(--blue);font-weight:700}
+/* WhatsApp float */
+.wa-float{position:fixed;bottom:28px;right:28px;z-index:999;width:58px;height:58px;border-radius:50%;background:#25d366;box-shadow:0 6px 20px rgba(37,211,102,.55);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
+.wa-float:hover{transform:scale(1.12);box-shadow:0 10px 30px rgba(37,211,102,.7)}
+.wa-float svg{width:30px;height:30px;fill:#fff}
 </style>
 </head>
 <body>
@@ -459,16 +469,18 @@ nav.solid .nav-toggle span{background:var(--ink)}
         <div class="cpill"><div class="ci">📍</div><div><div class="cl">Based In</div><div class="cv">High Wycombe, Buckinghamshire</div></div></div>
       </div>
     </div>
-    <!-- Zero-backend: submits via the visitor's email client. Swap for a free
-         Formspree/Web3Forms endpoint (form action + method="POST") to auto-collect. -->
+    <!-- Form submits via Web3Forms (free). Sign up at web3forms.com with your
+         email address to get an access_key, then replace the placeholder below. -->
     <form id="enquiry" class="reveal" onsubmit="return sendEnquiry(event)">
+      <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY">
+      <input type="hidden" name="redirect" value="false">
       <div class="form-row">
-        <input id="f-name" type="text" placeholder="Your Name" required>
-        <input id="f-phone" type="tel" placeholder="Phone Number">
+        <input id="f-name" name="name" type="text" placeholder="Your Name" required>
+        <input id="f-phone" name="phone" type="tel" placeholder="Phone Number">
       </div>
-      <input id="f-email" type="email" placeholder="Email Address" required>
-      <input id="f-biz" type="text" placeholder="Business Name">
-      <select id="f-type">
+      <input id="f-email" name="email" type="email" placeholder="Email Address" required>
+      <input id="f-biz" name="business" type="text" placeholder="Business Name">
+      <select id="f-type" name="business_type">
         <option value="">What type of business are you?</option>
         <option>Trades (Plumber, Electrician, Builder etc.)</option>
         <option>Restaurant / Café / Takeaway</option>
@@ -478,7 +490,7 @@ nav.solid .nav-toggle span{background:var(--ink)}
         <option>Fitness / Gym</option>
         <option>Other</option>
       </select>
-      <textarea id="f-msg" placeholder="Tell us a bit about what you need — do you have a website already?"></textarea>
+      <textarea id="f-msg" name="message" placeholder="Tell us a bit about what you need — do you have a website already?"></textarea>
       <button type="submit" class="form-submit">Send My Enquiry →</button>
       <p class="form-note">Prefer to talk? Call or WhatsApp <strong><a href="tel:+447359881818" style="color:inherit">07359 881818</a></strong>.</p>
     </form>
@@ -543,16 +555,47 @@ function runCounts(){
   });
 }
 
-/* contact form -> email (no backend needed) */
-function sendEnquiry(e){
+/* contact form — submits to Web3Forms; falls back to mailto if key not set */
+async function sendEnquiry(e){
   e.preventDefault();
-  var v=function(id){var el=document.getElementById(id);return el?(el.value||'').trim():'';};
-  var name=v('f-name'),phone=v('f-phone'),email=v('f-email'),biz=v('f-biz'),type=v('f-type'),msg=v('f-msg');
-  var subject='Website enquiry'+(biz?(' — '+biz):'');
-  var body=['Name: '+name,'Business: '+biz,'Phone: '+phone,'Email: '+email,'Type: '+type,'','Message:',msg].join('\n');
-  window.location.href='mailto:hello@hwwebdesign.co.uk?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  var form=e.target,btn=form.querySelector('.form-submit');
+  var key=(form.querySelector('[name="access_key"]')||{}).value||'';
+  var biz=(form.querySelector('[name="business"]')||{}).value||'';
+  var name=(form.querySelector('[name="name"]')||{}).value||'';
+  var email=(form.querySelector('[name="email"]')||{}).value||'';
+  var phone=(form.querySelector('[name="phone"]')||{}).value||'';
+  var type=(form.querySelector('[name="business_type"]')||{}).value||'';
+  var msg=(form.querySelector('[name="message"]')||{}).value||'';
+  // Fallback: if access key is still the placeholder, open mailto
+  if(!key||key==='YOUR_WEB3FORMS_ACCESS_KEY'){
+    var sub='Website enquiry'+(biz?' — '+biz:'');
+    var body=['Name: '+name,'Business: '+biz,'Phone: '+phone,'Email: '+email,'Type: '+type,'','Message:',msg].join('\n');
+    window.location.href='mailto:hello@hwwebdesign.co.uk?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body);
+    return false;
+  }
+  btn.disabled=true;btn.textContent='Sending…';
+  var data=new FormData(form);
+  data.set('subject','New enquiry'+(biz?' — '+biz:''));
+  data.set('from_name',name||'HW Web Design Enquiry');
+  try{
+    var r=await fetch('https://api.web3forms.com/submit',{method:'POST',body:data});
+    var j=await r.json();
+    if(j.success){
+      form.innerHTML='<div class="form-ok"><div class="fok-icon">✓</div><h4>Enquiry sent!</h4><p>Thanks '+(name.split(' ')[0]||'')+'! We\'ll be in touch today.<br>Need it faster? Call or WhatsApp <a href="tel:+447359881818">07359 881818</a>.</p></div>';
+    }else{throw new Error(j.message||'Submit error');}
+  }catch(err){
+    btn.disabled=false;btn.textContent='Send My Enquiry →';
+    alert('Could not send right now — please call or WhatsApp us on 07359 881818.');
+  }
   return false;
 }
 </script>
+<!-- WhatsApp click-to-chat — works immediately, no account setup needed -->
+<a href="https://wa.me/447359881818?text=Hi%2C%20I%27d%20like%20to%20find%20out%20about%20a%20website%20for%20my%20business"
+   class="wa-float" aria-label="Chat on WhatsApp" target="_blank" rel="noopener noreferrer">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
 </body>
 </html>
