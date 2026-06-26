@@ -34,8 +34,8 @@
   --blue:#2563eb;--blue-dark:#1d4ed8;--indigo:#4f46e5;--violet:#7c3aed;--cyan:#06b6d4;
   --ink:#0b1220;--slate:#0f172a;--text:#0f172a;--grey:#64748b;--light:#f8fafc;--border:#e7ebf3;
 }
-html{scroll-behavior:smooth}
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--text);line-height:1.6;background:#fff;overflow-x:hidden}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--text);line-height:1.6;background:#fff;overflow-x:hidden;width:100%;max-width:100%;position:relative}
 a{text-decoration:none}
 ::selection{background:var(--blue);color:#fff}
 img{max-width:100%}
@@ -121,7 +121,7 @@ nav.solid .nav-links a{color:var(--grey)}
 .hero-fade{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(transparent,#fff);z-index:1}
 
 /* ---------- marquee ---------- */
-.marquee-wrap{background:var(--ink);padding:0 0 38px;position:relative;z-index:2}
+.marquee-wrap{background:var(--ink);padding:0 0 38px;position:relative;z-index:2;overflow:hidden}
 .marquee-label{text-align:center;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:22px;font-weight:600}
 .marquee{display:flex;gap:18px;width:max-content;animation:scrollx 26s linear infinite}
 .marquee:hover{animation-play-state:paused}
@@ -155,25 +155,7 @@ h2{font-size:clamp(29px,4vw,46px);font-weight:900;color:var(--ink);line-height:1
 .stat .num{font-size:clamp(30px,4vw,44px);font-weight:900;background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
 .stat .lab{font-size:14px;color:rgba(255,255,255,.62);margin-top:8px}
 
-/* ---------- portfolio ---------- */
-.pf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px;margin-top:54px}
-.pf-card{border-radius:18px;overflow:hidden;border:1px solid var(--border);background:#fff;box-shadow:0 2px 8px rgba(2,6,23,.05);transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s}
-.pf-card:hover{transform:translateY(-8px);box-shadow:0 28px 56px rgba(2,6,23,.14)}
-.pf-prev{height:210px;display:flex;align-items:center;justify-content:center;font-size:74px;position:relative;overflow:hidden}
-.pf-prev::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-100%);transition:transform .7s}
-.pf-card:hover .pf-prev::after{transform:translateX(100%)}
-.pf-prev span{transition:transform .4s}
-.pf-card:hover .pf-prev span{transform:scale(1.14) rotate(-4deg)}
-.pf-prev.trades{background:linear-gradient(135deg,#1e3a5f,#2563eb)}
-.pf-prev.restaurant{background:linear-gradient(135deg,#3d1a08,#b91c1c)}
-.pf-prev.beauty{background:linear-gradient(135deg,#4a1942,#9d2b5b)}
-.pf-info{padding:24px}
-.pf-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);background:#eff6ff;padding:4px 11px;border-radius:5px;margin-bottom:12px}
-.pf-info h3{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px}
-.pf-info p{font-size:14px;color:var(--grey);line-height:1.6;margin-bottom:16px}
-.pf-link{font-size:14px;font-weight:700;color:var(--blue);display:inline-flex;align-items:center;gap:6px}
-.pf-link .arr{transition:transform .25s}
-.pf-link:hover .arr{transform:translateX(5px)}
+/* (portfolio section removed) */
 
 /* ---------- free mockup band ---------- */
 .mockup-band{position:relative;text-align:center;color:#fff;overflow:hidden;background:linear-gradient(120deg,#1d4ed8,#4f46e5,#7c3aed);background-size:200% 200%;animation:gradmove 9s ease infinite}
@@ -247,6 +229,47 @@ footer .fl a:hover{color:#fff}
   .contact-grid{grid-template-columns:1fr;gap:36px}
   .form-row{grid-template-columns:1fr}
 }
+/* anchor offset so links don't hide under the fixed nav */
+section{scroll-margin-top:84px}
+/* keyboard-focus accessibility */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #93c5fd;outline-offset:3px;border-radius:6px}
+
+/* what's-included features */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:54px}
+.feat-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px;transition:transform .3s,box-shadow .3s}
+.feat-card:hover{transform:translateY(-6px);box-shadow:0 22px 48px rgba(2,6,23,.1)}
+.feat-ic{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;font-size:25px;background:linear-gradient(135deg,#eff6ff,#eef2ff);margin-bottom:16px}
+.feat-card h3{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px}
+.feat-card p{font-size:14.5px;color:var(--grey);line-height:1.65}
+
+/* hamburger + mobile menu */
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;border:0;background:transparent;cursor:pointer}
+.nav-toggle span{display:block;width:24px;height:2.5px;border-radius:3px;background:#fff;margin:0 auto;transition:transform .3s,opacity .2s}
+nav.solid .nav-toggle span{background:var(--ink)}
+.nav-toggle.open span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+.mobile-menu{position:fixed;top:70px;left:0;right:0;z-index:99;background:rgba(11,18,32,.98);backdrop-filter:blur(12px);display:flex;flex-direction:column;padding:12px 5% 22px;transform:translateY(-135%);transition:transform .35s cubic-bezier(.2,.7,.2,1);border-bottom:1px solid rgba(255,255,255,.1)}
+.mobile-menu.open{transform:translateY(0)}
+.mobile-menu a{color:rgba(255,255,255,.92);font-size:17px;font-weight:600;padding:15px 6px;border-bottom:1px solid rgba(255,255,255,.08)}
+.mobile-menu .mm-cta{background:var(--blue);color:#fff;text-align:center;border-radius:11px;margin-top:12px;padding:15px;border:0;box-shadow:0 10px 24px rgba(37,99,235,.4)}
+
+@media(max-width:880px){
+  .nav-toggle{display:flex}
+  .nav-cta{display:none}
+  nav.solid{backdrop-filter:none;background:#fff}
+}
+@media(max-width:600px){
+  section{padding:74px 5%}
+  .hero{padding:108px 5% 72px}
+  .hero-btns{flex-direction:column;align-items:stretch}
+  .hero-btns a{text-align:center}
+  .blob{animation:none!important;filter:blur(55px);opacity:.42}
+  .stats{padding:34px 18px;gap:26px 14px}
+  form{padding:24px}
+  .mockup-band p{font-size:17px}
+}
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
   .reveal,.stagger>*{opacity:1!important;transform:none!important}
@@ -259,13 +282,23 @@ footer .fl a:hover{color:#fff}
 <nav id="nav">
   <a href="#home" class="nav-logo">HW <span>Web Design</span></a>
   <ul class="nav-links">
-    <li><a href="#work">Our Work</a></li>
+    <li><a href="#included">What's Included</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="#process">How It Works</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
-  <a href="#mockup" class="nav-cta">Get a Free Mockup</a>
+  <div class="nav-right">
+    <a href="#mockup" class="nav-cta">Get a Free Mockup</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+  </div>
 </nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#included">What's Included</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#process">How It Works</a>
+  <a href="#contact">Contact</a>
+  <a href="#mockup" class="mm-cta">Get a Free Mockup →</a>
+</div>
 
 <section class="hero" id="home">
   <div class="aurora">
@@ -274,7 +307,7 @@ footer .fl a:hover{color:#fff}
   <div class="grid-overlay"></div>
   <div class="hero-inner">
     <div class="hero-copy">
-      <div class="eyebrow"><span class="dot"></span> High Wycombe & Buckinghamshire · Web Design</div>
+      <div class="eyebrow"><span class="dot"></span> High Wycombe · Web Design</div>
       <h1>Websites that<br><span class="rot-wrap"><span id="rot">win customers</span></span></h1>
       <p class="tagline">Modern, fast, mobile-friendly sites for ambitious local businesses — <b>from £399, live within a week.</b> See yours first with a free, no-obligation mockup.</p>
       <div class="hero-btns">
@@ -325,29 +358,17 @@ footer .fl a:hover{color:#fff}
   </div>
 </section>
 
-<section id="work">
+<section id="included">
   <div class="wrap">
-    <div class="reveal"><div class="tag">Portfolio</div><h2>Recent Work</h2>
-    <p class="sub">Every site is custom-designed for the business — not a template with the logo swapped. Tap through to explore the live demos.</p></div>
-    <div class="pf-grid stagger">
-      <div class="pf-card">
-        <div class="pf-prev trades"><span>🔧</span></div>
-        <div class="pf-info"><span class="pf-tag">Trades</span><h3>Chiltern Trades & Build</h3>
-          <p>Full site for a local plumbing & building company — services, quote form and 24hr emergency contact.</p>
-          <a href="demos/trades/" target="_blank" class="pf-link">View Demo <span class="arr">→</span></a></div>
-      </div>
-      <div class="pf-card">
-        <div class="pf-prev restaurant"><span>🍛</span></div>
-        <div class="pf-info"><span class="pf-tag">Restaurant</span><h3>Spice Garden Restaurant</h3>
-          <p>Restaurant site with full menu, opening hours, booking prompt and Google Maps integration.</p>
-          <a href="demos/restaurant/" target="_blank" class="pf-link">View Demo <span class="arr">→</span></a></div>
-      </div>
-      <div class="pf-card">
-        <div class="pf-prev beauty"><span>💅</span></div>
-        <div class="pf-info"><span class="pf-tag">Beauty</span><h3>Bloom Beauty Studio</h3>
-          <p>Elegant salon site with service menu, price list, reviews and an online booking call-to-action.</p>
-          <a href="demos/beauty/" target="_blank" class="pf-link">View Demo <span class="arr">→</span></a></div>
-      </div>
+    <div class="reveal"><div class="tag">What's Included</div><h2>Everything Your Website Needs</h2>
+    <p class="sub">Every site comes with the essentials to look professional and get found by local customers — no upsells, no surprises.</p></div>
+    <div class="feat-grid stagger">
+      <div class="feat-card"><div class="feat-ic">🎨</div><h3>Custom Design</h3><p>Designed around your brand and your customers — never a template with the logo swapped in.</p></div>
+      <div class="feat-card"><div class="feat-ic">📱</div><h3>Flawless on Mobile</h3><p>Most people find local businesses on a phone, so your site is built mobile-first to look perfect on every screen.</p></div>
+      <div class="feat-card"><div class="feat-ic">🔍</div><h3>Google-Ready SEO</h3><p>Set up from day one to be found by local customers searching for exactly what you do.</p></div>
+      <div class="feat-card"><div class="feat-ic">⚡</div><h3>Lightning Fast</h3><p>Hand-built, lightweight pages that load in a blink — fast sites rank higher and win more enquiries.</p></div>
+      <div class="feat-card"><div class="feat-ic">📍</div><h3>Google Business Setup</h3><p>We get you onto Google Maps and local search so nearby customers can find and call you.</p></div>
+      <div class="feat-card"><div class="feat-ic">🛟</div><h3>Local, Ongoing Support</h3><p>30 days of free aftercare and a real local person to call whenever you need a change.</p></div>
     </div>
   </div>
 </section>
@@ -466,7 +487,7 @@ footer .fl a:hover{color:#fff}
 
 <footer>
   <div><strong>HW Web Design</strong> · High Wycombe, Buckinghamshire</div>
-  <div class="fl"><a href="#work">Work</a><a href="#pricing">Pricing</a><a href="#contact">Contact</a></div>
+  <div class="fl"><a href="#included">What's Included</a><a href="#pricing">Pricing</a><a href="#contact">Contact</a></div>
   <div>© 2025 HW Web Design. All rights reserved.</div>
 </footer>
 
@@ -480,6 +501,18 @@ function onScroll(){
   prog.style.width=(h>0?(y/h*100):0)+'%';
 }
 addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+/* mobile menu */
+var tgl=document.getElementById('navToggle'),mm=document.getElementById('mobileMenu');
+if(tgl&&mm){
+  tgl.addEventListener('click',function(){
+    var open=mm.classList.toggle('open');tgl.classList.toggle('open',open);
+    tgl.setAttribute('aria-expanded',open);tgl.setAttribute('aria-label',open?'Close menu':'Open menu');
+  });
+  mm.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){
+    mm.classList.remove('open');tgl.classList.remove('open');tgl.setAttribute('aria-expanded','false');
+  });});
+}
 
 /* rotating headline word */
 var words=['win customers','get you found','turn clicks into calls','make you look the part'],i=0,rot=document.getElementById('rot');
