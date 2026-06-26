@@ -17,7 +17,7 @@ Happy to have a no-pressure chat if you're interested — or I can send over a f
 
 Best,
 [Your Name]
-07XXX XXX XXX
+07359 881818
 
 ---
 
@@ -37,7 +37,7 @@ Here's a demo of the kind of thing I'd build for you:
 Worth a quick call? No obligation at all.
 
 [Your Name]
-07XXX XXX XXX
+07359 881818
 
 ---
 
@@ -57,6 +57,6 @@ Just wanted to follow up on my last message in case it got lost.
 
 I build websites for local businesses in High Wycombe — simple process, fair prices, and most sites are live within a week.
 
-If now isn't the right time, no worries at all — but if you'd like to see a free mockup for [Business Name], just reply here or give me a call on 07XXX XXX XXX.
+If now isn't the right time, no worries at all — but if you'd like to see a free mockup for [Business Name], just reply here or give me a call on 07359 881818.
 
 [Your Name]

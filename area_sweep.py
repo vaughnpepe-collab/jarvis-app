@@ -34,7 +34,7 @@ PER = 30
 SLEEP = 1.3  # be polite to the free OSM endpoints (~1 req/sec policy)
 
 SHAKY = ("unreachable", "returns http", "blocked automated", "audit error")
-SIGNATURE = "Vaughn\nHW Web Design · 07XXX XXX XXX · hwwebdesign.co.uk"
+SIGNATURE = "Vaughn\nHW Web Design · 07359 881818 · hwwebdesign.co.uk"
 BASE_URL = "https://vaughnpepe-collab.github.io/jarvis-app"  # free GitHub Pages URL.
 # When the domain is bought: set this to "https://hwwebdesign.co.uk", re-add the
 # CNAME file, then re-run mockup_gen.py + prepare_drafts.py to refresh the links.
@@ -242,8 +242,8 @@ def render_outreach_from_csv(csv_path, out_path, area="High Wycombe & area",
 Personalised opener + email for your top callable leads, built from the live
 audit. Each lead has a **ready-made mockup** — generate them with
 `python mockup_gen.py`, and they go live at the link below once this is merged
-to `main`. **Swap in** your real phone number (placeholder `07XXX XXX XXX`) and
-your name if it isn't *Vaughn*.
+to `main`. Signed as **Vaughn · 07359 881818** — edit `SIGNATURE` in
+area_sweep.py to change the name or number.
 
 ---
 
