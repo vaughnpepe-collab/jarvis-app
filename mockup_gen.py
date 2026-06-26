@@ -17,6 +17,7 @@ Sample content (reviews, prices, stats) is illustrative and clearly labelled
 as a design concept on every page.
 """
 import csv
+import hashlib
 import os
 import sys
 
@@ -218,6 +219,80 @@ REVIEWS = {  # (text, name, town-offset) — first review localised to the lead'
 }
 NEARBY = ["High Wycombe", "Marlow", "Beaconsfield", "Amersham"]
 
+# ---------------------------------------------------------------- variants
+# Each business gets a deterministic-but-unique combination so no two mockups
+# feel template-stamped: typography, shape language, hero treatment, card
+# style, section order and "why" image side all vary by a hash of the name.
+V_HFONT = ["Georgia,'Times New Roman',serif",
+           "'Segoe UI',system-ui,-apple-system,sans-serif",
+           "'Trebuchet MS','Segoe UI',sans-serif",
+           "'Palatino Linotype','Book Antiqua',Georgia,serif",
+           "Verdana,Geneva,sans-serif"]
+V_BFONT = ["'Segoe UI',system-ui,-apple-system,sans-serif",
+           "Georgia,serif",
+           "'Trebuchet MS',Verdana,sans-serif"]
+V_RAD = ["3px", "10px", "16px", "26px"]
+V_HALIGN = ["left", "center"]
+V_HBG = ["grad", "mesh", "spot", "duo"]
+V_CARD = ["elevated", "bordered", "tinted"]
+V_ORDER = [("services", "about", "reviews"),
+           ("about", "services", "reviews"),
+           ("reviews", "services", "about"),
+           ("services", "reviews", "about")]
+V_VIS = ["right", "left"]
+
+
+def _pick(seed, opts, salt):
+    h = int(hashlib.md5((seed + salt).encode()).hexdigest(), 16)
+    return opts[h % len(opts)]
+
+
+def variant(name, town):
+    s = name + "|" + town
+    return {"hfont": _pick(s, V_HFONT, "hf"), "bfont": _pick(s, V_BFONT, "bf"),
+            "rad": _pick(s, V_RAD, "rd"), "halign": _pick(s, V_HALIGN, "ha"),
+            "hbg": _pick(s, V_HBG, "hb"), "card": _pick(s, V_CARD, "cd"),
+            "order": _pick(s, V_ORDER, "or"), "vis": _pick(s, V_VIS, "vs")}
+
+
+def build_variant_css(v, a):
+    """Return plain-CSS overrides (built by concatenation to avoid f-string
+    brace/percent escaping)."""
+    hero = [x.strip() for x in a["hero"].split(",")]
+    h0, h1, h2 = hero[0], hero[1], hero[2]
+    p, pd, ac, bd, cr = a["primary"], a["dark"], a["accent"], a["border"], a["cream"]
+    o = []
+    o.append("body{font-family:" + v["bfont"] + "}")
+    o.append("h1,h2,h3,h4,.logo,.tag,.num,.price{font-family:" + v["hfont"] + "}")
+    o.append(".card,.rev,form,.crow,input,textarea,.ncta,.bp,.bs,.fsub,.badge,"
+             ".price,.visual{border-radius:" + v["rad"] + "}")
+    o.append(".mid{display:flex;flex-direction:column}")
+    om = {"services": "#services", "about": "#about", "reviews": "#reviews"}
+    for i, k in enumerate(v["order"]):
+        o.append(om[k] + "{order:" + str(i) + "}")
+    if v["halign"] == "center":
+        o.append(".hero .hwrap{margin-left:auto;margin-right:auto;text-align:center;max-width:720px}")
+        o.append(".hero .btns{justify-content:center}")
+    if v["hbg"] == "mesh":
+        o.append(".hero{background-color:" + h2 + ";background-image:radial-gradient("
+                 "rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(135deg,"
+                 + h0 + "," + h1 + "," + h2 + ");background-size:24px 24px,cover}")
+    elif v["hbg"] == "spot":
+        o.append(".hero{background:radial-gradient(circle at 78% 28%," + ac
+                 + "55,transparent 55%),linear-gradient(165deg," + h0 + "," + h2 + ")}")
+    elif v["hbg"] == "duo":
+        o.append(".hero{background:linear-gradient(115deg," + p + " 0%," + pd
+                 + " 55%,#07080e 100%)}")
+    if v["card"] == "bordered":
+        o.append(".card{box-shadow:none;border:1.5px solid " + bd + "}")
+    elif v["card"] == "tinted":
+        o.append(".card{background:" + cr + ";border-color:transparent}")
+    else:
+        o.append(".card{box-shadow:0 12px 30px rgba(2,6,23,.07);border-color:transparent}")
+    if v["vis"] == "left":
+        o.append(".why-wrap{direction:rtl}.why-wrap>*{direction:ltr}")
+    return "\n".join(o)
+
 
 def tel(phone):
     digits = "".join(c for c in (phone or "") if c.isdigit() or c == "+")
@@ -228,6 +303,8 @@ def render(biz):
     name, niche, town = biz["name"], biz["niche"], biz["town"]
     n = NICHE.get(niche, NICHE["restaurant"])
     a = ARCH[n["arch"]]
+    v = variant(name, town)
+    vcss = build_variant_css(v, a)
     phone = biz.get("phone") or ""
     href = f"tel:{tel(phone)}" if phone else "#contact"
     fmt = lambda s: s.format(town=town)
@@ -365,6 +442,7 @@ footer .fn span{{color:var(--a)}}
 @media(prefers-reduced-motion:reduce){{*{{animation:none!important;transition:none!important}}.reveal,.grid .card,.revs .rev,.statbar .stat,.hero .badge,.hero h1,.hero p,.hero .btns{{opacity:1!important;transform:none!important}}}}
 @media(max-width:820px){{.nlinks{{display:none}}.why-wrap,.contact-wrap{{grid-template-columns:1fr}}.visual{{min-height:220px;font-size:90px}}}}
 </style>
+<style>{vcss}</style>
 </head>
 <body>
 <nav id="nav">
@@ -392,6 +470,7 @@ footer .fn span{{color:var(--a)}}
 
 <div class="statbar">{stats}</div>
 
+<div class="mid">
 <section id="services">
   <div class="reveal">
     <div class="tag">{n['stag']}</div>
@@ -421,6 +500,7 @@ footer .fn span{{color:var(--a)}}
   </div>
   <div class="revs">{reviews}</div>
 </section>
+</div>
 
 <section id="contact" class="cream">
   <div class="contact-wrap">

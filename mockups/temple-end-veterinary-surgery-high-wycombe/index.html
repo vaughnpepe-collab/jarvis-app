@@ -111,6 +111,17 @@ footer .fn span{color:var(--a)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal,.grid .card,.revs .rev,.statbar .stat,.hero .badge,.hero h1,.hero p,.hero .btns{opacity:1!important;transform:none!important}}
 @media(max-width:820px){.nlinks{display:none}.why-wrap,.contact-wrap{grid-template-columns:1fr}.visual{min-height:220px;font-size:90px}}
 </style>
+<style>body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+h1,h2,h3,h4,.logo,.tag,.num,.price{font-family:'Trebuchet MS','Segoe UI',sans-serif}
+.card,.rev,form,.crow,input,textarea,.ncta,.bp,.bs,.fsub,.badge,.price,.visual{border-radius:10px}
+.mid{display:flex;flex-direction:column}
+#services{order:0}
+#reviews{order:1}
+#about{order:2}
+.hero .hwrap{margin-left:auto;margin-right:auto;text-align:center;max-width:720px}
+.hero .btns{justify-content:center}
+.hero{background-color:#0a3a44;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(135deg,#062a33,#0e4d5c,#0a3a44);background-size:24px 24px,cover}
+.card{background:#f0fbfc;border-color:transparent}</style>
 </head>
 <body>
 <nav id="nav">
@@ -138,6 +149,7 @@ footer .fn span{color:var(--a)}
 
 <div class="statbar"><div class="stat"><div class="num">4.9★</div><div class="lab">Patient rating</div></div><div class="stat"><div class="num">New</div><div class="lab">Patients welcome</div></div><div class="stat"><div class="num">Same-week</div><div class="lab">Appointments</div></div></div>
 
+<div class="mid">
 <section id="services">
   <div class="reveal">
     <div class="tag">Our Services</div>
@@ -167,6 +179,7 @@ footer .fn span{color:var(--a)}
   </div>
   <div class="revs"><div class="rev"><div class="stars">★★★★★</div><p>"Nervous patient here — they put me completely at ease. Gentle, kind and professional."</p><div class="auth"><div class="ava">DM</div><div><div class="an">David M.</div><div class="al">High Wycombe</div></div></div></div><div class="rev"><div class="stars">★★★★★</div><p>"Got an emergency appointment the same day. Sorted quickly and explained everything clearly."</p><div class="auth"><div class="ava">PS</div><div><div class="an">Priya S.</div><div class="al">Marlow</div></div></div></div><div class="rev"><div class="stars">★★★★★</div><p>"The whole family goes here now. Friendly team and never a long wait. Brilliant."</p><div class="auth"><div class="ava">KB</div><div><div class="an">Karen B.</div><div class="al">Beaconsfield</div></div></div></div></div>
 </section>
+</div>
 
 <section id="contact" class="cream">
   <div class="contact-wrap">
