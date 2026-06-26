@@ -8,5 +8,5 @@ __pycache__/
 leads/*.csv
 leads/leads_*.md
 leads/outreach_pack_*.md
-leads/email_drafts.json
-leads/email_drafts.md
+leads/email_drafts*.json
+leads/email_drafts*.md
