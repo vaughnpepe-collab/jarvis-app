@@ -9,9 +9,6 @@ jarvis-app/
 ├─ jarvis_server.py  ← Python backend (the brain bridge + telemetry)
 ├─ ui.html           ← the HUD interface
 └─ requirements.txt  ← optional (psutil for real CPU/RAM)
-```
-
-## Auth — Claude with NO API key
 
 JARVIS talks to Claude through OpenClaw's `claude-cli` provider using your
 **Claude.ai subscription OAuth token** (no API key). The backend **auto-refreshes
