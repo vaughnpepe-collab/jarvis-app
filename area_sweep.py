@@ -35,8 +35,8 @@ SLEEP = 1.3  # be polite to the free OSM endpoints (~1 req/sec policy)
 
 SHAKY = ("unreachable", "returns http", "blocked automated", "audit error")
 SIGNATURE = "Vaughn\nHW Web Design · 07359 881818 · hwwebdesign.co.uk"
-BASE_URL = "https://vaughnpepe-collab.github.io/jarvis-app"  # free GitHub Pages URL.
-# When the domain is bought: set this to "https://hwwebdesign.co.uk", re-add the
+BASE_URL = "https://hwwebdesign.co.uk"  # live custom domain (CNAME in repo root).
+# To use the free URL instead: set this to the github.io project URL, delete the
 # CNAME file, then re-run mockup_gen.py + prepare_drafts.py to refresh the links.
 WARM_LIMIT = 20  # how many has-a-website leads get a ready mockup + outreach block
 

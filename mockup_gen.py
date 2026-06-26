@@ -335,6 +335,34 @@ footer .fn span{{color:var(--a)}}
 .flag{{position:fixed;right:16px;bottom:16px;z-index:200;background:#0f172a;color:#fff;font-size:12.5px;font-weight:600;padding:9px 15px;border-radius:30px;box-shadow:0 8px 26px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12)}}
 .flag span{{color:#7dd3fc}}
 .flag b{{color:var(--a)}}
+/* animation + polish */
+@keyframes mkUp{{from{{opacity:0;transform:translateY(26px)}}to{{opacity:1;transform:none}}}}
+@keyframes mkGlow{{0%,100%{{transform:translate(0,0) scale(1)}}50%{{transform:translate(-45px,35px) scale(1.18)}}}}
+@keyframes mkShine{{0%,55%{{left:-130%}}80%,100%{{left:140%}}}}
+.hero .badge{{animation:mkUp .6s .05s both cubic-bezier(.2,.7,.2,1)}}
+.hero h1{{animation:mkUp .7s .16s both cubic-bezier(.2,.7,.2,1)}}
+.hero p{{animation:mkUp .7s .3s both cubic-bezier(.2,.7,.2,1)}}
+.hero .btns{{animation:mkUp .7s .42s both cubic-bezier(.2,.7,.2,1)}}
+.hero::after{{content:'';position:absolute;left:-120px;bottom:-170px;width:430px;height:430px;border-radius:50%;background:radial-gradient(circle,var(--a) 0%,transparent 60%);opacity:.16;pointer-events:none;animation:mkGlow 17s ease-in-out infinite}}
+.bp{{position:relative;overflow:hidden}}
+.bp::after{{content:'';position:absolute;top:0;left:-130%;width:55%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:mkShine 4.8s ease-in-out infinite}}
+.reveal{{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}}
+.reveal.in{{opacity:1;transform:none}}
+.grid .card,.revs .rev{{opacity:0;transform:translateY(26px);transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .6s cubic-bezier(.2,.7,.2,1)}}
+.grid.in .card,.revs.in .rev{{opacity:1;transform:none}}
+.grid.in .card:nth-child(2),.revs.in .rev:nth-child(2){{transition-delay:.08s}}
+.grid.in .card:nth-child(3),.revs.in .rev:nth-child(3){{transition-delay:.16s}}
+.grid.in .card:nth-child(4){{transition-delay:.24s}}
+.grid.in .card:nth-child(5){{transition-delay:.32s}}
+.grid.in .card:nth-child(6){{transition-delay:.4s}}
+.statbar .stat{{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}}
+.statbar.in .stat{{opacity:1;transform:none}}
+.statbar.in .stat:nth-child(2){{transition-delay:.1s}}
+.statbar.in .stat:nth-child(3){{transition-delay:.2s}}
+.statbar.in .stat:nth-child(4){{transition-delay:.3s}}
+.card .ico{{transition:transform .3s}}
+.card:hover .ico{{transform:scale(1.15) rotate(-5deg)}}
+@media(prefers-reduced-motion:reduce){{*{{animation:none!important;transition:none!important}}.reveal,.grid .card,.revs .rev,.statbar .stat,.hero .badge,.hero h1,.hero p,.hero .btns{{opacity:1!important;transform:none!important}}}}
 @media(max-width:820px){{.nlinks{{display:none}}.why-wrap,.contact-wrap{{grid-template-columns:1fr}}.visual{{min-height:220px;font-size:90px}}}}
 </style>
 </head>
@@ -365,34 +393,38 @@ footer .fn span{{color:var(--a)}}
 <div class="statbar">{stats}</div>
 
 <section id="services">
-  <div class="tag">{n['stag']}</div>
-  <h2>{fmt(n['shead'])}</h2>
-  <p class="sub">{fmt(n['ssub'])}</p>
+  <div class="reveal">
+    <div class="tag">{n['stag']}</div>
+    <h2>{fmt(n['shead'])}</h2>
+    <p class="sub">{fmt(n['ssub'])}</p>
+  </div>
   <div class="grid">{services}</div>
 </section>
 
 <section id="about" class="cream">
   <div class="why-wrap">
-    <div>
+    <div class="reveal">
       <div class="tag">Why {name}</div>
       <h2>Why Locals Choose Us</h2>
       <p class="sub">We're proud to serve {town} and the surrounding area — and we work hard to keep it that way.</p>
       <ul class="whys">{why}</ul>
     </div>
-    <div class="visual">{n['visual']}</div>
+    <div class="visual reveal">{n['visual']}</div>
   </div>
 </section>
 
 <section id="reviews">
-  <div class="tag">Reviews</div>
-  <h2>What People Say</h2>
-  <p class="sub">Real words from happy customers across {town} and beyond.</p>
+  <div class="reveal">
+    <div class="tag">Reviews</div>
+    <h2>What People Say</h2>
+    <p class="sub">Real words from happy customers across {town} and beyond.</p>
+  </div>
   <div class="revs">{reviews}</div>
 </section>
 
 <section id="contact" class="cream">
   <div class="contact-wrap">
-    <div>
+    <div class="reveal">
       <div class="tag">Get In Touch</div>
       <h2>{n['cta']}</h2>
       <p class="sub">We'd love to hear from you. Call us or drop a message and we'll get straight back to you.</p>
@@ -402,7 +434,7 @@ footer .fn span{{color:var(--a)}}
         <div class="crow"><div class="ci">🕒</div><div><div class="cl">Hours</div><div class="cv">Open 6 days a week</div></div></div>
       </div>
     </div>
-    <form onsubmit="return false">
+    <form class="reveal" onsubmit="return false">
       <input type="text" placeholder="Your name" aria-label="Your name">
       <input type="tel" placeholder="Phone number" aria-label="Phone number">
       <input type="email" placeholder="Email address" aria-label="Email address">
@@ -422,7 +454,9 @@ footer .fn span{{color:var(--a)}}
 
 <a class="flag" href="{BASE_URL}" target="_blank" rel="noopener">✦ Concept by <b>HW Web Design</b> — <span>let's build yours</span></a>
 <script>
-addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('solid',scrollY>30));
+addEventListener('scroll',function(){{document.getElementById('nav').classList.toggle('solid',scrollY>30)}},{{passive:true}});
+var mio=new IntersectionObserver(function(es){{es.forEach(function(e){{if(e.isIntersecting){{e.target.classList.add('in');mio.unobserve(e.target)}}}})}},{{threshold:.14}});
+document.querySelectorAll('.reveal,.grid,.revs,.statbar').forEach(function(el){{mio.observe(el)}});
 </script>
 </body>
 </html>

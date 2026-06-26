@@ -81,6 +81,34 @@ footer .fn span{color:var(--a)}
 .flag{position:fixed;right:16px;bottom:16px;z-index:200;background:#0f172a;color:#fff;font-size:12.5px;font-weight:600;padding:9px 15px;border-radius:30px;box-shadow:0 8px 26px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12)}
 .flag span{color:#7dd3fc}
 .flag b{color:var(--a)}
+/* animation + polish */
+@keyframes mkUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes mkGlow{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-45px,35px) scale(1.18)}}
+@keyframes mkShine{0%,55%{left:-130%}80%,100%{left:140%}}
+.hero .badge{animation:mkUp .6s .05s both cubic-bezier(.2,.7,.2,1)}
+.hero h1{animation:mkUp .7s .16s both cubic-bezier(.2,.7,.2,1)}
+.hero p{animation:mkUp .7s .3s both cubic-bezier(.2,.7,.2,1)}
+.hero .btns{animation:mkUp .7s .42s both cubic-bezier(.2,.7,.2,1)}
+.hero::after{content:'';position:absolute;left:-120px;bottom:-170px;width:430px;height:430px;border-radius:50%;background:radial-gradient(circle,var(--a) 0%,transparent 60%);opacity:.16;pointer-events:none;animation:mkGlow 17s ease-in-out infinite}
+.bp{position:relative;overflow:hidden}
+.bp::after{content:'';position:absolute;top:0;left:-130%;width:55%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:mkShine 4.8s ease-in-out infinite}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.grid .card,.revs .rev{opacity:0;transform:translateY(26px);transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .6s cubic-bezier(.2,.7,.2,1)}
+.grid.in .card,.revs.in .rev{opacity:1;transform:none}
+.grid.in .card:nth-child(2),.revs.in .rev:nth-child(2){transition-delay:.08s}
+.grid.in .card:nth-child(3),.revs.in .rev:nth-child(3){transition-delay:.16s}
+.grid.in .card:nth-child(4){transition-delay:.24s}
+.grid.in .card:nth-child(5){transition-delay:.32s}
+.grid.in .card:nth-child(6){transition-delay:.4s}
+.statbar .stat{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
+.statbar.in .stat{opacity:1;transform:none}
+.statbar.in .stat:nth-child(2){transition-delay:.1s}
+.statbar.in .stat:nth-child(3){transition-delay:.2s}
+.statbar.in .stat:nth-child(4){transition-delay:.3s}
+.card .ico{transition:transform .3s}
+.card:hover .ico{transform:scale(1.15) rotate(-5deg)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal,.grid .card,.revs .rev,.statbar .stat,.hero .badge,.hero h1,.hero p,.hero .btns{opacity:1!important;transform:none!important}}
 @media(max-width:820px){.nlinks{display:none}.why-wrap,.contact-wrap{grid-template-columns:1fr}.visual{min-height:220px;font-size:90px}}
 </style>
 </head>
@@ -111,34 +139,38 @@ footer .fn span{color:var(--a)}
 <div class="statbar"><div class="stat"><div class="num">4.9★</div><div class="lab">Google rating</div></div><div class="stat"><div class="num">Walk-ins</div><div class="lab">Welcome</div></div><div class="stat"><div class="num">Expert</div><div class="lab">Trained stylists</div></div></div>
 
 <section id="services">
-  <div class="tag">Our Services</div>
-  <h2>Treatments & Pricing</h2>
-  <p class="sub">A full range of hair and beauty treatments, all at honest, up-front prices.</p>
+  <div class="reveal">
+    <div class="tag">Our Services</div>
+    <h2>Treatments & Pricing</h2>
+    <p class="sub">A full range of hair and beauty treatments, all at honest, up-front prices.</p>
+  </div>
   <div class="grid"><div class="card"><div class="ico">✂️</div><h3>Cut & Blow-Dry</h3><p>A fresh, flattering style tailored to you.</p><div class="price">from £28</div></div><div class="card"><div class="ico">🎨</div><h3>Colour & Highlights</h3><p>Balayage, highlights and full colour by experts.</p><div class="price">from £55</div></div><div class="card"><div class="ico">💅</div><h3>Manicure & Pedicure</h3><p>Gel, acrylic and classic nails that last.</p><div class="price">from £25</div></div><div class="card"><div class="ico">🌿</div><h3>Facials & Skincare</h3><p>Relaxing, results-driven facial treatments.</p><div class="price">from £40</div></div><div class="card"><div class="ico">🌸</div><h3>Waxing & Threading</h3><p>Quick, gentle and precise — every time.</p><div class="price">from £12</div></div><div class="card"><div class="ico">👰</div><h3>Bridal & Occasion</h3><p>Look unforgettable for your big day.</p><div class="price">from £75</div></div></div>
 </section>
 
 <section id="about" class="cream">
   <div class="why-wrap">
-    <div>
+    <div class="reveal">
       <div class="tag">Why The Hairology Centre</div>
       <h2>Why Locals Choose Us</h2>
       <p class="sub">We're proud to serve Marlow and the surrounding area — and we work hard to keep it that way.</p>
       <ul class="whys"><li class="why"><div class="chk">✓</div><div><h4>Skilled, Friendly Team</h4><p>Experienced stylists and therapists who genuinely listen.</p></div></li><li class="why"><div class="chk">✓</div><div><h4>Relaxing Space</h4><p>A calm, welcoming salon where you can switch off and unwind.</p></div></li><li class="why"><div class="chk">✓</div><div><h4>Quality Products</h4><p>Only trusted, professional-grade products on every treatment.</p></div></li><li class="why"><div class="chk">✓</div><div><h4>Easy Booking</h4><p>Book online in seconds, or just pop in — whatever suits you.</p></div></li></ul>
     </div>
-    <div class="visual">💅</div>
+    <div class="visual reveal">💅</div>
   </div>
 </section>
 
 <section id="reviews">
-  <div class="tag">Reviews</div>
-  <h2>What People Say</h2>
-  <p class="sub">Real words from happy customers across Marlow and beyond.</p>
+  <div class="reveal">
+    <div class="tag">Reviews</div>
+    <h2>What People Say</h2>
+    <p class="sub">Real words from happy customers across Marlow and beyond.</p>
+  </div>
   <div class="revs"><div class="rev"><div class="stars">★★★★★</div><p>"Absolutely love my new colour — they really listened to what I wanted. Felt so relaxed."</p><div class="auth"><div class="ava">SH</div><div><div class="an">Sophie H.</div><div class="al">Marlow</div></div></div></div><div class="rev"><div class="stars">★★★★★</div><p>"Best nails I've had in years and the salon is gorgeous. Booking again already!"</p><div class="auth"><div class="ava">MT</div><div><div class="an">Megan T.</div><div class="al">High Wycombe</div></div></div></div><div class="rev"><div class="stars">★★★★★</div><p>"Did my hair and makeup for my wedding — I felt incredible. Thank you so much."</p><div class="auth"><div class="ava">HL</div><div><div class="an">Hannah L.</div><div class="al">Beaconsfield</div></div></div></div></div>
 </section>
 
 <section id="contact" class="cream">
   <div class="contact-wrap">
-    <div>
+    <div class="reveal">
       <div class="tag">Get In Touch</div>
       <h2>Book an Appointment</h2>
       <p class="sub">We'd love to hear from you. Call us or drop a message and we'll get straight back to you.</p>
@@ -148,7 +180,7 @@ footer .fn span{color:var(--a)}
         <div class="crow"><div class="ci">🕒</div><div><div class="cl">Hours</div><div class="cv">Open 6 days a week</div></div></div>
       </div>
     </div>
-    <form onsubmit="return false">
+    <form class="reveal" onsubmit="return false">
       <input type="text" placeholder="Your name" aria-label="Your name">
       <input type="tel" placeholder="Phone number" aria-label="Phone number">
       <input type="email" placeholder="Email address" aria-label="Email address">
@@ -166,9 +198,11 @@ footer .fn span{color:var(--a)}
     Like it? Let's make it real — hwwebdesign.co.uk</p>
 </footer>
 
-<a class="flag" href="https://vaughnpepe-collab.github.io/jarvis-app" target="_blank" rel="noopener">✦ Concept by <b>HW Web Design</b> — <span>let's build yours</span></a>
+<a class="flag" href="https://hwwebdesign.co.uk" target="_blank" rel="noopener">✦ Concept by <b>HW Web Design</b> — <span>let's build yours</span></a>
 <script>
-addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('solid',scrollY>30));
+addEventListener('scroll',function(){document.getElementById('nav').classList.toggle('solid',scrollY>30)},{passive:true});
+var mio=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');mio.unobserve(e.target)}})},{threshold:.14});
+document.querySelectorAll('.reveal,.grid,.revs,.statbar').forEach(function(el){mio.observe(el)});
 </script>
 </body>
 </html>
