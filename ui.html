@@ -73,6 +73,13 @@
     font-family:var(--font);font-size:10px;letter-spacing:1px;padding:3px 5px;max-width:160px;cursor:pointer;outline:none}
   .brainsel:focus,.brainsel:hover{border-color:var(--cyan);box-shadow:0 0 8px var(--cyan-glow)}
   .brainsel option{background:#02121e;color:var(--text)}
+  .ai-ctl{display:flex;gap:6px;align-items:center}
+  .braintest{background:rgba(2,12,20,.85);border:1px solid var(--line);border-radius:5px;color:var(--cyan);
+    font-family:var(--font);font-size:9px;letter-spacing:1px;padding:3px 7px;cursor:pointer;
+    transition:transform .08s ease,border-color .2s,box-shadow .2s}
+  .braintest:hover{border-color:var(--cyan);box-shadow:0 0 8px var(--cyan-glow)}
+  .braintest:active{transform:translateY(1px) scale(.96)}
+  .braintest.busy{opacity:.55;pointer-events:none}
   .feed{font-size:10.5px;line-height:1.7;max-height:150px;overflow:auto;color:var(--mut)}
   .feed div{opacity:0;animation:fade .4s forwards}.feed .t{color:var(--cyan-dim)}.feed .w{color:var(--amber)}
   @keyframes fade{to{opacity:1}}
@@ -174,7 +181,10 @@
       <div class="metric"><div class="lab"><span>Network Flux</span><span id="netV">0%</span></div><div class="bar" id="netB"><i></i></div></div>
       <div style="margin-top:16px">
         <div class="kv"><span>Brain</span><span id="brain" class="warn">LINKING…</span></div>
-        <div class="kv"><span>AI</span><select id="brainSel" class="brainsel" title="Choose which AI answers"><option>…</option></select></div>
+        <div class="kv"><span>AI</span><span class="ai-ctl">
+          <select id="brainSel" class="brainsel" title="Choose which AI answers"><option>…</option></select>
+          <button id="brainTest" class="braintest" title="Test which AIs actually connect and reply">TEST</button>
+        </span></div>
         <div class="kv"><span>Telemetry</span><span id="telmode">—</span></div>
         <div class="kv"><span>Cores</span><span id="cores">—</span></div>
         <div class="kv"><span>Uptime</span><span id="uptime">00:00:00</span></div>
@@ -304,6 +314,28 @@
     }catch(e){logFeed('Brain switch failed','w');}
     refreshBrains();
   };
+  // "TEST" — probe every configured AI and show which ones actually reply.
+  async function testBrains(){
+    const btn=$('brainTest');btn.classList.add('busy');btn.textContent='…';
+    logFeed('Testing AI brains…','');
+    try{
+      const d=await (await fetch(API+'/brains/test',{method:'POST'})).json();
+      const byId={};d.results.forEach(r=>byId[r.id]=r);
+      // tag each dropdown option with a ✓ + latency or ✗
+      [...$('brainSel').options].forEach(o=>{const r=byId[o.value];if(!r)return;
+        const base=o.textContent.replace(/\s+[✓✗].*$/,'');
+        o.textContent=base+(r.ok?(' ✓ '+r.ms+'ms'):' ✗ FAIL');});
+      // readable rundown in the console
+      sys('AI test — '+d.results.map(r=>`${r.label}: ${r.ok?('✓ '+r.ms+'ms'):'✗ '+esc(r.detail||'failed')}`).join('   |   '));
+      const working=d.results.filter(r=>r.ok).map(r=>r.id);
+      logFeed('Working: '+(working.join(', ')||'none'),working.length?'':'w');
+      say(working.length>1?('The responsive brains are '+working.join(', ')+', Sir.')
+          :working.length?('Only '+working[0]+' is responding, Sir.')
+          :'No brains are responding, Sir.');
+    }catch(e){logFeed('Brain test failed','w');sys('AI test failed — is the backend running?');}
+    btn.classList.remove('busy');btn.textContent='TEST';
+  }
+  $('brainTest').onclick=testBrains;
   refreshBrains();
 
   /* activity feed */

@@ -103,7 +103,7 @@ class TestAttempt(unittest.TestCase):
     def test_first_model_ok_short_circuits(self):
         calls = []
 
-        def fake_run(model, prompt):
+        def fake_run(model, prompt, timeout=None):
             calls.append(model)
             return ("Hello, Sir.", "blob", None)
 
@@ -321,6 +321,35 @@ class TestBrainSelection(unittest.TestCase):
                 mock.patch.object(js, "OPENAI_API_KEY", "o"), \
                 mock.patch.object(js, "DEFAULT_BRAIN", "openai"):
             self.assertEqual(js.active_brain(), "openai")
+
+
+class TestTestBrains(unittest.TestCase):
+    def test_reports_per_brain_status(self):
+        with mock.patch.object(js, "available_brains",
+                               return_value=["anthropic", "openai", "demo"]), \
+                mock.patch.object(js, "_ask_anthropic", return_value=(True, "online")), \
+                mock.patch.object(js, "_ask_openai", return_value=(False, "key rejected")):
+            out = js.test_brains()
+        by_id = {r["id"]: r for r in out["results"]}
+        self.assertTrue(by_id["anthropic"]["ok"])
+        self.assertFalse(by_id["openai"]["ok"])
+        self.assertIn("key rejected", by_id["openai"]["detail"])
+        self.assertTrue(by_id["demo"]["ok"])          # demo always passes
+        self.assertIn("active", out)
+
+    def test_probe_exception_is_caught(self):
+        with mock.patch.object(js, "available_brains", return_value=["gemini", "demo"]), \
+                mock.patch.object(js, "_ask_gemini", side_effect=RuntimeError("boom")):
+            out = js.test_brains()
+        by_id = {r["id"]: r for r in out["results"]}
+        self.assertFalse(by_id["gemini"]["ok"])
+        self.assertIn("boom", by_id["gemini"]["detail"])
+
+    def test_only_demo_when_nothing_configured(self):
+        with mock.patch.object(js, "available_brains", return_value=["demo"]):
+            out = js.test_brains()
+        self.assertEqual([r["id"] for r in out["results"]], ["demo"])
+        self.assertTrue(out["results"][0]["ok"])
 
 
 class TestAskOpenclaw(unittest.TestCase):

@@ -31,6 +31,16 @@ default with `JARVIS_BRAIN` (e.g. `JARVIS_BRAIN=openai`), or pick one live from 
 HUD **AI** dropdown. The active brain is shown in the HUD (the **Brain** readout:
 `ONLINE` for a real brain, `DEMO` for demo) and in the backend startup log.
 
+### See which brain actually works
+
+A configured key isn't proof the brain works (it can be invalid, the model name
+wrong, or the network down). Click **TEST** next to the AI dropdown — JARVIS pings
+every configured brain in parallel and reports which ones genuinely connect and
+reply, with latency: e.g. `OpenAI ✓ 420ms | Gemini ✗ key not valid | Demo ✓`.
+Working brains are tagged with a ✓ in the dropdown. (Backend: `POST /brains/test`;
+probe timeout via `JARVIS_PROBE_TIMEOUT`, default 20s. Each probe sends one tiny
+request, so it uses a negligible amount of quota.)
+
 ```
 jarvis-app/
 ├─ JARVIS.bat            ← Windows: double-click to launch
@@ -94,6 +104,7 @@ so plainly instead of dumping a traceback.
 | `GEMINI_MODEL`          | `gemini-2.0-flash`       | Model for the Gemini brain                |
 | `JARVIS_BRAIN`          | (auto)                   | Pin a default brain (`anthropic`/`openai`/`gemini`/`openclaw`) |
 | `JARVIS_MAX_TOKENS`     | `1024`                   | Max reply length for the API brains       |
+| `JARVIS_PROBE_TIMEOUT`  | `20`                     | Per-brain timeout (s) for the TEST button  |
 | `JARVIS_HOST`           | `127.0.0.1`              | Bind address                              |
 | `JARVIS_PORT`           | `8765`                   | Bind port                                 |
 | `JARVIS_MODELS`         | `claude-cli/...,anthropic/...` | OpenClaw models, tried in order     |

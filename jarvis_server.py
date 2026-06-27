@@ -28,6 +28,7 @@ import time
 import urllib.request
 import urllib.error
 import webbrowser
+from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -44,6 +45,8 @@ MODELS = [m.strip() for m in os.environ.get(
 ).split(",") if m.strip()]
 MODEL = MODELS[0]  # shown in the UI
 ASK_TIMEOUT = int(os.environ.get("JARVIS_TIMEOUT", "240"))
+# Shorter timeout for connectivity probes (the "test brains" button).
+PROBE_TIMEOUT = int(os.environ.get("JARVIS_PROBE_TIMEOUT", "20"))
 
 # --- AI providers ("brains") -------------------------------------------------
 # All API keys are read from the environment only; never hardcoded or logged.
@@ -279,7 +282,7 @@ def _extract_text(stdout):
     return best.strip() or s
 
 
-def _run_model(model, prompt):
+def _run_model(model, prompt, timeout=ASK_TIMEOUT):
     """One subprocess call for a single model. Returns (text, blob, fatal_msg)."""
     cmd = OPENCLAW_CMD + ["infer", "model", "run",
                           "--model", model, "--prompt", prompt, "--local", "--json"]
@@ -287,10 +290,10 @@ def _run_model(model, prompt):
         proc = subprocess.run(
             cmd, capture_output=True, text=True,
             encoding="utf-8", errors="replace",
-            timeout=ASK_TIMEOUT, cwd=str(HERE), shell=False,
+            timeout=timeout, cwd=str(HERE), shell=False,
         )
     except subprocess.TimeoutExpired:
-        log.warning("model %s timed out after %ss", model, ASK_TIMEOUT)
+        log.warning("model %s timed out after %ss", model, timeout)
         return "", "", ("Apologies, Sir — that took longer than I'm willing to keep "
                         "you waiting. Do try again.")
     except FileNotFoundError:
@@ -313,13 +316,13 @@ _AUTH_MARKERS = ("authentication_error", "Invalid authentication", "401",
                  "Unknown provider", "not configured", "No API key", "No text output")
 
 
-def _attempt(prompt):
+def _attempt(prompt, timeout=ASK_TIMEOUT):
     """Try each candidate model. Returns (kind, payload):
     ('ok', text) | ('fatal', msg) | ('auth', blob) | ('fail', blob)."""
     auth_problem = False
     last_blob = ""
     for model in MODELS:
-        text, blob, fatal = _run_model(model, prompt)
+        text, blob, fatal = _run_model(model, prompt, timeout)
         if fatal:
             return ("fatal", fatal)
         last_blob = blob
@@ -430,7 +433,7 @@ def _build_messages(user_text):
     return msgs
 
 
-def _ask_anthropic(user_text):
+def _ask_anthropic(user_text, timeout=ASK_TIMEOUT):
     """One turn via the Anthropic Messages API. Returns (ok, reply)."""
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
@@ -444,7 +447,7 @@ def _ask_anthropic(user_text):
         "content-type": "application/json",
     })
     try:
-        with urllib.request.urlopen(req, timeout=ASK_TIMEOUT) as r:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
             data = json.loads(r.read())
     except urllib.error.HTTPError as e:
         detail = ""
@@ -481,7 +484,7 @@ def _ask_anthropic(user_text):
 
 
 # --- shared JSON-over-HTTP helper for the API brains ------------------------
-def _post_json(url, payload, headers, label):
+def _post_json(url, payload, headers, label, timeout=ASK_TIMEOUT):
     """POST JSON and return (data, error_reply). Exactly one is non-None.
     `error_reply` is an in-character, user-facing message on any failure."""
     body = json.dumps(payload).encode("utf-8")
@@ -489,7 +492,7 @@ def _post_json(url, payload, headers, label):
     hdrs.setdefault("content-type", "application/json")
     req = urllib.request.Request(url, data=body, headers=hdrs)
     try:
-        with urllib.request.urlopen(req, timeout=ASK_TIMEOUT) as r:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
             return json.loads(r.read()), None
     except urllib.error.HTTPError as e:
         detail = ""
@@ -518,7 +521,7 @@ def _post_json(url, payload, headers, label):
 
 
 # --- brain: OpenAI (and any OpenAI-compatible server) -----------------------
-def _ask_openai(user_text):
+def _ask_openai(user_text, timeout=ASK_TIMEOUT):
     """One turn via the OpenAI Chat Completions API (or a compatible server).
     Returns (ok, reply)."""
     messages = [{"role": "system", "content": JARVIS_PERSONA}] + _build_messages(user_text)
@@ -526,7 +529,7 @@ def _ask_openai(user_text):
         OPENAI_BASE_URL + "/chat/completions",
         {"model": OPENAI_MODEL, "max_tokens": MAX_TOKENS, "messages": messages},
         {"authorization": f"Bearer {OPENAI_API_KEY}"},
-        "OpenAI",
+        "OpenAI", timeout,
     )
     if err:
         return False, err
@@ -541,7 +544,7 @@ def _ask_openai(user_text):
 
 
 # --- brain: Google Gemini ---------------------------------------------------
-def _ask_gemini(user_text):
+def _ask_gemini(user_text, timeout=ASK_TIMEOUT):
     """One turn via the Google Gemini generateContent API. Returns (ok, reply)."""
     # Gemini uses roles "user"/"model" and a separate systemInstruction.
     contents = [{"role": "user" if m["role"] == "user" else "model",
@@ -552,7 +555,7 @@ def _ask_gemini(user_text):
         "systemInstruction": {"parts": [{"text": JARVIS_PERSONA}]},
         "contents": contents,
         "generationConfig": {"maxOutputTokens": MAX_TOKENS},
-    }, {}, "Gemini")
+    }, {}, "Gemini", timeout)
     if err:
         return False, err
     try:
@@ -570,13 +573,13 @@ def _ask_gemini(user_text):
 
 
 # --- brain: OpenClaw subscription -------------------------------------------
-def _ask_openclaw(user_text):
+def _ask_openclaw(user_text, timeout=ASK_TIMEOUT):
     """One turn via OpenClaw; auto-refresh the subscription token and retry once
     on an auth failure. Returns (ok, reply)."""
     prompt = _build_prompt(user_text)
-    kind, payload = _attempt(prompt)
+    kind, payload = _attempt(prompt, timeout)
     if kind == "auth" and _refresh_token():
-        kind, payload = _attempt(prompt)  # retry with fresh token
+        kind, payload = _attempt(prompt, timeout)  # retry with fresh token
 
     if kind == "ok":
         return True, payload
@@ -610,17 +613,21 @@ def _demo_reply(user_text):
             "OPENAI_API_KEY, or GEMINI_API_KEY) — or install OpenClaw — and restart me.")
 
 
-def ask_claude(user_text):
-    """Run one conversational turn through whichever brain is active."""
-    brain = active_brain()
-    # Built per-call so the handler names resolve from module globals (keeps the
-    # functions independently testable/patchable).
-    handler = {
+def _handler_for(name):
+    """The (ok, reply) handler for a brain, or None for demo. Resolved at call
+    time so the functions stay independently testable/patchable."""
+    return {
         "anthropic": _ask_anthropic,
         "openai": _ask_openai,
         "gemini": _ask_gemini,
         "openclaw": _ask_openclaw,
-    }.get(brain)
+    }.get(name)
+
+
+def ask_claude(user_text):
+    """Run one conversational turn through whichever brain is active."""
+    brain = active_brain()
+    handler = _handler_for(brain)
     if handler:
         ok, reply = handler(user_text)
     else:  # demo
@@ -629,6 +636,38 @@ def ask_claude(user_text):
     if ok:
         _record_turn(user_text, reply)
     return {"ok": ok, "reply": reply, "brain": brain}
+
+
+def test_brains():
+    """Probe every configured brain with a tiny prompt (short timeout, in
+    parallel) and report which ones actually connect and reply. Demo always
+    passes. Does not touch conversation history."""
+    probe = "Reply with the single word: online."
+    names = [n for n in available_brains() if n != "demo"]
+
+    def run(name):
+        t0 = time.time()
+        handler = _handler_for(name)
+        try:
+            ok, reply = handler(probe, timeout=PROBE_TIMEOUT)
+        except Exception as e:  # never let one probe break the batch
+            log.warning("brain probe %s raised: %s", name, e)
+            ok, reply = False, str(e)
+        ms = int((time.time() - t0) * 1000)
+        return {"id": name, "label": BRAIN_LABELS.get(name, name),
+                "model": _BRAIN_MODEL_LABELS.get(name, name),
+                "ok": ok, "ms": ms, "detail": (reply or "").strip()[:200]}
+
+    results = []
+    if names:
+        with ThreadPoolExecutor(max_workers=len(names)) as pool:
+            results = list(pool.map(run, names))
+    results.append({"id": "demo", "label": BRAIN_LABELS["demo"],
+                    "model": "demo (offline)", "ok": True, "ms": 0,
+                    "detail": "always-available offline fallback"})
+    log.info("brain test: %s", "  ".join(
+        f"{r['id']}={'OK' if r['ok'] else 'FAIL'}" for r in results))
+    return {"active": active_brain(), "results": results}
 
 
 def get_stats():
@@ -718,6 +757,9 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send(400, json.dumps({"ok": False, "error": f"{name} not available",
                                             "available": available_brains()}))
+
+        elif self.path == "/brains/test":
+            self._send(200, json.dumps(test_brains()))
 
         elif self.path == "/prospect":
             try:
