@@ -45,13 +45,31 @@ MODELS = [m.strip() for m in os.environ.get(
 MODEL = MODELS[0]  # shown in the UI
 ASK_TIMEOUT = int(os.environ.get("JARVIS_TIMEOUT", "240"))
 
-# Direct Anthropic API (works out of the box with just an API key — no OpenClaw).
-# The key is read from the environment only; it is never hardcoded or logged.
+# --- AI providers ("brains") -------------------------------------------------
+# All API keys are read from the environment only; never hardcoded or logged.
+# Shared reply length and the preference order used for auto-selection.
+MAX_TOKENS = int(os.environ.get("JARVIS_MAX_TOKENS", "1024"))
+# Optional explicit default brain (e.g. JARVIS_BRAIN=openai). Empty = auto.
+DEFAULT_BRAIN = os.environ.get("JARVIS_BRAIN", "").strip().lower()
+# When auto-selecting, the first available brain in this order wins.
+BRAIN_ORDER = ["anthropic", "openai", "gemini", "openclaw"]
+
+# 1) Anthropic API (preferred) — just an API key, no OpenClaw.
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
 ANTHROPIC_MODEL = os.environ.get("JARVIS_ANTHROPIC_MODEL", "claude-opus-4-8").strip()
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
-ANTHROPIC_MAX_TOKENS = int(os.environ.get("JARVIS_MAX_TOKENS", "1024"))
+
+# 2) OpenAI (and any OpenAI-compatible server: OpenRouter, Groq, Together, a local
+#    Ollama/LM Studio, ...). Point OPENAI_BASE_URL at the compatible endpoint.
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
+OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini").strip()
+
+# 3) Google Gemini.
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
 HERE = Path(__file__).resolve().parent
 UI_FILE = HERE / "ui.html"
@@ -314,25 +332,83 @@ def _attempt(prompt):
 
 
 # ---------------------------------------------------------------- brains
-# JARVIS can think through one of three "brains", chosen automatically:
-#   1. anthropic — a direct Anthropic API call (needs only ANTHROPIC_API_KEY)
-#   2. openclaw  — the Claude.ai subscription via OpenClaw (no API key)
-#   3. demo      — an always-available offline fallback so the HUD is never dead
+# JARVIS can think through any of several "brains" (AI providers):
+#   anthropic — direct Anthropic API            (ANTHROPIC_API_KEY)
+#   openai    — OpenAI / any OpenAI-compatible   (OPENAI_API_KEY [+ OPENAI_BASE_URL])
+#   gemini    — Google Gemini                    (GEMINI_API_KEY)
+#   openclaw  — Claude.ai subscription via OpenClaw (no API key)
+#   demo      — always-available offline fallback so the HUD is never dead
+#
+# A brain is "available" when its credentials/tooling are present. The active
+# brain is the user's live selection (set via POST /brain) if available, else
+# the JARVIS_BRAIN default if available, else the first available in BRAIN_ORDER,
+# else demo. Friendly labels and per-brain model names are registry-driven.
+BRAIN_LABELS = {
+    "anthropic": "Anthropic (Claude API)",
+    "openai": "OpenAI / compatible",
+    "gemini": "Google Gemini",
+    "openclaw": "Claude subscription (OpenClaw)",
+    "demo": "Demo (offline)",
+}
+
+# Runtime override chosen from the HUD; None = auto-select.
+_selected_brain = None
+_brain_lock = threading.Lock()
+
+
+def _brain_available(name):
+    return {
+        "anthropic": bool(ANTHROPIC_API_KEY),
+        "openai": bool(OPENAI_API_KEY),
+        "gemini": bool(GEMINI_API_KEY),
+        "openclaw": bool(OPENCLAW_AVAILABLE),
+        "demo": True,
+    }.get(name, False)
+
+
+def available_brains():
+    """All usable brains, in preference order; demo is always last."""
+    return [n for n in BRAIN_ORDER if _brain_available(n)] + ["demo"]
+
+
 def active_brain():
-    if ANTHROPIC_API_KEY:
-        return "anthropic"
-    if OPENCLAW_AVAILABLE:
-        return "openclaw"
+    with _brain_lock:
+        chosen = _selected_brain
+    if chosen and _brain_available(chosen):
+        return chosen
+    if DEFAULT_BRAIN and _brain_available(DEFAULT_BRAIN):
+        return DEFAULT_BRAIN
+    for name in BRAIN_ORDER:
+        if _brain_available(name):
+            return name
     return "demo"
 
 
+def select_brain(name):
+    """Pin the active brain (HUD selector). Returns True if applied."""
+    global _selected_brain
+    if name == "auto":
+        with _brain_lock:
+            _selected_brain = None
+        return True
+    if _brain_available(name):
+        with _brain_lock:
+            _selected_brain = name
+        return True
+    return False
+
+
+_BRAIN_MODEL_LABELS = {
+    "anthropic": ANTHROPIC_MODEL,
+    "openai": OPENAI_MODEL,
+    "gemini": GEMINI_MODEL,
+    "openclaw": MODEL,
+    "demo": "demo (offline)",
+}
+
+
 def active_model_label():
-    brain = active_brain()
-    if brain == "anthropic":
-        return ANTHROPIC_MODEL
-    if brain == "openclaw":
-        return MODEL
-    return "demo (offline)"
+    return _BRAIN_MODEL_LABELS.get(active_brain(), "demo (offline)")
 
 
 def _record_turn(user_text, reply):
@@ -358,7 +434,7 @@ def _ask_anthropic(user_text):
     """One turn via the Anthropic Messages API. Returns (ok, reply)."""
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
-        "max_tokens": ANTHROPIC_MAX_TOKENS,
+        "max_tokens": MAX_TOKENS,
         "system": JARVIS_PERSONA,
         "messages": _build_messages(user_text),
     }).encode("utf-8")
@@ -404,7 +480,96 @@ def _ask_anthropic(user_text):
     return True, text
 
 
-# --- brain 2: OpenClaw subscription -----------------------------------------
+# --- shared JSON-over-HTTP helper for the API brains ------------------------
+def _post_json(url, payload, headers, label):
+    """POST JSON and return (data, error_reply). Exactly one is non-None.
+    `error_reply` is an in-character, user-facing message on any failure."""
+    body = json.dumps(payload).encode("utf-8")
+    hdrs = dict(headers)
+    hdrs.setdefault("content-type", "application/json")
+    req = urllib.request.Request(url, data=body, headers=hdrs)
+    try:
+        with urllib.request.urlopen(req, timeout=ASK_TIMEOUT) as r:
+            return json.loads(r.read()), None
+    except urllib.error.HTTPError as e:
+        detail = ""
+        try:
+            err = json.loads(e.read())
+            detail = (err.get("error", {}) or {}).get("message", "") if isinstance(
+                err.get("error"), dict) else str(err.get("error", ""))
+        except Exception:
+            pass
+        log.warning("%s HTTP %s: %s", label, e.code, detail or e.reason)
+        if e.code in (401, 403):
+            return None, (f"My {label} credentials were rejected, Sir. Do check the "
+                          "relevant API key.")
+        if e.code == 429:
+            return None, (f"{label} is rate-limiting us, Sir. A moment's patience and "
+                          "we may try again.")
+        return None, (f"{label} returned an error ({e.code}), Sir"
+                      + (f": {detail}" if detail else "."))
+    except urllib.error.URLError as e:
+        log.warning("%s unreachable: %s", label, e.reason)
+        return None, (f"I can't reach {label} just now, Sir — the network link "
+                      "appears to be down.")
+    except Exception as e:
+        log.exception("%s call failed", label)
+        return None, f"Something went awry contacting {label}, Sir: {e}"
+
+
+# --- brain: OpenAI (and any OpenAI-compatible server) -----------------------
+def _ask_openai(user_text):
+    """One turn via the OpenAI Chat Completions API (or a compatible server).
+    Returns (ok, reply)."""
+    messages = [{"role": "system", "content": JARVIS_PERSONA}] + _build_messages(user_text)
+    data, err = _post_json(
+        OPENAI_BASE_URL + "/chat/completions",
+        {"model": OPENAI_MODEL, "max_tokens": MAX_TOKENS, "messages": messages},
+        {"authorization": f"Bearer {OPENAI_API_KEY}"},
+        "OpenAI",
+    )
+    if err:
+        return False, err
+    try:
+        text = (data["choices"][0]["message"]["content"] or "").strip()
+    except (KeyError, IndexError, TypeError):
+        text = ""
+    if not text:
+        log.debug("OpenAI returned no text: %s", str(data)[:200])
+        return False, "I received an empty reply from OpenAI, Sir. Do try again."
+    return True, text
+
+
+# --- brain: Google Gemini ---------------------------------------------------
+def _ask_gemini(user_text):
+    """One turn via the Google Gemini generateContent API. Returns (ok, reply)."""
+    # Gemini uses roles "user"/"model" and a separate systemInstruction.
+    contents = [{"role": "user" if m["role"] == "user" else "model",
+                 "parts": [{"text": m["content"]}]}
+                for m in _build_messages(user_text)]
+    url = f"{GEMINI_URL}/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+    data, err = _post_json(url, {
+        "systemInstruction": {"parts": [{"text": JARVIS_PERSONA}]},
+        "contents": contents,
+        "generationConfig": {"maxOutputTokens": MAX_TOKENS},
+    }, {}, "Gemini")
+    if err:
+        return False, err
+    try:
+        cand = data["candidates"][0]
+        if cand.get("finishReason") == "SAFETY":
+            return False, "I'm afraid I must decline that particular request, Sir."
+        parts = cand["content"]["parts"]
+        text = "".join(p.get("text", "") for p in parts).strip()
+    except (KeyError, IndexError, TypeError):
+        text = ""
+    if not text:
+        log.debug("Gemini returned no text: %s", str(data)[:200])
+        return False, "I received an empty reply from Gemini, Sir. Do try again."
+    return True, text
+
+
+# --- brain: OpenClaw subscription -------------------------------------------
 def _ask_openclaw(user_text):
     """One turn via OpenClaw; auto-refresh the subscription token and retry once
     on an auth failure. Returns (ok, reply)."""
@@ -440,19 +605,25 @@ def _demo_reply(user_text):
     if "who are you" in t or "your name" in t or "what are you" in t:
         return ("I am JARVIS, Sir — your executive assistant. At the moment I'm in demo "
                 "mode, so my wit is canned rather than freshly reasoned.")
-    return ("I'm in demo mode, Sir — no live link to Claude is configured, so I can only "
-            "offer canned courtesies. To wake me fully, set an ANTHROPIC_API_KEY "
-            "environment variable (or install OpenClaw) and restart me.")
+    return ("I'm in demo mode, Sir — no live AI is configured, so I can only offer "
+            "canned courtesies. To wake me fully, set an API key (ANTHROPIC_API_KEY, "
+            "OPENAI_API_KEY, or GEMINI_API_KEY) — or install OpenClaw — and restart me.")
 
 
 def ask_claude(user_text):
-    """Run one conversational turn through whichever brain is available."""
+    """Run one conversational turn through whichever brain is active."""
     brain = active_brain()
-    if brain == "anthropic":
-        ok, reply = _ask_anthropic(user_text)
-    elif brain == "openclaw":
-        ok, reply = _ask_openclaw(user_text)
-    else:
+    # Built per-call so the handler names resolve from module globals (keeps the
+    # functions independently testable/patchable).
+    handler = {
+        "anthropic": _ask_anthropic,
+        "openai": _ask_openai,
+        "gemini": _ask_gemini,
+        "openclaw": _ask_openclaw,
+    }.get(brain)
+    if handler:
+        ok, reply = handler(user_text)
+    else:  # demo
         ok, reply = True, _demo_reply(user_text)
 
     if ok:
@@ -508,6 +679,13 @@ class Handler(BaseHTTPRequestHandler):
                                         "psutil": HAVE_PSUTIL}))
         elif self.path == "/stats":
             self._send(200, json.dumps(get_stats()))
+        elif self.path == "/brains":
+            avail = available_brains()
+            self._send(200, json.dumps({
+                "active": active_brain(),
+                "available": [{"id": n, "label": BRAIN_LABELS.get(n, n),
+                               "model": _BRAIN_MODEL_LABELS.get(n, n)} for n in avail],
+            }))
         else:
             self._send(404, json.dumps({"error": "not found"}))
 
@@ -526,6 +704,20 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(400, json.dumps({"ok": False, "reply": "You said nothing, Sir."}))
                 return
             self._send(200, json.dumps(ask_claude(text)))
+
+        elif self.path == "/brain":
+            try:
+                name = (self._read_json().get("brain") or "").strip().lower()
+            except Exception:
+                self._send(400, json.dumps({"ok": False, "error": "bad request"}))
+                return
+            if select_brain(name):
+                log.info("brain switched to %s (now active: %s)", name, active_brain())
+                self._send(200, json.dumps({"ok": True, "active": active_brain(),
+                                            "model": active_model_label()}))
+            else:
+                self._send(400, json.dumps({"ok": False, "error": f"{name} not available",
+                                            "available": available_brains()}))
 
         elif self.path == "/prospect":
             try:
@@ -634,14 +826,14 @@ def main(argv=None):
 
     setup_logging()
     brain = active_brain()
-    brain_desc = {
-        "anthropic": f"Anthropic API ({ANTHROPIC_MODEL})",
-        "openclaw": f"OpenClaw subscription ({MODEL}) — no API key",
-        "demo": "DEMO MODE — no brain configured "
-                "(set ANTHROPIC_API_KEY or install OpenClaw for real replies)",
-    }[brain]
+    avail = available_brains()
     log.info("J.A.R.V.I.S. backend online")
-    log.info("Brain    : %s", brain_desc)
+    if brain == "demo":
+        log.info("Brain    : DEMO MODE — no AI configured (set ANTHROPIC_API_KEY, "
+                 "OPENAI_API_KEY, or GEMINI_API_KEY — or install OpenClaw)")
+    else:
+        log.info("Brain    : %s (%s)", BRAIN_LABELS.get(brain, brain), active_model_label())
+    log.info("Available: %s", ", ".join(avail))
     log.info("Telemetry: %s", "psutil (real)" if HAVE_PSUTIL
              else "estimated (install psutil for real)")
     if brain == "openclaw":

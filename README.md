@@ -1,27 +1,35 @@
 # J.A.R.V.I.S. — Desktop App
 
-A JARVIS-style HUD assistant. Python backend + holographic UI, powered by Claude.
-Voice in and voice out.
+A JARVIS-style HUD assistant. Python backend + holographic UI, powered by your
+choice of AI — Claude (API or subscription), OpenAI, Google Gemini, or any
+OpenAI-compatible/local model. Voice in and voice out.
 
-## How JARVIS thinks — the "brain"
+## How JARVIS thinks — the "brains"
 
-JARVIS picks the best available brain automatically, so it works out of the box:
+JARVIS can use several AI providers ("brains"). Configure as many as you like;
+it auto-selects the best available one, and you can **switch live** from the HUD
+(the **AI** dropdown in the System Telemetry panel) without restarting.
 
-1. **Anthropic API** — the simplest path. Set one environment variable and you get
-   real Claude replies with no other setup:
-   ```
-   export ANTHROPIC_API_KEY=sk-ant-...        # macOS/Linux
-   set ANTHROPIC_API_KEY=sk-ant-...           # Windows (cmd)
-   ```
-2. **OpenClaw subscription** — if no API key is set but OpenClaw is installed,
-   JARVIS talks to Claude through your Claude.ai subscription OAuth token (no API
-   key). The backend auto-refreshes that token when it expires.
-3. **Demo mode** — if neither is configured, JARVIS still runs and responds in
-   character (canned courtesies) and tells you how to enable a real brain, so the
-   interface is never dead.
+| Brain | Configure with | Notes |
+|-------|----------------|-------|
+| **Anthropic (Claude API)** | `ANTHROPIC_API_KEY` | Preferred. `JARVIS_ANTHROPIC_MODEL` (default `claude-opus-4-8`). |
+| **OpenAI / compatible** | `OPENAI_API_KEY` | `OPENAI_MODEL` (default `gpt-4o-mini`). Point `OPENAI_BASE_URL` at any OpenAI-compatible server — OpenRouter, Groq, Together, or a local Ollama / LM Studio (`http://localhost:11434/v1`). |
+| **Google Gemini** | `GEMINI_API_KEY` | `GEMINI_MODEL` (default `gemini-2.0-flash`). |
+| **Claude subscription (OpenClaw)** | install OpenClaw | Uses your Claude.ai subscription OAuth token — no API key. Auto-refreshes. |
+| **Demo (offline)** | nothing | Always available — responds in character and tells you how to enable a real brain, so the interface is never dead. |
 
-The active brain is shown in the HUD (the **Brain** readout: `ONLINE` for a real
-brain, `DEMO` for demo mode) and in the backend startup log.
+Set whichever you have, e.g. on macOS/Linux:
+```
+export ANTHROPIC_API_KEY=sk-ant-...     # Claude
+export OPENAI_API_KEY=sk-...            # OpenAI / compatible
+export GEMINI_API_KEY=...               # Gemini
+```
+(Windows `cmd`: `set ANTHROPIC_API_KEY=sk-ant-...`)
+
+**Auto-selection order** is Anthropic → OpenAI → Gemini → OpenClaw → Demo. Pin a
+default with `JARVIS_BRAIN` (e.g. `JARVIS_BRAIN=openai`), or pick one live from the
+HUD **AI** dropdown. The active brain is shown in the HUD (the **Brain** readout:
+`ONLINE` for a real brain, `DEMO` for demo) and in the backend startup log.
 
 ```
 jarvis-app/
@@ -77,9 +85,15 @@ so plainly instead of dumping a traceback.
 
 | Variable                | Default                  | Purpose                                   |
 |-------------------------|--------------------------|-------------------------------------------|
-| `ANTHROPIC_API_KEY`     | (unset)                  | If set, JARVIS uses the Anthropic API directly (preferred brain) |
-| `JARVIS_ANTHROPIC_MODEL`| `claude-opus-4-8`        | Model for the Anthropic-API brain         |
-| `JARVIS_MAX_TOKENS`     | `1024`                   | Max reply length for the Anthropic-API brain |
+| `ANTHROPIC_API_KEY`     | (unset)                  | Enables the Anthropic (Claude API) brain  |
+| `JARVIS_ANTHROPIC_MODEL`| `claude-opus-4-8`        | Model for the Anthropic brain             |
+| `OPENAI_API_KEY`        | (unset)                  | Enables the OpenAI / compatible brain     |
+| `OPENAI_MODEL`          | `gpt-4o-mini`            | Model for the OpenAI brain                |
+| `OPENAI_BASE_URL`       | `https://api.openai.com/v1` | Point at any OpenAI-compatible server  |
+| `GEMINI_API_KEY`        | (unset)                  | Enables the Google Gemini brain           |
+| `GEMINI_MODEL`          | `gemini-2.0-flash`       | Model for the Gemini brain                |
+| `JARVIS_BRAIN`          | (auto)                   | Pin a default brain (`anthropic`/`openai`/`gemini`/`openclaw`) |
+| `JARVIS_MAX_TOKENS`     | `1024`                   | Max reply length for the API brains       |
 | `JARVIS_HOST`           | `127.0.0.1`              | Bind address                              |
 | `JARVIS_PORT`           | `8765`                   | Bind port                                 |
 | `JARVIS_MODELS`         | `claude-cli/...,anthropic/...` | OpenClaw models, tried in order     |
@@ -88,9 +102,9 @@ so plainly instead of dumping a traceback.
 | `JARVIS_LOG_FILE`       | `jarvis.log` (next to the script) | Log file path                    |
 | `JARVIS_LOG_LEVEL`      | `INFO`                   | `DEBUG`/`INFO`/`WARNING`/`ERROR`          |
 
-The `ANTHROPIC_API_KEY` is read from the environment only — it is never hardcoded
-and never written to the log. Logs go to both the console and a rotating log file
-(1 MB × 3 backups); no secrets are written to the log.
+API keys are read from the environment only — never hardcoded and never written
+to the log. Logs go to both the console and a rotating log file (1 MB × 3
+backups); no secrets are written to the log.
 
 ## Tests
 

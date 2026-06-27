@@ -225,6 +225,104 @@ class TestAskAnthropic(unittest.TestCase):
         self.assertIn("can't reach", reply.lower())
 
 
+def _fake_resp(payload):
+    cm = mock.MagicMock()
+    cm.__enter__.return_value.read.return_value = json.dumps(payload).encode()
+    return cm
+
+
+class TestAskOpenAI(unittest.TestCase):
+    def test_success(self):
+        payload = {"choices": [{"message": {"content": "Quite so, Sir."}}]}
+        with mock.patch.object(js, "OPENAI_API_KEY", "sk-test"), \
+                mock.patch("urllib.request.urlopen", return_value=_fake_resp(payload)):
+            ok, reply = js._ask_openai("hi")
+        self.assertTrue(ok)
+        self.assertEqual(reply, "Quite so, Sir.")
+
+    def test_bad_key(self):
+        err = urllib.error.HTTPError("u", 401, "no", {}, io.BytesIO(b"{}"))
+        with mock.patch.object(js, "OPENAI_API_KEY", "sk-bad"), \
+                mock.patch("urllib.request.urlopen", side_effect=err):
+            ok, reply = js._ask_openai("hi")
+        self.assertFalse(ok)
+        self.assertIn("rejected", reply.lower())
+
+    def test_empty(self):
+        with mock.patch.object(js, "OPENAI_API_KEY", "sk-test"), \
+                mock.patch("urllib.request.urlopen", return_value=_fake_resp({"choices": []})):
+            ok, reply = js._ask_openai("hi")
+        self.assertFalse(ok)
+        self.assertIn("empty reply", reply.lower())
+
+
+class TestAskGemini(unittest.TestCase):
+    def test_success(self):
+        payload = {"candidates": [{"content": {"parts": [{"text": "Indeed, Sir."}]}}]}
+        with mock.patch.object(js, "GEMINI_API_KEY", "g-test"), \
+                mock.patch("urllib.request.urlopen", return_value=_fake_resp(payload)):
+            ok, reply = js._ask_gemini("hi")
+        self.assertTrue(ok)
+        self.assertEqual(reply, "Indeed, Sir.")
+
+    def test_safety_is_declined(self):
+        payload = {"candidates": [{"finishReason": "SAFETY", "content": {"parts": []}}]}
+        with mock.patch.object(js, "GEMINI_API_KEY", "g-test"), \
+                mock.patch("urllib.request.urlopen", return_value=_fake_resp(payload)):
+            ok, reply = js._ask_gemini("hi")
+        self.assertFalse(ok)
+        self.assertIn("decline", reply.lower())
+
+    def test_network_error(self):
+        with mock.patch.object(js, "GEMINI_API_KEY", "g-test"), \
+                mock.patch("urllib.request.urlopen",
+                           side_effect=urllib.error.URLError("down")):
+            ok, reply = js._ask_gemini("hi")
+        self.assertFalse(ok)
+        self.assertIn("can't reach", reply.lower())
+
+
+class TestBrainSelection(unittest.TestCase):
+    def setUp(self):
+        js._selected_brain = None
+
+    def tearDown(self):
+        js._selected_brain = None
+
+    def test_available_brains_order_and_demo_last(self):
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "a"), \
+                mock.patch.object(js, "OPENAI_API_KEY", "o"), \
+                mock.patch.object(js, "GEMINI_API_KEY", ""), \
+                mock.patch.object(js, "OPENCLAW_AVAILABLE", False), \
+                mock.patch.object(js, "DEFAULT_BRAIN", ""):
+            self.assertEqual(js.available_brains(), ["anthropic", "openai", "demo"])
+
+    def test_select_pins_active(self):
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "a"), \
+                mock.patch.object(js, "OPENAI_API_KEY", "o"), \
+                mock.patch.object(js, "DEFAULT_BRAIN", ""):
+            self.assertTrue(js.select_brain("openai"))
+            self.assertEqual(js.active_brain(), "openai")  # not anthropic, despite order
+
+    def test_select_unavailable_rejected(self):
+        with mock.patch.object(js, "GEMINI_API_KEY", ""):
+            self.assertFalse(js.select_brain("gemini"))
+
+    def test_auto_resets_selection(self):
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "a"), \
+                mock.patch.object(js, "OPENAI_API_KEY", "o"), \
+                mock.patch.object(js, "DEFAULT_BRAIN", ""):
+            js.select_brain("openai")
+            self.assertTrue(js.select_brain("auto"))
+            self.assertEqual(js.active_brain(), "anthropic")  # back to order preference
+
+    def test_default_brain_env_respected(self):
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "a"), \
+                mock.patch.object(js, "OPENAI_API_KEY", "o"), \
+                mock.patch.object(js, "DEFAULT_BRAIN", "openai"):
+            self.assertEqual(js.active_brain(), "openai")
+
+
 class TestAskOpenclaw(unittest.TestCase):
     def test_ok(self):
         with mock.patch.object(js, "_attempt", return_value=("ok", "Certainly, Sir.")):
