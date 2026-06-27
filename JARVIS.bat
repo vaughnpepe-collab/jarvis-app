@@ -24,29 +24,10 @@ REM --- optional: real telemetry ---
   %PY% -m pip install --quiet psutil 2>nul
 )
 
-REM --- start backend (minimized) ---
-start "JARVIS backend" /min %PY% "%~dp0jarvis_server.py"
-
-REM --- give it a moment ---
-ping -n 3 127.0.0.1 >nul
-
-REM --- open as an app window (Chrome, then Edge, then default browser) ---
-set "CHROME="
-if exist "%ProgramFiles%\Google\Chrome\Application\chrome.exe" set "CHROME=%ProgramFiles%\Google\Chrome\Application\chrome.exe"
-if exist "%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe" set "CHROME=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"
-if exist "%LocalAppData%\Google\Chrome\Application\chrome.exe" set "CHROME=%LocalAppData%\Google\Chrome\Application\chrome.exe"
-
-set "EDGE="
-if exist "%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe" set "EDGE=%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe"
-if exist "%ProgramFiles%\Microsoft\Edge\Application\msedge.exe" set "EDGE=%ProgramFiles%\Microsoft\Edge\Application\msedge.exe"
-
-if defined CHROME (
-  start "" "!CHROME!" --app=%URL% --window-size=1320,860
-) else if defined EDGE (
-  start "" "!EDGE!" --app=%URL% --window-size=1320,860
-) else (
-  start "" %URL%
-)
+REM --- start backend minimized; it opens the HUD app window itself (--open) ---
+REM    The window-detection logic lives in jarvis_server.py so every platform
+REM    (Windows .bat, macOS/Linux jarvis.sh) shares one implementation.
+start "JARVIS backend" /min %PY% "%~dp0jarvis_server.py" --open
 
 echo   JARVIS is live at %URL%
 echo   ^(Close the minimized "JARVIS backend" window to shut down.^)

@@ -5,10 +5,13 @@ through your OpenClaw subscription — no API key required**. Voice in and voice
 
 ```
 jarvis-app/
-├─ JARVIS.bat        ← double-click to launch
-├─ jarvis_server.py  ← Python backend (the brain bridge + telemetry)
-├─ ui.html           ← the HUD interface
-└─ requirements.txt  ← optional (psutil for real CPU/RAM)
+├─ JARVIS.bat            ← Windows: double-click to launch
+├─ jarvis.sh             ← macOS/Linux: ./jarvis.sh to launch
+├─ jarvis_server.py      ← Python backend (brain bridge, telemetry, window-opener)
+├─ ui.html               ← the HUD interface
+├─ requirements.txt      ← optional (psutil for real CPU/RAM)
+├─ requirements-dev.txt  ← optional (pytest; tests also run on the stdlib alone)
+└─ tests/                ← unit tests for the backend
 
 JARVIS talks to Claude through OpenClaw's `claude-cli` provider using your
 **Claude.ai subscription OAuth token** (no API key). The backend **auto-refreshes
@@ -29,15 +32,58 @@ Notes for Windows PowerShell:
 
 ## Run
 
-**Double-click `JARVIS.bat`.** It will:
-1. start the Python backend (minimized window),
-2. open JARVIS in a frameless app window (Chrome → Edge → default browser).
+**Windows:** double-click `JARVIS.bat`.
+**macOS / Linux:** run `./jarvis.sh` (`chmod +x jarvis.sh` the first time).
 
-Or manually:
+Either launcher will:
+1. start the Python backend,
+2. open JARVIS in a frameless app window (Chrome → Edge → Chromium → default browser).
+
+The window-opening logic lives in `jarvis_server.py` (`--open`), so every platform
+shares one implementation.
+
+Or run the backend directly:
 
 ```
-python jarvis_server.py      # then open http://127.0.0.1:8765
+python jarvis_server.py            # backend only — open http://127.0.0.1:8765 yourself
+python jarvis_server.py --open     # backend + auto-open the HUD window
+python jarvis_server.py --no-open  # never open a browser
 ```
+
+It shuts down cleanly on Ctrl-C or SIGTERM. If the port is already taken, it says
+so plainly instead of dumping a traceback.
+
+## Configuration (environment variables)
+
+| Variable          | Default                  | Purpose                                   |
+|-------------------|--------------------------|-------------------------------------------|
+| `JARVIS_HOST`     | `127.0.0.1`              | Bind address                              |
+| `JARVIS_PORT`     | `8765`                   | Bind port                                 |
+| `JARVIS_MODELS`   | `claude-cli/...,anthropic/...` | Comma-separated models, tried in order |
+| `JARVIS_TIMEOUT`  | `240`                    | Seconds to wait for a model reply         |
+| `JARVIS_OPEN`     | (unset)                  | `1` to auto-open the window (same as `--open`) |
+| `JARVIS_LOG_FILE` | `jarvis.log` (next to the script) | Log file path                    |
+| `JARVIS_LOG_LEVEL`| `INFO`                   | `DEBUG`/`INFO`/`WARNING`/`ERROR`          |
+
+Logs go to both the console and a rotating log file (1 MB × 3 backups). No
+secrets are written to the log.
+
+## Tests
+
+The suite uses only the standard library — no install required:
+
+```
+python -m unittest discover -s tests
+```
+
+Or, if you prefer pytest (`pip install -r requirements-dev.txt`):
+
+```
+python -m pytest tests
+```
+
+The OpenClaw/model boundary is mocked, so tests are fast and never make a real
+network or subprocess call.
 
 ## Using it
 
