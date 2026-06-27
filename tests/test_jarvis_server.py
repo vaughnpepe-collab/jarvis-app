@@ -256,6 +256,33 @@ class TestAskOpenAI(unittest.TestCase):
         self.assertIn("empty reply", reply.lower())
 
 
+class TestAskLocal(unittest.TestCase):
+    def test_success_keyless_sends_no_auth_header(self):
+        captured = {}
+
+        def fake_urlopen(req, timeout=None):
+            captured["headers"] = req.headers
+            captured["url"] = req.full_url
+            return _fake_resp({"choices": [{"message": {"content": "online"}}]})
+
+        with mock.patch.object(js, "LOCAL_MODEL", "llama3.2"), \
+                mock.patch.object(js, "LOCAL_API_KEY", ""), \
+                mock.patch.object(js, "LOCAL_URL", "http://localhost:11434/v1"), \
+                mock.patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            ok, reply = js._ask_local("hi")
+        self.assertTrue(ok)
+        self.assertEqual(reply, "online")
+        # keyless => no Authorization header (urllib title-cases keys)
+        self.assertNotIn("Authorization", captured["headers"])
+        self.assertTrue(captured["url"].endswith("/chat/completions"))
+
+    def test_available_when_model_named(self):
+        with mock.patch.object(js, "LOCAL_MODEL", "llama3.2"):
+            self.assertTrue(js._brain_available("local"))
+        with mock.patch.object(js, "LOCAL_MODEL", ""):
+            self.assertFalse(js._brain_available("local"))
+
+
 class TestAskGemini(unittest.TestCase):
     def test_success(self):
         payload = {"candidates": [{"content": {"parts": [{"text": "Indeed, Sir."}]}}]}

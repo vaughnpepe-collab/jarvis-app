@@ -55,7 +55,7 @@ MAX_TOKENS = int(os.environ.get("JARVIS_MAX_TOKENS", "1024"))
 # Optional explicit default brain (e.g. JARVIS_BRAIN=openai). Empty = auto.
 DEFAULT_BRAIN = os.environ.get("JARVIS_BRAIN", "").strip().lower()
 # When auto-selecting, the first available brain in this order wins.
-BRAIN_ORDER = ["anthropic", "openai", "gemini", "openclaw"]
+BRAIN_ORDER = ["anthropic", "openai", "gemini", "local", "openclaw"]
 
 # 1) Anthropic API (preferred) — just an API key, no OpenClaw.
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
@@ -73,6 +73,13 @@ OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini").strip()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models"
+
+# 4) Local model — NO API KEY. Any OpenAI-compatible local server: Ollama
+#    (default) or LM Studio. Opt in by naming the model you've pulled, e.g.
+#    JARVIS_LOCAL_MODEL=llama3.2 . Point JARVIS_LOCAL_URL at LM Studio if needed.
+LOCAL_MODEL = os.environ.get("JARVIS_LOCAL_MODEL", "").strip()
+LOCAL_URL = os.environ.get("JARVIS_LOCAL_URL", "http://localhost:11434/v1").rstrip("/")
+LOCAL_API_KEY = os.environ.get("JARVIS_LOCAL_API_KEY", "").strip()  # usually unneeded
 
 HERE = Path(__file__).resolve().parent
 UI_FILE = HERE / "ui.html"
@@ -339,6 +346,7 @@ def _attempt(prompt, timeout=ASK_TIMEOUT):
 #   anthropic — direct Anthropic API            (ANTHROPIC_API_KEY)
 #   openai    — OpenAI / any OpenAI-compatible   (OPENAI_API_KEY [+ OPENAI_BASE_URL])
 #   gemini    — Google Gemini                    (GEMINI_API_KEY)
+#   local     — local model, NO API KEY          (JARVIS_LOCAL_MODEL; Ollama/LM Studio)
 #   openclaw  — Claude.ai subscription via OpenClaw (no API key)
 #   demo      — always-available offline fallback so the HUD is never dead
 #
@@ -350,6 +358,7 @@ BRAIN_LABELS = {
     "anthropic": "Anthropic (Claude API)",
     "openai": "OpenAI / compatible",
     "gemini": "Google Gemini",
+    "local": "Local model (no key)",
     "openclaw": "Claude subscription (OpenClaw)",
     "demo": "Demo (offline)",
 }
@@ -364,6 +373,7 @@ def _brain_available(name):
         "anthropic": bool(ANTHROPIC_API_KEY),
         "openai": bool(OPENAI_API_KEY),
         "gemini": bool(GEMINI_API_KEY),
+        "local": bool(LOCAL_MODEL),  # keyless — opt in by naming the local model
         "openclaw": bool(OPENCLAW_AVAILABLE),
         "demo": True,
     }.get(name, False)
@@ -405,6 +415,7 @@ _BRAIN_MODEL_LABELS = {
     "anthropic": ANTHROPIC_MODEL,
     "openai": OPENAI_MODEL,
     "gemini": GEMINI_MODEL,
+    "local": LOCAL_MODEL or "local",
     "openclaw": MODEL,
     "demo": "demo (offline)",
 }
@@ -520,16 +531,17 @@ def _post_json(url, payload, headers, label, timeout=ASK_TIMEOUT):
         return None, f"Something went awry contacting {label}, Sir: {e}"
 
 
-# --- brain: OpenAI (and any OpenAI-compatible server) -----------------------
-def _ask_openai(user_text, timeout=ASK_TIMEOUT):
-    """One turn via the OpenAI Chat Completions API (or a compatible server).
-    Returns (ok, reply)."""
+# --- brains: OpenAI Chat Completions shape (OpenAI, compatible servers, local) ---
+def _chat_completions(base_url, model, api_key, label, user_text, timeout):
+    """Shared (ok, reply) call for any OpenAI-compatible /chat/completions API.
+    `api_key` may be empty — local servers (Ollama/LM Studio) need no auth, so
+    the Authorization header is omitted entirely in that case."""
     messages = [{"role": "system", "content": JARVIS_PERSONA}] + _build_messages(user_text)
+    headers = {"authorization": f"Bearer {api_key}"} if api_key else {}
     data, err = _post_json(
-        OPENAI_BASE_URL + "/chat/completions",
-        {"model": OPENAI_MODEL, "max_tokens": MAX_TOKENS, "messages": messages},
-        {"authorization": f"Bearer {OPENAI_API_KEY}"},
-        "OpenAI", timeout,
+        base_url.rstrip("/") + "/chat/completions",
+        {"model": model, "max_tokens": MAX_TOKENS, "messages": messages},
+        headers, label, timeout,
     )
     if err:
         return False, err
@@ -538,9 +550,21 @@ def _ask_openai(user_text, timeout=ASK_TIMEOUT):
     except (KeyError, IndexError, TypeError):
         text = ""
     if not text:
-        log.debug("OpenAI returned no text: %s", str(data)[:200])
-        return False, "I received an empty reply from OpenAI, Sir. Do try again."
+        log.debug("%s returned no text: %s", label, str(data)[:200])
+        return False, f"I received an empty reply from {label}, Sir. Do try again."
     return True, text
+
+
+def _ask_openai(user_text, timeout=ASK_TIMEOUT):
+    """OpenAI (or any OpenAI-compatible server set via OPENAI_BASE_URL)."""
+    return _chat_completions(OPENAI_BASE_URL, OPENAI_MODEL, OPENAI_API_KEY,
+                             "OpenAI", user_text, timeout)
+
+
+def _ask_local(user_text, timeout=ASK_TIMEOUT):
+    """A local, keyless model — Ollama or LM Studio via their OpenAI-compatible API."""
+    return _chat_completions(LOCAL_URL, LOCAL_MODEL, LOCAL_API_KEY,
+                             "Local model", user_text, timeout)
 
 
 # --- brain: Google Gemini ---------------------------------------------------
@@ -609,8 +633,10 @@ def _demo_reply(user_text):
         return ("I am JARVIS, Sir — your executive assistant. At the moment I'm in demo "
                 "mode, so my wit is canned rather than freshly reasoned.")
     return ("I'm in demo mode, Sir — no live AI is configured, so I can only offer "
-            "canned courtesies. To wake me fully, set an API key (ANTHROPIC_API_KEY, "
-            "OPENAI_API_KEY, or GEMINI_API_KEY) — or install OpenClaw — and restart me.")
+            "canned courtesies. To wake me fully without an API key, run a local model "
+            "(set JARVIS_LOCAL_MODEL, e.g. llama3.2, with Ollama) or use your Claude "
+            "subscription via OpenClaw. An API key (ANTHROPIC_API_KEY / OPENAI_API_KEY "
+            "/ GEMINI_API_KEY) works too. Then restart me.")
 
 
 def _handler_for(name):
@@ -620,6 +646,7 @@ def _handler_for(name):
         "anthropic": _ask_anthropic,
         "openai": _ask_openai,
         "gemini": _ask_gemini,
+        "local": _ask_local,
         "openclaw": _ask_openclaw,
     }.get(name)
 
@@ -871,8 +898,9 @@ def main(argv=None):
     avail = available_brains()
     log.info("J.A.R.V.I.S. backend online")
     if brain == "demo":
-        log.info("Brain    : DEMO MODE — no AI configured (set ANTHROPIC_API_KEY, "
-                 "OPENAI_API_KEY, or GEMINI_API_KEY — or install OpenClaw)")
+        log.info("Brain    : DEMO MODE — no AI configured. Keyless options: a local "
+                 "model (JARVIS_LOCAL_MODEL via Ollama/LM Studio) or OpenClaw. Or set "
+                 "ANTHROPIC_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY")
     else:
         log.info("Brain    : %s (%s)", BRAIN_LABELS.get(brain, brain), active_model_label())
     log.info("Available: %s", ", ".join(avail))

@@ -15,8 +15,24 @@ it auto-selects the best available one, and you can **switch live** from the HUD
 | **Anthropic (Claude API)** | `ANTHROPIC_API_KEY` | Preferred. `JARVIS_ANTHROPIC_MODEL` (default `claude-opus-4-8`). |
 | **OpenAI / compatible** | `OPENAI_API_KEY` | `OPENAI_MODEL` (default `gpt-4o-mini`). Point `OPENAI_BASE_URL` at any OpenAI-compatible server — OpenRouter, Groq, Together, or a local Ollama / LM Studio (`http://localhost:11434/v1`). |
 | **Google Gemini** | `GEMINI_API_KEY` | `GEMINI_MODEL` (default `gemini-2.0-flash`). |
-| **Claude subscription (OpenClaw)** | install OpenClaw | Uses your Claude.ai subscription OAuth token — no API key. Auto-refreshes. |
+| **Local model (no key)** | `JARVIS_LOCAL_MODEL` | **No API key.** Any OpenAI-compatible local server — Ollama (default) or LM Studio. Free and private. See below. |
+| **Claude subscription (OpenClaw)** | install OpenClaw | **No API key.** Uses your Claude.ai subscription OAuth token. Auto-refreshes. |
 | **Demo (offline)** | nothing | Always available — responds in character and tells you how to enable a real brain, so the interface is never dead. |
+
+### No API key? Run a model locally (free)
+
+Install [Ollama](https://ollama.com), pull a model, then point JARVIS at it — no
+key, nothing leaves your machine:
+
+```
+ollama pull llama3.2                 # one-time download
+export JARVIS_LOCAL_MODEL=llama3.2   # Windows: set JARVIS_LOCAL_MODEL=llama3.2
+./jarvis.sh                          # (or JARVIS.bat)
+```
+
+It appears in the **AI** dropdown as “Local model (no key)”. For **LM Studio**
+instead, start its local server and add `JARVIS_LOCAL_URL=http://localhost:1234/v1`.
+The other keyless route is the **Claude subscription** brain (install OpenClaw).
 
 Set whichever you have, e.g. on macOS/Linux:
 ```
@@ -26,8 +42,8 @@ export GEMINI_API_KEY=...               # Gemini
 ```
 (Windows `cmd`: `set ANTHROPIC_API_KEY=sk-ant-...`)
 
-**Auto-selection order** is Anthropic → OpenAI → Gemini → OpenClaw → Demo. Pin a
-default with `JARVIS_BRAIN` (e.g. `JARVIS_BRAIN=openai`), or pick one live from the
+**Auto-selection order** is Anthropic → OpenAI → Gemini → Local → OpenClaw → Demo.
+Pin a default with `JARVIS_BRAIN` (e.g. `JARVIS_BRAIN=local`), or pick one live from the
 HUD **AI** dropdown. The active brain is shown in the HUD (the **Brain** readout:
 `ONLINE` for a real brain, `DEMO` for demo) and in the backend startup log.
 
@@ -102,6 +118,9 @@ so plainly instead of dumping a traceback.
 | `OPENAI_BASE_URL`       | `https://api.openai.com/v1` | Point at any OpenAI-compatible server  |
 | `GEMINI_API_KEY`        | (unset)                  | Enables the Google Gemini brain           |
 | `GEMINI_MODEL`          | `gemini-2.0-flash`       | Model for the Gemini brain                |
+| `JARVIS_LOCAL_MODEL`    | (unset)                  | Enables the keyless Local brain (name of a pulled model, e.g. `llama3.2`) |
+| `JARVIS_LOCAL_URL`      | `http://localhost:11434/v1` | Local server URL (Ollama default; LM Studio = `:1234/v1`) |
+| `JARVIS_LOCAL_API_KEY`  | (unset)                  | Only if your local server requires a token (usually not) |
 | `JARVIS_BRAIN`          | (auto)                   | Pin a default brain (`anthropic`/`openai`/`gemini`/`openclaw`) |
 | `JARVIS_MAX_TOKENS`     | `1024`                   | Max reply length for the API brains       |
 | `JARVIS_PROBE_TIMEOUT`  | `20`                     | Per-brain timeout (s) for the TEST button  |
