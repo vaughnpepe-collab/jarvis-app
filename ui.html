@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
 <title>J.A.R.V.I.S.</title>
 <style>
   :root{
@@ -24,7 +25,8 @@
     grid-template-areas:"head head head" "left center right" "left console projects" "left console projects"}
   .panel{border:1px solid var(--line);border-radius:10px;
     background:linear-gradient(180deg,rgba(12,34,52,.55),rgba(4,16,26,.35));
-    box-shadow:inset 0 0 22px rgba(57,199,255,.07);backdrop-filter:blur(3px);position:relative;overflow:hidden}
+    box-shadow:inset 0 0 22px rgba(57,199,255,.07);
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);position:relative;overflow:hidden}
   .ttl{font-size:11px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;padding:10px 14px;
     border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
   .ttl .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
@@ -116,6 +118,32 @@
   .boot .bl i{display:block;height:100%;width:0;background:var(--cyan);box-shadow:0 0 12px var(--cyan-glow);animation:boot 2s forwards}
   .boot p{font-size:10px;letter-spacing:2px;color:var(--mut)}
   @keyframes boot{to{width:100%}}
+
+  /* ---- polish: entrance + interaction (cheap — opacity/transform only) ---- */
+  @keyframes riseIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* panels "assemble" as the boot screen clears (body.ready set in JS) */
+  body.ready header,body.ready .panel,body.ready .center{animation:riseIn .6s cubic-bezier(.2,.7,.2,1) both}
+  body.ready header{animation-delay:.02s}
+  body.ready .center{animation-delay:.10s}
+  body.ready aside.left{animation-delay:.16s}
+  body.ready .console{animation-delay:.22s}
+  body.ready aside.right{animation-delay:.28s}
+  body.ready .projects{animation-delay:.34s}
+  .panel{transition:border-color .25s ease,box-shadow .25s ease}
+  .panel:hover{border-color:rgba(57,199,255,.5);box-shadow:inset 0 0 22px rgba(57,199,255,.12)}
+  .log .row{animation:msgIn .28s ease both}
+  /* tactile press feedback + accessible keyboard focus */
+  .inbar button,.iconbtn,#send,#brainSel{transition:transform .08s ease,background .2s ease,border-color .2s ease,box-shadow .2s ease}
+  .inbar button:active,.iconbtn:active{transform:translateY(1px) scale(.97)}
+  :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .inbar input:focus-visible{outline:none}
+  /* honour the OS "reduce motion" setting — kills all loops + entrances for
+     accessibility and battery; the HUD stays fully legible, just static */
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+      transition-duration:.001ms !important;scroll-behavior:auto !important}
+  }
 </style>
 </head>
 <body>
@@ -213,7 +241,8 @@
   /* boot */
   const bm=["INITIALISING SYSTEMS…","LINKING TO CLAUDE…","CALIBRATING REACTOR…","SYSTEMS NOMINAL."];
   let bi=0;const bt=setInterval(()=>{bi++;$('bootmsg')&&($('bootmsg').textContent=bm[Math.min(bi,bm.length-1)]);},480);
-  setTimeout(()=>{clearInterval(bt);const b=$('boot');b.style.opacity=0;setTimeout(()=>b.remove(),800);greet();},2100);
+  setTimeout(()=>{clearInterval(bt);const b=$('boot');b.style.opacity=0;setTimeout(()=>b.remove(),800);
+    document.body.classList.add('ready');greet();},2100);
 
   /* clock */
   const start=Date.now();const pad=n=>String(n).padStart(2,'0');
