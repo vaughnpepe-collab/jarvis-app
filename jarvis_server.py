@@ -44,6 +44,15 @@ MODELS = [m.strip() for m in os.environ.get(
 ).split(",") if m.strip()]
 MODEL = MODELS[0]  # shown in the UI
 ASK_TIMEOUT = int(os.environ.get("JARVIS_TIMEOUT", "240"))
+
+# Direct Anthropic API (works out of the box with just an API key — no OpenClaw).
+# The key is read from the environment only; it is never hardcoded or logged.
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+ANTHROPIC_MODEL = os.environ.get("JARVIS_ANTHROPIC_MODEL", "claude-opus-4-8").strip()
+ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
+ANTHROPIC_VERSION = "2023-06-01"
+ANTHROPIC_MAX_TOKENS = int(os.environ.get("JARVIS_MAX_TOKENS", "1024"))
+
 HERE = Path(__file__).resolve().parent
 UI_FILE = HERE / "ui.html"
 LOG_FILE = Path(os.environ.get("JARVIS_LOG_FILE", str(HERE / "jarvis.log")))
@@ -110,6 +119,12 @@ def _find_openclaw_cmd():
     return [npm_shim or "openclaw"]  # fallback (may mangle long prompts)
 
 OPENCLAW_CMD = _find_openclaw_cmd()
+# OpenClaw is genuinely usable only if we resolved a node entrypoint or a real
+# shim on PATH — the bare ["openclaw"] fallback means nothing was found.
+OPENCLAW_AVAILABLE = (
+    len(OPENCLAW_CMD) == 2  # [node, openclaw.mjs]
+    or bool(shutil.which("openclaw.cmd") or shutil.which("openclaw"))
+)
 
 # --- subscription token auto-refresh (keeps Claude alive without re-login) ---
 CRED_FILE = Path(os.path.expanduser("~/.claude/.credentials.json"))
@@ -298,28 +313,151 @@ def _attempt(prompt):
     return ("auth", last_blob) if auth_problem else ("fail", last_blob)
 
 
-def ask_claude(user_text):
-    """Run one turn; auto-refresh the subscription token and retry once on auth failure."""
+# ---------------------------------------------------------------- brains
+# JARVIS can think through one of three "brains", chosen automatically:
+#   1. anthropic — a direct Anthropic API call (needs only ANTHROPIC_API_KEY)
+#   2. openclaw  — the Claude.ai subscription via OpenClaw (no API key)
+#   3. demo      — an always-available offline fallback so the HUD is never dead
+def active_brain():
+    if ANTHROPIC_API_KEY:
+        return "anthropic"
+    if OPENCLAW_AVAILABLE:
+        return "openclaw"
+    return "demo"
+
+
+def active_model_label():
+    brain = active_brain()
+    if brain == "anthropic":
+        return ANTHROPIC_MODEL
+    if brain == "openclaw":
+        return MODEL
+    return "demo (offline)"
+
+
+def _record_turn(user_text, reply):
+    with _history_lock:
+        _history.append(("Sir", user_text))
+        _history.append(("JARVIS", reply))
+        del _history[:-24]
+
+
+# --- brain 1: direct Anthropic API ------------------------------------------
+def _build_messages(user_text):
+    """Render the rolling history as Anthropic chat messages (persona is the
+    `system` prompt, so it is not repeated here)."""
+    with _history_lock:
+        convo = _history[-12:]
+    msgs = [{"role": "user" if who == "Sir" else "assistant", "content": txt}
+            for who, txt in convo]
+    msgs.append({"role": "user", "content": user_text})
+    return msgs
+
+
+def _ask_anthropic(user_text):
+    """One turn via the Anthropic Messages API. Returns (ok, reply)."""
+    body = json.dumps({
+        "model": ANTHROPIC_MODEL,
+        "max_tokens": ANTHROPIC_MAX_TOKENS,
+        "system": JARVIS_PERSONA,
+        "messages": _build_messages(user_text),
+    }).encode("utf-8")
+    req = urllib.request.Request(ANTHROPIC_URL, data=body, headers={
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": ANTHROPIC_VERSION,
+        "content-type": "application/json",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=ASK_TIMEOUT) as r:
+            data = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        detail = ""
+        try:
+            detail = json.loads(e.read()).get("error", {}).get("message", "")
+        except Exception:
+            pass
+        log.warning("Anthropic API HTTP %s: %s", e.code, detail or e.reason)
+        if e.code in (401, 403):
+            return False, ("My Anthropic credentials were rejected, Sir. Do check the "
+                           "ANTHROPIC_API_KEY environment variable.")
+        if e.code == 429:
+            return False, ("The Anthropic service is rate-limiting us, Sir. A moment's "
+                           "patience and we may try again.")
+        return False, (f"The Anthropic service returned an error ({e.code}), Sir"
+                       + (f": {detail}" if detail else "."))
+    except urllib.error.URLError as e:
+        log.warning("Anthropic API unreachable: %s", e.reason)
+        return False, ("I can't reach Anthropic just now, Sir — the network link "
+                       "appears to be down.")
+    except Exception as e:
+        log.exception("Anthropic API call failed")
+        return False, f"Something went awry contacting Anthropic, Sir: {e}"
+
+    if data.get("stop_reason") == "refusal":
+        return False, ("I'm afraid I must decline that particular request, Sir.")
+    parts = [b.get("text", "") for b in data.get("content", [])
+             if isinstance(b, dict) and b.get("type") == "text"]
+    text = "".join(parts).strip()
+    if not text:
+        log.debug("Anthropic returned no text (stop_reason=%s)", data.get("stop_reason"))
+        return False, "I received an empty reply from Claude, Sir. Do try again."
+    return True, text
+
+
+# --- brain 2: OpenClaw subscription -----------------------------------------
+def _ask_openclaw(user_text):
+    """One turn via OpenClaw; auto-refresh the subscription token and retry once
+    on an auth failure. Returns (ok, reply)."""
     prompt = _build_prompt(user_text)
     kind, payload = _attempt(prompt)
     if kind == "auth" and _refresh_token():
         kind, payload = _attempt(prompt)  # retry with fresh token
 
     if kind == "ok":
-        with _history_lock:
-            _history.append(("Sir", user_text))
-            _history.append(("JARVIS", payload))
-            del _history[:-24]
-        return {"ok": True, "reply": payload}
+        return True, payload
     if kind == "fatal":
-        return {"ok": False, "reply": payload}
+        return False, payload
     if kind == "auth":
-        return {"ok": False, "reply":
-                "My link to Claude won't authenticate even after a refresh, Sir. The "
-                "subscription login may need redoing:  openclaw.cmd infer model auth "
-                "login --provider anthropic"}
+        return False, ("My link to Claude won't authenticate even after a refresh, "
+                       "Sir. The subscription login may need redoing:  openclaw.cmd "
+                       "infer model auth login --provider anthropic")
     snippet = payload.strip().splitlines()[-1] if payload.strip() else "no output"
-    return {"ok": False, "reply": f"Something went awry, Sir: {snippet[:300]}"}
+    return False, f"Something went awry, Sir: {snippet[:300]}"
+
+
+# --- brain 3: offline demo --------------------------------------------------
+def _demo_reply(user_text):
+    """Canned, in-character replies so the HUD always responds, even with no
+    brain configured. Always 'succeeds' (there is nothing to fail)."""
+    t = user_text.lower().strip()
+    if any(g in t for g in ("hello", "hi ", "hey", "good morning",
+                            "good evening", "good afternoon")) or t in ("hi", "hey"):
+        return ("Good day, Sir. I'm presently running in demo mode — pleasantries only, "
+                "I'm afraid, until a live brain is configured.")
+    if "time" in t or "date" in t:
+        return (f"By the workshop clock it's {time.strftime('%H:%M on %A')}, Sir — "
+                "though I'd not stake the reactor on my accuracy in demo mode.")
+    if "who are you" in t or "your name" in t or "what are you" in t:
+        return ("I am JARVIS, Sir — your executive assistant. At the moment I'm in demo "
+                "mode, so my wit is canned rather than freshly reasoned.")
+    return ("I'm in demo mode, Sir — no live link to Claude is configured, so I can only "
+            "offer canned courtesies. To wake me fully, set an ANTHROPIC_API_KEY "
+            "environment variable (or install OpenClaw) and restart me.")
+
+
+def ask_claude(user_text):
+    """Run one conversational turn through whichever brain is available."""
+    brain = active_brain()
+    if brain == "anthropic":
+        ok, reply = _ask_anthropic(user_text)
+    elif brain == "openclaw":
+        ok, reply = _ask_openclaw(user_text)
+    else:
+        ok, reply = True, _demo_reply(user_text)
+
+    if ok:
+        _record_turn(user_text, reply)
+    return {"ok": ok, "reply": reply, "brain": brain}
 
 
 def get_stats():
@@ -338,7 +476,8 @@ def get_stats():
     return {
         "cpu": cpu, "mem": mem,
         "real": HAVE_PSUTIL,
-        "model": MODEL,
+        "model": active_model_label(),
+        "brain": active_brain(),
         "cores": (psutil.cpu_count() if HAVE_PSUTIL else os.cpu_count()) or 0,
     }
 
@@ -364,7 +503,8 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send(404, "ui.html not found", "text/plain")
         elif self.path == "/health":
-            self._send(200, json.dumps({"ok": True, "model": MODEL,
+            self._send(200, json.dumps({"ok": True, "model": active_model_label(),
+                                        "brain": active_brain(),
                                         "psutil": HAVE_PSUTIL}))
         elif self.path == "/stats":
             self._send(200, json.dumps(get_stats()))
@@ -493,11 +633,19 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     setup_logging()
+    brain = active_brain()
+    brain_desc = {
+        "anthropic": f"Anthropic API ({ANTHROPIC_MODEL})",
+        "openclaw": f"OpenClaw subscription ({MODEL}) — no API key",
+        "demo": "DEMO MODE — no brain configured "
+                "(set ANTHROPIC_API_KEY or install OpenClaw for real replies)",
+    }[brain]
     log.info("J.A.R.V.I.S. backend online")
-    log.info("Model    : %s  (Claude subscription — no API key)", MODEL)
+    log.info("Brain    : %s", brain_desc)
     log.info("Telemetry: %s", "psutil (real)" if HAVE_PSUTIL
              else "estimated (install psutil for real)")
-    log.info("OpenClaw : %s", " ".join(OPENCLAW_CMD))
+    if brain == "openclaw":
+        log.info("OpenClaw : %s", " ".join(OPENCLAW_CMD))
     log.info("Serving  : http://%s:%s", HOST, PORT)
     log.info("Logs     : %s", LOG_FILE)
 

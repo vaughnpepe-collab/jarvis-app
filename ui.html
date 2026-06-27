@@ -242,9 +242,20 @@
   if(navigator.getBattery){navigator.getBattery().then(b=>{const u=()=>{const p=Math.round(b.level*100);
     setBar('batB','batV',p,()=>p+'%'+(b.charging?' ⚡':''));};u();b.addEventListener('levelchange',u);b.addEventListener('chargingchange',u);});}
   else $('batV').textContent='N/A';
-  // brain health
-  fetch(API+'/health').then(r=>r.json()).then(h=>{$('brain').textContent='ONLINE';$('brain').className='ok';})
-    .catch(()=>{$('brain').textContent='OFFLINE';$('brain').className='err';});
+  // brain health — reflects which "brain" is answering (real AI vs demo mode)
+  fetch(API+'/health').then(r=>r.json()).then(h=>{
+    if(h.brain==='demo'){
+      $('brain').textContent='DEMO';$('brain').className='warn';
+      $('brain').title='No live AI configured — set ANTHROPIC_API_KEY (or install OpenClaw) for real replies';
+      const sub=document.querySelector('.center-status .small');
+      if(sub)sub.textContent='DEMO MODE · SET ANTHROPIC_API_KEY';
+      logFeed('Running in DEMO mode — no live AI link','w');
+    }else{
+      $('brain').textContent='ONLINE';$('brain').className='ok';
+      const sub=document.querySelector('.center-status .small');
+      if(sub)sub.textContent=(h.brain==='anthropic')?'ANTHROPIC API · LIVE':'CLAUDE SUBSCRIPTION · NO API KEY';
+    }
+  }).catch(()=>{$('brain').textContent='OFFLINE';$('brain').className='err';});
 
   /* activity feed */
   function logFeed(msg,cls){const f=$('feed');const t=new Date().toLocaleTimeString();

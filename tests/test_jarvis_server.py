@@ -9,10 +9,12 @@ The network / subprocess boundary (OpenClaw) is always mocked — the tests neve
 spawn a real model call, so they are fast and deterministic.
 """
 
+import io
 import json
 import os
 import sys
 import unittest
+import urllib.error
 from pathlib import Path
 from unittest import mock
 
@@ -135,7 +137,27 @@ class TestAttempt(unittest.TestCase):
         self.assertEqual(kind, "fail")
 
 
-class TestAskClaude(unittest.TestCase):
+class TestActiveBrain(unittest.TestCase):
+    def test_anthropic_wins_when_key_present(self):
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "sk-test"), \
+                mock.patch.object(js, "OPENCLAW_AVAILABLE", True):
+            self.assertEqual(js.active_brain(), "anthropic")
+            self.assertEqual(js.active_model_label(), js.ANTHROPIC_MODEL)
+
+    def test_openclaw_when_no_key(self):
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", ""), \
+                mock.patch.object(js, "OPENCLAW_AVAILABLE", True):
+            self.assertEqual(js.active_brain(), "openclaw")
+            self.assertEqual(js.active_model_label(), js.MODEL)
+
+    def test_demo_when_nothing_configured(self):
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", ""), \
+                mock.patch.object(js, "OPENCLAW_AVAILABLE", False):
+            self.assertEqual(js.active_brain(), "demo")
+            self.assertIn("demo", js.active_model_label().lower())
+
+
+class TestBuildMessages(unittest.TestCase):
     def setUp(self):
         self._saved = list(js._history)
         js._history.clear()
@@ -143,49 +165,145 @@ class TestAskClaude(unittest.TestCase):
     def tearDown(self):
         js._history[:] = self._saved
 
-    def test_ok_records_history(self):
+    def test_roles_mapped_and_current_appended(self):
+        js._history.append(("Sir", "first"))
+        js._history.append(("JARVIS", "reply"))
+        msgs = js._build_messages("now")
+        self.assertEqual(msgs[0], {"role": "user", "content": "first"})
+        self.assertEqual(msgs[1], {"role": "assistant", "content": "reply"})
+        self.assertEqual(msgs[-1], {"role": "user", "content": "now"})
+
+
+class TestAskAnthropic(unittest.TestCase):
+    """The HTTP boundary (urllib.request.urlopen) is always mocked."""
+
+    def setUp(self):
+        self._saved = list(js._history)
+        js._history.clear()
+
+    def tearDown(self):
+        js._history[:] = self._saved
+
+    def _fake_response(self, payload):
+        cm = mock.MagicMock()
+        cm.__enter__.return_value.read.return_value = json.dumps(payload).encode()
+        return cm
+
+    def test_success_extracts_text(self):
+        payload = {"content": [{"type": "text", "text": "At your service, Sir."}],
+                   "stop_reason": "end_turn"}
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "sk-test"), \
+                mock.patch("urllib.request.urlopen",
+                           return_value=self._fake_response(payload)):
+            ok, reply = js._ask_anthropic("hello")
+        self.assertTrue(ok)
+        self.assertEqual(reply, "At your service, Sir.")
+
+    def test_refusal_is_declined(self):
+        payload = {"content": [], "stop_reason": "refusal"}
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "sk-test"), \
+                mock.patch("urllib.request.urlopen",
+                           return_value=self._fake_response(payload)):
+            ok, reply = js._ask_anthropic("hello")
+        self.assertFalse(ok)
+        self.assertIn("decline", reply.lower())
+
+    def test_http_401_reports_credentials(self):
+        err = urllib.error.HTTPError("u", 401, "Unauthorized", {}, io.BytesIO(b"{}"))
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "sk-bad"), \
+                mock.patch("urllib.request.urlopen", side_effect=err):
+            ok, reply = js._ask_anthropic("hello")
+        self.assertFalse(ok)
+        self.assertIn("ANTHROPIC_API_KEY", reply)
+
+    def test_network_error_is_graceful(self):
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "sk-test"), \
+                mock.patch("urllib.request.urlopen",
+                           side_effect=urllib.error.URLError("down")):
+            ok, reply = js._ask_anthropic("hello")
+        self.assertFalse(ok)
+        self.assertIn("can't reach", reply.lower())
+
+
+class TestAskOpenclaw(unittest.TestCase):
+    def test_ok(self):
         with mock.patch.object(js, "_attempt", return_value=("ok", "Certainly, Sir.")):
+            ok, reply = js._ask_openclaw("do it")
+        self.assertTrue(ok)
+        self.assertEqual(reply, "Certainly, Sir.")
+
+    def test_auth_triggers_refresh_then_retry(self):
+        with mock.patch.object(js, "_attempt",
+                               side_effect=[("auth", "b"), ("ok", "Recovered, Sir.")]), \
+                mock.patch.object(js, "_refresh_token", return_value=True) as refresh:
+            ok, reply = js._ask_openclaw("hi")
+        self.assertTrue(ok)
+        self.assertEqual(reply, "Recovered, Sir.")
+        refresh.assert_called_once()
+
+    def test_auth_refresh_fails(self):
+        with mock.patch.object(js, "_attempt", return_value=("auth", "b")), \
+                mock.patch.object(js, "_refresh_token", return_value=False):
+            ok, reply = js._ask_openclaw("hi")
+        self.assertFalse(ok)
+        self.assertIn("authenticate", reply.lower())
+
+    def test_failure_snippet(self):
+        with mock.patch.object(js, "_attempt",
+                               return_value=("fail", "line one\nfinal error line")):
+            ok, reply = js._ask_openclaw("hi")
+        self.assertFalse(ok)
+        self.assertIn("final error line", reply)
+
+
+class TestDemoReply(unittest.TestCase):
+    def test_greeting(self):
+        self.assertIn("demo mode", js._demo_reply("hello there").lower())
+
+    def test_identity(self):
+        self.assertIn("jarvis", js._demo_reply("who are you?").lower())
+
+    def test_generic_mentions_api_key(self):
+        self.assertIn("ANTHROPIC_API_KEY", js._demo_reply("what's the stock price"))
+
+
+class TestAskClaudeDispatch(unittest.TestCase):
+    def setUp(self):
+        self._saved = list(js._history)
+        js._history.clear()
+
+    def tearDown(self):
+        js._history[:] = self._saved
+
+    def test_dispatches_to_openclaw_and_records_history(self):
+        with mock.patch.object(js, "active_brain", return_value="openclaw"), \
+                mock.patch.object(js, "_ask_openclaw",
+                                  return_value=(True, "Certainly, Sir.")):
             res = js.ask_claude("Do the thing")
         self.assertTrue(res["ok"])
-        self.assertEqual(res["reply"], "Certainly, Sir.")
+        self.assertEqual(res["brain"], "openclaw")
         self.assertEqual(js._history[-2], ("Sir", "Do the thing"))
         self.assertEqual(js._history[-1], ("JARVIS", "Certainly, Sir."))
 
-    def test_auth_triggers_refresh_then_retry_success(self):
-        attempts = [("auth", "blob"), ("ok", "Recovered, Sir.")]
+    def test_failure_records_no_history(self):
+        before = len(js._history)
+        with mock.patch.object(js, "active_brain", return_value="openclaw"), \
+                mock.patch.object(js, "_ask_openclaw", return_value=(False, "nope")):
+            res = js.ask_claude("hello")
+        self.assertFalse(res["ok"])
+        self.assertEqual(len(js._history), before)
 
-        with mock.patch.object(js, "_attempt", side_effect=attempts), \
-                mock.patch.object(js, "_refresh_token", return_value=True) as refresh:
+    def test_demo_brain_always_ok(self):
+        with mock.patch.object(js, "active_brain", return_value="demo"):
             res = js.ask_claude("hello")
         self.assertTrue(res["ok"])
-        self.assertEqual(res["reply"], "Recovered, Sir.")
-        refresh.assert_called_once()
-
-    def test_auth_refresh_fails_returns_auth_message(self):
-        with mock.patch.object(js, "_attempt", return_value=("auth", "blob")), \
-                mock.patch.object(js, "_refresh_token", return_value=False):
-            res = js.ask_claude("hello")
-        self.assertFalse(res["ok"])
-        self.assertIn("authenticate", res["reply"].lower())
-
-    def test_failure_returns_last_line_snippet(self):
-        with mock.patch.object(js, "_attempt",
-                               return_value=("fail", "line one\nfinal error line")):
-            res = js.ask_claude("hello")
-        self.assertFalse(res["ok"])
-        self.assertIn("final error line", res["reply"])
-
-    def test_failure_no_history_recorded(self):
-        before = len(js._history)
-        with mock.patch.object(js, "_attempt", return_value=("fail", "nope")):
-            js.ask_claude("hello")
-        self.assertEqual(len(js._history), before)
+        self.assertEqual(res["brain"], "demo")
 
 
 class TestGetStats(unittest.TestCase):
     def test_shape_and_ranges(self):
         s = js.get_stats()
-        for key in ("cpu", "mem", "real", "model", "cores"):
+        for key in ("cpu", "mem", "real", "model", "brain", "cores"):
             self.assertIn(key, s)
         self.assertGreaterEqual(s["cpu"], 0)
         self.assertLessEqual(s["cpu"], 100)
