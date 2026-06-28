@@ -436,7 +436,12 @@
 
   /* ---- obsidian-style brain graph ---- */
   const gc=$('brainGraph'),gx=gc&&gc.getContext('2d');
-  let gnodes=[],glinks=[],graphRAF=0;
+  let gnodes=[],glinks=[],graphRAF=0,gFlows=[];
+  // a travelling "data" pulse from one node to another (team hand-offs)
+  function addFlow(from,to,ms){if(from&&to&&from!==to)gFlows.push({from,to,start:performance.now(),ms:ms||1300});}
+  function drawParticles(a,b,now,color,n,speed){for(let k=0;k<(n||3);k++){
+    const p=((now/(speed||900))+k/(n||3))%1,x=a.x+(b.x-a.x)*p,y=a.y+(b.y-a.y)*p;
+    gx.fillStyle=color;gx.beginPath();gx.arc(x,y,2,0,7);gx.fill();}}
   function gsize(){if(!gc)return;const dpr=window.devicePixelRatio||1;
     const w=gc.clientWidth||280,h=gc.clientHeight||200;
     gc.width=w*dpr;gc.height=h*dpr;gx.setTransform(dpr,0,0,dpr,0,0);}
@@ -466,11 +471,21 @@
     drawGraph();graphRAF=requestAnimationFrame(stepGraph);
   }
   function drawGraph(){
-    if(!gx)return;const w=gc.clientWidth,h=gc.clientHeight;gx.clearRect(0,0,w,h);
+    if(!gx)return;const w=gc.clientWidth,h=gc.clientHeight,now=performance.now();gx.clearRect(0,0,w,h);
     for(const l of glinks){const a=nodeById(l.a),b=nodeById(l.b);if(!a||!b)continue;
       const active=gWorking.has(b.id)||target===b.id;
       gx.strokeStyle=active?'rgba(57,199,255,.85)':'rgba(57,199,255,.16)';gx.lineWidth=active?2:1;
-      gx.beginPath();gx.moveTo(a.x,a.y);gx.lineTo(b.x,b.y);gx.stroke();}
+      gx.beginPath();gx.moveTo(a.x,a.y);gx.lineTo(b.x,b.y);gx.stroke();
+      // a working agent shows data streaming to/from JARVIS
+      if(gWorking.has(b.id))drawParticles(a,b,now,'rgba(255,179,71,.95)');}
+    // transient hand-off pulses between agents (team mode)
+    for(let i=gFlows.length-1;i>=0;i--){const fl=gFlows[i],p=(now-fl.start)/fl.ms;
+      if(p>=1){gFlows.splice(i,1);continue;}
+      const a=nodeById(fl.from),b=nodeById(fl.to);if(!a||!b)continue;
+      gx.strokeStyle='rgba(82,255,184,.35)';gx.lineWidth=1.2;
+      gx.beginPath();gx.moveTo(a.x,a.y);gx.lineTo(b.x,b.y);gx.stroke();
+      const x=a.x+(b.x-a.x)*p,y=a.y+(b.y-a.y)*p;
+      gx.fillStyle='#dffff1';gx.beginPath();gx.arc(x,y,3.2,0,7);gx.fill();}
     for(const n of gnodes){const working=gWorking.has(n.id),sel=target===n.id;
       const pulse=working?0.5+0.5*Math.abs(Math.sin(Date.now()/250)):0,r=n.r+(working?pulse*3:0);
       const g=gx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*2.4);
@@ -503,9 +518,13 @@
       const r=await fetch(API+'/collaborate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:goal})});
       const d=await r.json();ph.remove();
       if(!d.ok){say(d.final||'Team mode is unavailable, Sir.');thinkOff();return;}
+      let prev='jarvis';
       for(const st of (d.steps||[])){
+        addFlow(prev,st.agent);              // data passes from the previous worker to this one
         setStatus(st.agent,true);addAs(st.name,st.reply);logFeed(st.name+' contributed','');
-        await sleep(450);setStatus(st.agent,false);}
+        await sleep(650);setStatus(st.agent,false);prev=st.agent;}
+      addFlow(prev,'jarvis');                 // results return to JARVIS for synthesis
+      await sleep(300);
       sayAs('JARVIS',d.final||'The team has nothing further, Sir.');
       logFeed('Team synthesis delivered','');
     }catch(e){ph.remove();say('The team run failed, Sir — '+e.message);}

@@ -55,7 +55,9 @@ Each agent lights up as it works. (Backend: `POST /collaborate`.) Needs a live b
 
 **Brain graph.** Below System Telemetry is an Obsidian-style **Agent Neural Link** —
 JARVIS at the centre with the specialists around it. Nodes pulse amber while an
-agent is working; click a node to talk to that agent. It respects "reduce motion".
+agent is working, with **data streaming along the links**; in Team mode you can
+watch a pulse hand off from one agent to the next as they collaborate. Click a node
+to talk to that agent. It respects "reduce motion".
 
 ### No API key? Run a model locally (free)
 
