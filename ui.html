@@ -134,6 +134,20 @@
   .agent .ast.working{border-color:var(--amber);color:var(--amber);animation:pulse 1s infinite}
   .log .ag::before{content:"◆ "attr(data-name)"  ";color:var(--cyan-dim);font-size:10px}
   .log .ag{color:var(--cyan)}
+  .agentbrain{background:rgba(2,12,20,.9);border:1px solid var(--line);border-radius:4px;color:var(--cyan-dim);
+    font-family:var(--font);font-size:8.5px;letter-spacing:.5px;padding:2px 3px;max-width:74px;cursor:pointer;outline:none}
+  .agentbrain:hover,.agentbrain:focus{border-color:var(--cyan);color:var(--cyan)}
+  .agentbrain option{background:#02121e;color:var(--text)}
+  /* obsidian-style brain graph */
+  aside.left.panel{display:flex;flex-direction:column}
+  aside.left .body{flex:1;display:flex;flex-direction:column;min-height:0}
+  .graph-wrap{flex:1 1 auto;min-height:190px;margin-top:14px;border-top:1px solid var(--line);padding-top:8px;position:relative}
+  .graph-ttl{font-size:10px;letter-spacing:2px;color:var(--cyan);text-transform:uppercase;display:flex;justify-content:space-between}
+  .graph-ttl .hint{color:var(--mut);letter-spacing:1px;font-size:8.5px}
+  #brainGraph{display:block;width:100%;height:calc(100% - 18px);cursor:pointer}
+  /* team-mode button */
+  .iconbtn.team{width:auto;padding:0 12px;font-size:10px;letter-spacing:1px}
+  .iconbtn.team.on{background:rgba(82,255,184,.16);border-color:var(--green);color:#dffff1}
   ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--cyan-dim);border-radius:3px}
   .boot{position:fixed;inset:0;z-index:100;background:#01060c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .8s}
   .boot h2{letter-spacing:12px;color:var(--cyan);font-size:18px}
@@ -205,6 +219,10 @@
         <div class="kv"><span>Cores</span><span id="cores">—</span></div>
         <div class="kv"><span>Uptime</span><span id="uptime">00:00:00</span></div>
       </div>
+      <div class="graph-wrap">
+        <div class="graph-ttl"><span>Agent Neural Link</span><span class="hint">click a node</span></div>
+        <canvas id="brainGraph"></canvas>
+      </div>
     </div>
   </aside>
 
@@ -253,6 +271,7 @@
     <div class="inbar">
       <button id="mic" class="iconbtn" title="Click to listen — say 'Jarvis' then your request">🎙</button>
       <button id="voice" class="iconbtn on" title="JARVIS voice replies on/off">🔊</button>
+      <button id="team" class="iconbtn team" title="Team mode — JARVIS plans and the specialists collaborate">🤝 TEAM</button>
       <input id="cmd" autocomplete="off" placeholder="Speak, Sir… (say 'Jarvis …' or just type)" />
       <button id="send">SEND</button>
     </div>
@@ -268,7 +287,8 @@
   const bm=["INITIALISING SYSTEMS…","LINKING TO CLAUDE…","CALIBRATING REACTOR…","SYSTEMS NOMINAL."];
   let bi=0;const bt=setInterval(()=>{bi++;$('bootmsg')&&($('bootmsg').textContent=bm[Math.min(bi,bm.length-1)]);},480);
   setTimeout(()=>{clearInterval(bt);const b=$('boot');b.style.opacity=0;setTimeout(()=>b.remove(),800);
-    document.body.classList.add('ready');greet();},2100);
+    document.body.classList.add('ready');greet();
+    try{initGraph();}catch(e){}},2100);
 
   /* clock */
   const start=Date.now();const pad=n=>String(n).padStart(2,'0');
@@ -314,10 +334,12 @@
   async function refreshBrains(){
     try{
       const d=await (await fetch(API+'/brains')).json();
+      availBrains=d.available||[];
       const sel=$('brainSel');
       sel.innerHTML=d.available.map(b=>`<option value="${b.id}">${esc(b.label)}</option>`).join('');
       sel.value=d.active;
       applyBrainUI(d.active,d.available);
+      renderAgents();   // refresh per-agent brain dropdowns now that brains are known
     }catch(e){$('brain').textContent='OFFLINE';$('brain').className='err';}
   }
   $('brainSel').onchange=async function(){
@@ -376,25 +398,119 @@
   function thinkOff(){thinking=false;$('core').classList.remove('think');$('cstat').textContent='ALL SYSTEMS NOMINAL';}
 
   /* ---- agent team ---- */
-  let AGENTS=[],target='jarvis';
+  let AGENTS=[],availBrains=[],target='jarvis';
+  const gWorking=new Set();
+  const reduceMotion=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
   const agentName=id=>{const a=AGENTS.find(x=>x.id===id);return a?a.name:id.toUpperCase();};
   function setStatus(id,working){const el=document.querySelector('.agent[data-id="'+id+'"] .ast');
-    if(el){el.textContent=working?'WORKING':'IDLE';el.classList.toggle('working',working);}}
+    if(el){el.textContent=working?'WORKING':'IDLE';el.classList.toggle('working',working);}
+    if(working)gWorking.add(id);else gWorking.delete(id);
+    if(reduceMotion)drawGraph();}
   function renderAgents(){
-    const list=$('agent-list');
-    list.innerHTML=AGENTS.map(a=>'<div class="agent'+(a.id===target?' sel':'')+'" data-id="'+a.id+'">'+
-      '<div class="av"></div><div class="meta"><div class="an">'+esc(a.name)+'</div>'+
-      '<div class="ar">'+esc(a.role)+'</div></div><span class="ast">IDLE</span></div>').join('');
+    const list=$('agent-list');if(!list)return;
+    list.innerHTML=AGENTS.map(a=>{
+      const opts=['<option value="auto">auto</option>'].concat(
+        availBrains.map(b=>'<option value="'+b.id+'"'+(a.brain===b.id?' selected':'')+'>'+esc(b.id)+'</option>')).join('');
+      return '<div class="agent'+(a.id===target?' sel':'')+'" data-id="'+a.id+'">'+
+        '<div class="av"></div><div class="meta"><div class="an">'+esc(a.name)+'</div>'+
+        '<div class="ar">'+esc(a.role)+'</div></div>'+
+        '<select class="agentbrain" data-id="'+a.id+'" title="AI for '+esc(a.name)+'">'+opts+'</select>'+
+        '<span class="ast">IDLE</span></div>';}).join('');
     [...list.querySelectorAll('.agent')].forEach(el=>el.onclick=()=>selectAgent(el.dataset.id));
+    [...list.querySelectorAll('.agentbrain')].forEach(sel=>{
+      sel.onclick=e=>e.stopPropagation();
+      sel.onchange=async e=>{e.stopPropagation();const id=sel.dataset.id,brain=sel.value;
+        try{await fetch(API+'/agent/brain',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent:id,brain})});
+          logFeed(agentName(id)+' AI → '+brain,'');}catch(_){}
+        loadAgents();};});
+    gWorking.forEach(id=>setStatus(id,true));
   }
   function selectAgent(id){target=id;
     [...document.querySelectorAll('.agent')].forEach(el=>el.classList.toggle('sel',el.dataset.id===id));
-    $('consoleTarget').textContent='TALKING TO: '+agentName(id);
-    logFeed('Now talking to '+agentName(id),'');}
+    $('consoleTarget').textContent=teamMode?'TEAM MODE — ALL AGENTS':'TALKING TO: '+agentName(id);
+    logFeed('Now talking to '+agentName(id),'');if(reduceMotion)drawGraph();}
   async function loadAgents(){
-    try{const d=await(await fetch(API+'/agents')).json();AGENTS=d.agents||[];renderAgents();}catch(e){}
+    try{const d=await(await fetch(API+'/agents')).json();AGENTS=d.agents||[];renderAgents();initGraph();}catch(e){}
   }
   loadAgents();
+
+  /* ---- obsidian-style brain graph ---- */
+  const gc=$('brainGraph'),gx=gc&&gc.getContext('2d');
+  let gnodes=[],glinks=[],graphRAF=0;
+  function gsize(){if(!gc)return;const dpr=window.devicePixelRatio||1;
+    const w=gc.clientWidth||280,h=gc.clientHeight||200;
+    gc.width=w*dpr;gc.height=h*dpr;gx.setTransform(dpr,0,0,dpr,0,0);}
+  function nodeById(id){return gnodes.find(n=>n.id===id);}
+  function initGraph(){
+    if(!gc||!AGENTS.length)return;gsize();
+    const w=gc.clientWidth||280,h=gc.clientHeight||200,R=Math.min(w,h)*0.34;
+    const others=AGENTS.filter(a=>a.id!=='jarvis');
+    gnodes=AGENTS.map(a=>{const center=a.id==='jarvis';let x=w/2,y=h/2;
+      if(!center){const i=others.indexOf(a),ang=-Math.PI/2+i/others.length*Math.PI*2;
+        x=w/2+Math.cos(ang)*R;y=h/2+Math.sin(ang)*R;}
+      return {id:a.id,name:a.name,center,x,y,vx:0,vy:0,r:center?15:10};});
+    glinks=gnodes.filter(n=>!n.center).map(n=>({a:'jarvis',b:n.id}));
+    cancelAnimationFrame(graphRAF);
+    if(reduceMotion)drawGraph();else stepGraph();
+  }
+  function stepGraph(){
+    const w=gc.clientWidth,h=gc.clientHeight,c=nodeById('jarvis');if(!c){return;}
+    for(const n of gnodes){if(n.center)continue;
+      for(const m of gnodes){if(m===n)continue;let dx=n.x-m.x,dy=n.y-m.y,d2=dx*dx+dy*dy+0.01,d=Math.sqrt(d2);
+        const f=1500/d2;n.vx+=dx/d*f;n.vy+=dy/d*f;}
+      let dx=c.x-n.x,dy=c.y-n.y,d=Math.hypot(dx,dy)||1,rest=Math.min(w,h)*0.34,f=(d-rest)*0.02;
+      n.vx+=dx/d*f;n.vy+=dy/d*f;n.vx+=(w/2-n.x)*0.0008;n.vy+=(h/2-n.y)*0.0008;
+      n.vx*=0.85;n.vy*=0.85;n.x+=n.vx;n.y+=n.vy;
+      n.x=Math.max(n.r+2,Math.min(w-n.r-2,n.x));n.y=Math.max(n.r+14,Math.min(h-n.r-2,n.y));}
+    c.x+=(w/2-c.x)*0.06;c.y+=(h/2-c.y)*0.06;
+    drawGraph();graphRAF=requestAnimationFrame(stepGraph);
+  }
+  function drawGraph(){
+    if(!gx)return;const w=gc.clientWidth,h=gc.clientHeight;gx.clearRect(0,0,w,h);
+    for(const l of glinks){const a=nodeById(l.a),b=nodeById(l.b);if(!a||!b)continue;
+      const active=gWorking.has(b.id)||target===b.id;
+      gx.strokeStyle=active?'rgba(57,199,255,.85)':'rgba(57,199,255,.16)';gx.lineWidth=active?2:1;
+      gx.beginPath();gx.moveTo(a.x,a.y);gx.lineTo(b.x,b.y);gx.stroke();}
+    for(const n of gnodes){const working=gWorking.has(n.id),sel=target===n.id;
+      const pulse=working?0.5+0.5*Math.abs(Math.sin(Date.now()/250)):0,r=n.r+(working?pulse*3:0);
+      const g=gx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*2.4);
+      g.addColorStop(0,working?'rgba(255,179,71,.7)':(sel?'rgba(82,255,184,.6)':'rgba(57,199,255,.5)'));
+      g.addColorStop(1,'rgba(57,199,255,0)');gx.fillStyle=g;gx.beginPath();gx.arc(n.x,n.y,r*2.4,0,7);gx.fill();
+      gx.fillStyle=n.center?'#bff0ff':(working?'#ffd9a0':(sel?'#bfffe5':'#7fd6ff'));
+      gx.beginPath();gx.arc(n.x,n.y,r,0,7);gx.fill();
+      if(sel){gx.strokeStyle='#52ffb8';gx.lineWidth=1.5;gx.beginPath();gx.arc(n.x,n.y,r+4,0,7);gx.stroke();}
+      gx.fillStyle='#cfeeff';gx.font='9px Consolas, monospace';gx.textAlign='center';
+      gx.fillText(n.name,n.x,n.y+r+11);}
+  }
+  if(gc){
+    gc.addEventListener('click',e=>{const rc=gc.getBoundingClientRect(),mx=e.clientX-rc.left,my=e.clientY-rc.top;
+      let best=null,bd=1e9;for(const n of gnodes){const d=Math.hypot(mx-n.x,my-n.y);if(d<bd){bd=d;best=n;}}
+      if(best&&bd<best.r+12)selectAgent(best.id);});
+    window.addEventListener('resize',()=>{gsize();initGraph();});
+  }
+
+  /* ---- team mode ---- */
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  function addAs(name,t){add('ag',t,name);}      // attributed, not spoken
+  let teamMode=false;
+  $('team').onclick=function(){teamMode=!teamMode;this.classList.toggle('on',teamMode);
+    $('consoleTarget').textContent=teamMode?'TEAM MODE — ALL AGENTS':'TALKING TO: '+agentName(target);
+    logFeed('Team mode '+(teamMode?'ON':'off'),'');};
+  async function runTeam(goal){
+    logFeed('Team assembling…','');thinkOn('TEAM WORKING…');
+    const ph=sys('JARVIS is assembling the team…');
+    try{
+      const r=await fetch(API+'/collaborate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:goal})});
+      const d=await r.json();ph.remove();
+      if(!d.ok){say(d.final||'Team mode is unavailable, Sir.');thinkOff();return;}
+      for(const st of (d.steps||[])){
+        setStatus(st.agent,true);addAs(st.name,st.reply);logFeed(st.name+' contributed','');
+        await sleep(450);setStatus(st.agent,false);}
+      sayAs('JARVIS',d.final||'The team has nothing further, Sir.');
+      logFeed('Team synthesis delivered','');
+    }catch(e){ph.remove();say('The team run failed, Sir — '+e.message);}
+    thinkOff();
+  }
 
   async function askAgent(id,text){
     const nm=agentName(id);
@@ -460,7 +576,8 @@
     // otherwise: talk to whichever agent is currently selected
     return askAgent(target,text);
   }
-  function submit(){const v=$('cmd').value.trim();if(!v)return;you(v);$('cmd').value='';respond(v);}
+  function submit(){const v=$('cmd').value.trim();if(!v)return;you(v);$('cmd').value='';
+    if(teamMode)runTeam(v);else respond(v);}
   $('send').onclick=submit;
   $('cmd').addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
 

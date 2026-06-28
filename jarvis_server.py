@@ -159,6 +159,9 @@ AGENTS = [
      "priorities straight." + _AGENT_TONE},
 ]
 AGENT_BY_ID = {a["id"]: a for a in AGENTS}
+# Per-agent brain pin: agent_id -> brain name. Absent/"auto" => follow the active
+# brain. Lets you run, say, FRIDAY on Gemini and VERONICA on a local code model.
+_agent_brains = {}
 
 # Try optional psutil
 try:
@@ -466,6 +469,31 @@ def select_brain(name):
     return False
 
 
+def agent_brain(agent_id):
+    """The brain an agent actually uses: its pinned brain if set & available,
+    otherwise the globally active brain."""
+    with _brain_lock:
+        pinned = _agent_brains.get(agent_id)
+    if pinned and _brain_available(pinned):
+        return pinned
+    return active_brain()
+
+
+def set_agent_brain(agent_id, brain):
+    """Pin (or, with 'auto', unpin) a single agent's brain. Returns True if applied."""
+    if agent_id not in AGENT_BY_ID:
+        return False
+    if brain == "auto":
+        with _brain_lock:
+            _agent_brains.pop(agent_id, None)
+        return True
+    if _brain_available(brain):
+        with _brain_lock:
+            _agent_brains[agent_id] = brain
+        return True
+    return False
+
+
 _BRAIN_MODEL_LABELS = {
     "anthropic": ANTHROPIC_MODEL,
     "openai": OPENAI_MODEL,
@@ -708,9 +736,9 @@ def _handler_for(name):
 
 def ask_agent(agent_id, user_text):
     """Run one turn through a named agent (its persona + its own transcript) on
-    whichever brain is active. Returns {ok, reply, agent, brain}."""
+    that agent's brain. Returns {ok, reply, agent, brain}."""
     agent = AGENT_BY_ID.get(agent_id, AGENT_BY_ID["jarvis"])
-    brain = active_brain()
+    brain = agent_brain(agent["id"])
     handler = _handler_for(brain)
     hist = _history_for(agent["id"])
     if handler:
@@ -729,6 +757,88 @@ def ask_agent(agent_id, user_text):
 def ask_claude(user_text):
     """Back-compat entry point: one turn with JARVIS, the orchestrator."""
     return ask_agent("jarvis", user_text)
+
+
+# --- team mode: agents plan, delegate, and build on each other --------------
+def _run_brain(brain, text, system):
+    """One stateless call to a brain with a custom system prompt (no history).
+    Returns (ok, reply); (False, '') if the brain is demo/unavailable."""
+    handler = _handler_for(brain)
+    if not handler:
+        return False, ""
+    return handler(text, system=system, history=[])
+
+
+_PLAN_SYS = (
+    "You are JARVIS, routing a task to your specialists: friday (research/web), "
+    "edith (data/documents), karen (comms/messaging), veronica (code/automation), "
+    "jocasta (planning/scheduling). Reply with ONLY a JSON array (no prose). Each "
+    'item is {"agent": "<one id>", "task": "<clear instruction>"}. Use 1-4 steps, '
+    "ordered so a later specialist can build on earlier results. Pick only the "
+    "specialists who genuinely fit the task.")
+
+# keyword hints for the no-JSON fallback plan
+_PLAN_KW = {
+    "friday": ("research", "find", "look", "search", "compare", "news", "info", "who", "what"),
+    "edith": ("data", "document", "table", "summar", "extract", "report", "spreadsheet"),
+    "karen": ("email", "message", "reply", "draft", "contact", "outreach", "tone", "post"),
+    "veronica": ("code", "script", "automat", "bug", "program", "api", "app", "website"),
+    "jocasta": ("plan", "schedule", "timeline", "step", "organi", "prioriti", "roadmap"),
+}
+
+
+def _fallback_plan(goal):
+    g = goal.lower()
+    picks = [aid for aid, kws in _PLAN_KW.items() if any(k in g for k in kws)]
+    return [{"agent": aid, "task": goal} for aid in (picks or ["friday"])]
+
+
+def _plan(goal, brain):
+    """Ask JARVIS for a JSON routing plan; fall back to keyword routing."""
+    ok, reply = _run_brain(brain, "Goal: " + goal, _PLAN_SYS)
+    steps = []
+    if ok and reply:
+        try:
+            s, e = reply.find("["), reply.rfind("]")
+            arr = json.loads(reply[s:e + 1]) if s != -1 and e > s else []
+            for it in arr:
+                aid = str(it.get("agent", "")).lower().strip()
+                task = str(it.get("task", "")).strip()
+                if aid in AGENT_BY_ID and aid != "jarvis" and task:
+                    steps.append({"agent": aid, "task": task})
+        except Exception:
+            steps = []
+    return (steps or _fallback_plan(goal))[:4]
+
+
+def orchestrate(goal):
+    """Run a multi-agent pipeline: JARVIS plans, specialists work in turn (each
+    seeing the team's results so far), then JARVIS synthesises the final answer.
+    Returns {ok, steps:[...], final, brain}."""
+    brain = agent_brain("jarvis")
+    if not _handler_for(brain):  # demo / no brain
+        return {"ok": False, "steps": [], "brain": brain,
+                "final": "Team mode needs a live brain, Sir — connect one (an API "
+                "key, a local model, or your subscription) and I'll convene the team."}
+
+    plan = _plan(goal, brain)
+    steps, context = [], ""
+    for st in plan:
+        aid, task = st["agent"], st["task"]
+        ask = task if not context else (
+            task + "\n\nWhat the team has gathered so far:\n" + context)
+        out = ask_agent(aid, ask)
+        name = AGENT_BY_ID[aid]["name"]
+        steps.append({"agent": aid, "name": name, "task": task,
+                      "ok": out["ok"], "reply": out["reply"]})
+        if out["ok"]:
+            context += f"\n[{name}] {out['reply']}"
+
+    syn = ask_agent("jarvis", "Goal: " + goal + "\n\nYour specialists reported:\n"
+                    + context + "\n\nSynthesise this into a clear, concise final "
+                    "answer for Sir, noting who contributed what.")
+    log.info("team run: %s step(s) on %s", len(steps), brain)
+    return {"ok": True, "steps": steps, "final": syn["reply"], "brain": brain}
 
 
 def test_brains():
@@ -764,8 +874,10 @@ def test_brains():
 
 
 def agents_list():
-    """Public roster for the dashboard."""
-    return [{"id": a["id"], "name": a["name"], "role": a["role"]} for a in AGENTS]
+    """Public roster for the dashboard, incl. each agent's chosen brain."""
+    return [{"id": a["id"], "name": a["name"], "role": a["role"],
+             "brain": _agent_brains.get(a["id"], "auto"),
+             "effective": agent_brain(a["id"])} for a in AGENTS]
 
 
 def get_stats():
@@ -860,6 +972,34 @@ class Handler(BaseHTTPRequestHandler):
                            "reply": f"I've no agent called '{agent_id}', Sir."}))
                 return
             self._send(200, json.dumps(ask_agent(agent_id, text)))
+
+        elif self.path == "/agent/brain":
+            try:
+                p = self._read_json()
+                agent_id = (p.get("agent") or "").strip().lower()
+                brain = (p.get("brain") or "auto").strip().lower()
+            except Exception:
+                self._send(400, json.dumps({"ok": False, "error": "bad request"}))
+                return
+            if set_agent_brain(agent_id, brain):
+                log.info("agent %s brain set to %s (effective: %s)",
+                         agent_id, brain, agent_brain(agent_id))
+                self._send(200, json.dumps({"ok": True, "agent": agent_id,
+                                            "brain": brain, "effective": agent_brain(agent_id)}))
+            else:
+                self._send(400, json.dumps({"ok": False, "error": "could not set",
+                                            "available": available_brains()}))
+
+        elif self.path == "/collaborate":
+            try:
+                text = (self._read_json().get("text") or "").strip()
+            except Exception:
+                self._send(400, json.dumps({"ok": False, "reply": "Malformed request, Sir."}))
+                return
+            if not text:
+                self._send(400, json.dumps({"ok": False, "reply": "You said nothing, Sir."}))
+                return
+            self._send(200, json.dumps(orchestrate(text)))
 
         elif self.path == "/brain":
             try:

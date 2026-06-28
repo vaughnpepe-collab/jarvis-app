@@ -42,8 +42,20 @@ conversation memory** and its own workspace in the console. To use them:
 
 Replies are attributed by name in the console, and each agent shows an
 **IDLE / WORKING** status while it thinks. (Backend: `GET /agents`, `POST /agent`
-with `{agent, text}`.) The agents share whichever brain is active, so once a brain
-is connected they all work.
+with `{agent, text}`.)
+
+**A different AI per agent.** Each agent row has its own little dropdown — leave it
+`auto` to follow the main brain, or pin that agent to a specific AI (e.g. FRIDAY on
+Gemini, VERONICA on a local code model). (Backend: `POST /agent/brain`.)
+
+**Team mode — they work together.** Click the **🤝 TEAM** button, then type a goal.
+JARVIS plans which specialists to involve, runs them in sequence *passing each one
+the results so far* (so they build on each other), then synthesises a final answer.
+Each agent lights up as it works. (Backend: `POST /collaborate`.) Needs a live brain.
+
+**Brain graph.** Below System Telemetry is an Obsidian-style **Agent Neural Link** —
+JARVIS at the centre with the specialists around it. Nodes pulse amber while an
+agent is working; click a node to talk to that agent. It respects "reduce motion".
 
 ### No API key? Run a model locally (free)
 

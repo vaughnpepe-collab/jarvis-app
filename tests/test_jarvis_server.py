@@ -419,6 +419,67 @@ class TestAgents(unittest.TestCase):
         self.assertIn("VERONICA", out["reply"])
 
 
+class TestAgentBrain(unittest.TestCase):
+    def setUp(self):
+        js._agent_brains.clear()
+
+    def tearDown(self):
+        js._agent_brains.clear()
+
+    def test_pin_and_effective(self):
+        with mock.patch.object(js, "OPENAI_API_KEY", "x"):
+            self.assertTrue(js.set_agent_brain("friday", "openai"))
+            self.assertEqual(js.agent_brain("friday"), "openai")
+
+    def test_auto_unpins(self):
+        with mock.patch.object(js, "OPENAI_API_KEY", "x"):
+            js.set_agent_brain("friday", "openai")
+            self.assertTrue(js.set_agent_brain("friday", "auto"))
+        self.assertNotIn("friday", js._agent_brains)
+
+    def test_unavailable_rejected(self):
+        with mock.patch.object(js, "GEMINI_API_KEY", ""):
+            self.assertFalse(js.set_agent_brain("friday", "gemini"))
+
+    def test_unknown_agent_rejected(self):
+        with mock.patch.object(js, "OPENAI_API_KEY", "x"):
+            self.assertFalse(js.set_agent_brain("nobody", "openai"))
+
+
+class TestOrchestrate(unittest.TestCase):
+    def test_demo_is_gated(self):
+        with mock.patch.object(js, "agent_brain", return_value="demo"):
+            out = js.orchestrate("do a thing")
+        self.assertFalse(out["ok"])
+        self.assertIn("Team mode needs", out["final"])
+
+    def test_pipeline_runs_then_synthesises(self):
+        with mock.patch.object(js, "agent_brain", return_value="openai"), \
+                mock.patch.object(js, "_plan", return_value=[
+                    {"agent": "friday", "task": "t1"},
+                    {"agent": "veronica", "task": "t2"}]), \
+                mock.patch.object(js, "ask_agent",
+                                  side_effect=lambda a, t: {"ok": True, "reply": a + "-done",
+                                                            "agent": a, "brain": "openai"}):
+            out = js.orchestrate("build a thing")
+        self.assertTrue(out["ok"])
+        self.assertEqual([s["agent"] for s in out["steps"]], ["friday", "veronica"])
+        self.assertEqual(out["final"], "jarvis-done")   # synthesis is JARVIS
+
+    def test_plan_parses_json(self):
+        with mock.patch.object(js, "_run_brain",
+                               return_value=(True, 'noise [{"agent":"friday","task":"x"}] more')):
+            steps = js._plan("g", "openai")
+        self.assertEqual(steps, [{"agent": "friday", "task": "x"}])
+
+    def test_plan_fallback_uses_keywords(self):
+        with mock.patch.object(js, "_run_brain", return_value=(False, "")):
+            steps = js._plan("write some code and a plan", "openai")
+        ids = [s["agent"] for s in steps]
+        self.assertIn("veronica", ids)
+        self.assertIn("jocasta", ids)
+
+
 class TestAskOpenclaw(unittest.TestCase):
     def test_ok(self):
         with mock.patch.object(js, "_attempt", return_value=("ok", "Certainly, Sir.")):
