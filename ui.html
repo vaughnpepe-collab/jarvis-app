@@ -361,7 +361,7 @@
   const $=id=>document.getElementById(id);
   const API=location.origin;
   // a signature colour per agent, used across the console, roster and graph
-  const AGENT_COLORS={JARVIS:'#7fd6ff',FRIDAY:'#52ffb8',EDITH:'#b48bff',KAREN:'#ffb347',VERONICA:'#ff6fae',JOCASTA:'#ffd24a'};
+  const AGENT_COLORS={JARVIS:'#7fd6ff',FRIDAY:'#52ffb8',EDITH:'#b48bff',KAREN:'#ffb347',VERONICA:'#ff6fae',JOCASTA:'#ffd24a',DEEPSEEK:'#4d6bff'};
   const agentColor=name=>AGENT_COLORS[(name||'').toUpperCase()]||'#39c7ff';
   const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';};
 

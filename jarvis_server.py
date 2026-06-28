@@ -156,8 +156,9 @@ AGENTS = [
     {"id": "jarvis", "name": "JARVIS", "role": "Executive Orchestrator",
      "persona": JARVIS_PERSONA + " You lead a team of specialists — FRIDAY "
      "(research/web), EDITH (data/documents), KAREN (comms/messaging), VERONICA "
-     "(code/automation) and JOCASTA (planning/scheduling). When a request clearly "
-     "suits a specialist, recommend asking them by name."},
+     "(code/automation), JOCASTA (planning/scheduling) and DEEPSEEK (deep reasoning: "
+     "maths, logic, hard analysis). When a request clearly suits a specialist, "
+     "recommend asking them by name."},
     {"id": "friday", "name": "FRIDAY", "role": "Research & Web",
      "persona": "You are FRIDAY, a sharp, fast research specialist on JARVIS's team."
      " You gather facts, summarise topics, compare options and surface what matters."
@@ -178,6 +179,13 @@ AGENTS = [
      "persona": "You are JOCASTA, an organised planning and scheduling specialist on "
      "JARVIS's team. You break goals into steps, build plans and timelines, and keep "
      "priorities straight." + _AGENT_TONE},
+    {"id": "deepseek", "name": "DEEPSEEK", "role": "Deep Reasoning",
+     # Runs on a DeepSeek model by default (NVIDIA-hosted, or the native DeepSeek
+     # API) — falls back to the active brain if neither is configured.
+     "prefer": ["nvidia", "deepseek"],
+     "persona": "You are DEEPSEEK, a deep-reasoning specialist on JARVIS's team. You "
+     "tackle hard analytical problems — maths, logic, complex code and step-by-step "
+     "reasoning — and lay out your conclusion clearly." + _AGENT_TONE},
 ]
 AGENT_BY_ID = {a["id"]: a for a in AGENTS}
 # Per-agent brain pin: agent_id -> brain name. Absent/"auto" => follow the active
@@ -503,11 +511,15 @@ def select_brain(name):
 
 def agent_brain(agent_id):
     """The brain an agent actually uses: its pinned brain if set & available,
-    otherwise the globally active brain."""
+    else the agent's own preferred brain (e.g. DEEPSEEK -> nvidia/deepseek) if
+    available, else the globally active brain."""
     with _brain_lock:
         pinned = _agent_brains.get(agent_id)
     if pinned and _brain_available(pinned):
         return pinned
+    for pref in AGENT_BY_ID.get(agent_id, {}).get("prefer", []):
+        if _brain_available(pref):
+            return pref
     return active_brain()
 
 
@@ -846,7 +858,8 @@ def _run_brain(brain, text, system):
 _PLAN_SYS = (
     "You are JARVIS, routing a task to your specialists: friday (research/web), "
     "edith (data/documents), karen (comms/messaging), veronica (code/automation), "
-    "jocasta (planning/scheduling). Reply with ONLY a JSON array (no prose). Each "
+    "jocasta (planning/scheduling), deepseek (deep reasoning: maths, logic, hard "
+    "analysis). Reply with ONLY a JSON array (no prose). Each "
     'item is {"agent": "<one id>", "task": "<clear instruction>"}. Use 1-4 steps, '
     "ordered so a later specialist can build on earlier results. Pick only the "
     "specialists who genuinely fit the task.")
@@ -858,6 +871,7 @@ _PLAN_KW = {
     "karen": ("email", "message", "reply", "draft", "contact", "outreach", "tone", "post"),
     "veronica": ("code", "script", "automat", "bug", "program", "api", "app", "website"),
     "jocasta": ("plan", "schedule", "timeline", "step", "organi", "prioriti", "roadmap"),
+    "deepseek": ("reason", "math", "calcul", "logic", "prove", "solve", "analyse", "analyze", "deep"),
 }
 
 

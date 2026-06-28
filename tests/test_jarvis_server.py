@@ -391,8 +391,8 @@ class TestAgents(unittest.TestCase):
     def test_roster_has_jarvis_first_and_specialists(self):
         ids = [a["id"] for a in js.agents_list()]
         self.assertEqual(ids[0], "jarvis")
-        self.assertEqual(len(ids), 6)
-        for sid in ("friday", "edith", "karen", "veronica", "jocasta"):
+        self.assertEqual(len(ids), 7)
+        for sid in ("friday", "edith", "karen", "veronica", "jocasta", "deepseek"):
             self.assertIn(sid, ids)
 
     def test_ask_agent_uses_persona_and_own_transcript(self):
@@ -475,6 +475,24 @@ class TestExtraProviders(unittest.TestCase):
         self.assertTrue(captured["url"].endswith("/chat/completions"))
         self.assertEqual(captured["headers"]["authorization"], "Bearer nvapi-test")
         self.assertEqual(captured["body"]["chat_template_kwargs"], {"thinking": False})
+
+    def test_deepseek_agent_prefers_a_deepseek_brain(self):
+        js._agent_brains.clear()
+        # With NVIDIA configured, the DEEPSEEK agent runs on it automatically.
+        with mock.patch.object(js, "NVIDIA_API_KEY", "k"), \
+                mock.patch.object(js, "active_brain", return_value="demo"):
+            self.assertEqual(js.agent_brain("deepseek"), "nvidia")
+        # Falls back to the native DeepSeek API if NVIDIA isn't set.
+        with mock.patch.object(js, "NVIDIA_API_KEY", ""), \
+                mock.patch.object(js, "DEEPSEEK_API_KEY", "k"), \
+                mock.patch.object(js, "active_brain", return_value="demo"):
+            self.assertEqual(js.agent_brain("deepseek"), "deepseek")
+        # An explicit pin still wins over the preference.
+        with mock.patch.object(js, "NVIDIA_API_KEY", "k"), \
+                mock.patch.object(js, "GROQ_API_KEY", "k"):
+            self.assertTrue(js.set_agent_brain("deepseek", "groq"))
+            self.assertEqual(js.agent_brain("deepseek"), "groq")
+        js._agent_brains.clear()
 
     def test_different_agents_different_providers(self):
         # FRIDAY on Claude (anthropic), EDITH on DeepSeek — both available at once
