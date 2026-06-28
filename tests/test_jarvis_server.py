@@ -419,6 +419,47 @@ class TestExtraProviders(unittest.TestCase):
             self.assertEqual(js.agent_brain("deepseek"), "groq")
         js._agent_brains.clear()
 
+    def test_set_api_key_enables_provider_live(self):
+        # Setting a key at runtime should make the brain available immediately.
+        saved = {"NVIDIA_API_KEY": js.NVIDIA_API_KEY, "MINIMAX_API_KEY": js.MINIMAX_API_KEY}
+        try:
+            js.NVIDIA_API_KEY = ""
+            js.MINIMAX_API_KEY = ""
+            self.assertFalse(js._brain_available("nvidia"))
+            ok, _ = js.set_api_key("nvidia", "nvapi-live", persist=False)
+            self.assertTrue(ok)
+            self.assertTrue(js._brain_available("nvidia"))
+            self.assertTrue(js._brain_available("minimax"))  # shares the NVIDIA key
+        finally:
+            js.NVIDIA_API_KEY = saved["NVIDIA_API_KEY"]
+            js.MINIMAX_API_KEY = saved["MINIMAX_API_KEY"]
+
+    def test_set_api_key_rejects_unknown_provider(self):
+        ok, msg = js.set_api_key("nonsense", "x", persist=False)
+        self.assertFalse(ok)
+        self.assertIn("provider", msg.lower())
+
+    def test_set_api_key_persists_and_loads_with_bom(self):
+        import tempfile
+        saved = {"NVIDIA_API_KEY": js.NVIDIA_API_KEY, "MINIMAX_API_KEY": js.MINIMAX_API_KEY}
+        try:
+            with tempfile.TemporaryDirectory() as d:
+                envp = Path(d) / "jarvis.env"
+                with mock.patch.object(js, "ENV_FILE", envp):
+                    js.set_api_key("nvidia", "nvapi-persisted")  # persist=True
+                    self.assertIn("NVIDIA_API_KEY=nvapi-persisted",
+                                  envp.read_text(encoding="utf-8"))
+                    # simulate Notepad's UTF-8 BOM, then confirm the loader still reads it
+                    envp.write_text("﻿NVIDIA_API_KEY=nvapi-frombom\n", encoding="utf-8")
+                    os.environ.pop("NVIDIA_API_KEY", None)
+                    with mock.patch.object(js, "__file__", str(Path(d) / "jarvis_server.py")):
+                        js._load_env_file()
+                    self.assertEqual(os.environ.get("NVIDIA_API_KEY"), "nvapi-frombom")
+        finally:
+            js.NVIDIA_API_KEY = saved["NVIDIA_API_KEY"]
+            js.MINIMAX_API_KEY = saved["MINIMAX_API_KEY"]
+            os.environ.pop("NVIDIA_API_KEY", None)
+
     def test_different_agents_different_providers(self):
         # FRIDAY on Claude (anthropic), EDITH on DeepSeek — both available at once
         with mock.patch.object(js, "ANTHROPIC_API_KEY", "a"), \

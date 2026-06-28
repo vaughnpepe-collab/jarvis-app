@@ -6,13 +6,20 @@ Google Gemini, or any OpenAI-compatible/local model. Voice in and voice out.
 
 ## Quick setup — getting off Demo mode (easiest way)
 
-If the HUD shows **DEMO**, JARVIS just hasn't found an API key yet. The simplest
-fix — no terminal, no environment variables:
+If the HUD shows **DEMO**, JARVIS just hasn't found an API key yet.
+
+**Easiest — paste it in the app:** click **+ KEY** next to the AI dropdown, pick a
+provider (e.g. NVIDIA NIM), paste your key, and hit **Save & Connect**. The brain
+comes online immediately and the key is saved to `jarvis.env` so it sticks.
+
+**Or edit the file directly:**
 
 1. Find **`jarvis.env.example`** next to the app and **rename it to `jarvis.env`**.
 2. Open it in any text editor and paste your key after the matching `=`, e.g.
    `NVIDIA_API_KEY=nvapi-xxxxxxxx`.
 3. Save and (re)start JARVIS. The header now shows your provider instead of DEMO.
+   (The reader tolerates the hidden BOM that Windows Notepad adds, so that won't
+   trip you up.)
 
 That single NVIDIA key powers both the **NVIDIA NIM** brain (DeepSeek by default)
 and the **MiniMax M3** brain. Real shell environment variables still work too and

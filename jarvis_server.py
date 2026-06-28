@@ -38,15 +38,22 @@ from pathlib import Path
 #     NVIDIA_API_KEY=nvapi-xxxxxxxx
 #     ANTHROPIC_API_KEY=sk-ant-xxxx
 # Lines starting with # are ignored. Real shell env vars always take precedence.
+ENV_FILE = Path(__file__).resolve().parent / "jarvis.env"
+
+
 def _load_env_file():
     here = Path(__file__).resolve().parent
+    loaded = []
     for name in ("jarvis.env", ".env"):
         path = here / name
         if not path.is_file():
             continue
         try:
-            for raw in path.read_text(encoding="utf-8").splitlines():
-                line = raw.strip()
+            # utf-8-sig strips the BOM that Windows Notepad silently prepends —
+            # without this the first key reads as "﻿NVIDIA_API_KEY" and is
+            # ignored, which is the classic "I added my key but it's still DEMO".
+            for raw in path.read_text(encoding="utf-8-sig").splitlines():
+                line = raw.strip().lstrip("﻿")
                 if not line or line.startswith("#") or "=" not in line:
                     continue
                 key, _, val = line.partition("=")
@@ -55,11 +62,13 @@ def _load_env_file():
                 # don't override anything the user already set in the real shell
                 if key and key not in os.environ:
                     os.environ[key] = val
+                    loaded.append(key)
         except OSError:
             pass
+    return loaded
 
 
-_load_env_file()
+_ENV_LOADED = _load_env_file()
 
 # ---------------------------------------------------------------- config
 HOST = os.environ.get("JARVIS_HOST", "127.0.0.1")
@@ -323,6 +332,60 @@ def select_brain(name):
             _selected_brain = name
         return True
     return False
+
+
+# Which environment variable holds each brain's API key (for the in-app key box).
+_BRAIN_KEY_VARS = {
+    "anthropic": "ANTHROPIC_API_KEY", "openai": "OPENAI_API_KEY",
+    "deepseek": "DEEPSEEK_API_KEY", "grok": "XAI_API_KEY",
+    "mistral": "MISTRAL_API_KEY", "groq": "GROQ_API_KEY",
+    "nvidia": "NVIDIA_API_KEY", "minimax": "MINIMAX_API_KEY",
+    "gemini": "GEMINI_API_KEY",
+}
+
+
+def _persist_env_var(var, value):
+    """Upsert VAR=value into jarvis.env so the key survives a restart."""
+    try:
+        lines, found = [], False
+        if ENV_FILE.is_file():
+            lines = ENV_FILE.read_text(encoding="utf-8-sig").splitlines()
+        for i, ln in enumerate(lines):
+            if ln.strip().lstrip("﻿").startswith(var + "="):
+                lines[i] = f"{var}={value}"
+                found = True
+                break
+        if not found:
+            lines.append(f"{var}={value}")
+        ENV_FILE.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return True
+    except OSError as e:
+        log.warning("could not write %s: %s", ENV_FILE, e)
+        return False
+
+
+def set_api_key(provider, key, persist=True):
+    """Set a provider's API key live (no restart) and, by default, save it to
+    jarvis.env. Updates the module global so every brain check/call sees it.
+    Returns (ok, message)."""
+    provider = (provider or "").strip().lower()
+    key = (key or "").strip()
+    var = _BRAIN_KEY_VARS.get(provider)
+    if not var:
+        return False, f"I don't recognise the provider '{provider}', Sir."
+    if not key:
+        return False, "The key was empty, Sir."
+    globals()[var] = key
+    os.environ[var] = key
+    # MiniMax rides on the NVIDIA endpoint and shares the key by default.
+    if provider == "nvidia" and not globals().get("MINIMAX_API_KEY"):
+        globals()["MINIMAX_API_KEY"] = key
+        os.environ.setdefault("MINIMAX_API_KEY", key)
+    saved = _persist_env_var(var, key) if persist else False
+    log.info("API key set for %s (saved to jarvis.env: %s)", provider, saved)
+    return True, ("Key accepted — %s is online, Sir." % BRAIN_LABELS.get(provider, provider)
+                  + ("" if saved else " (couldn't save it to jarvis.env, so it'll need "
+                     "re-entering after a restart.)"))
 
 
 def agent_brain(agent_id):
@@ -829,6 +892,12 @@ class Handler(BaseHTTPRequestHandler):
                 "available": [{"id": n, "label": BRAIN_LABELS.get(n, n),
                                "model": _BRAIN_MODEL_LABELS.get(n, n)} for n in avail],
             }))
+        elif self.path == "/providers":
+            # every key-based provider + whether it's configured (for the key box)
+            self._send(200, json.dumps({"providers": [
+                {"id": pid, "label": BRAIN_LABELS.get(pid, pid),
+                 "configured": _brain_available(pid)}
+                for pid in _BRAIN_KEY_VARS]}))
         else:
             self._send(404, json.dumps({"error": "not found"}))
 
@@ -906,6 +975,23 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send(400, json.dumps({"ok": False, "error": f"{name} not available",
                                             "available": available_brains()}))
+
+        elif self.path == "/brain/key":
+            try:
+                p = self._read_json()
+                provider = (p.get("provider") or "").strip().lower()
+                key = (p.get("key") or "").strip()
+            except Exception:
+                self._send(400, json.dumps({"ok": False, "error": "bad request"}))
+                return
+            ok, msg = set_api_key(provider, key)
+            if ok:
+                select_brain(provider)  # make it the active brain straight away
+                self._send(200, json.dumps({"ok": True, "message": msg,
+                                            "active": active_brain(),
+                                            "available": available_brains()}))
+            else:
+                self._send(400, json.dumps({"ok": False, "error": msg}))
 
         elif self.path == "/brains/test":
             self._send(200, json.dumps(test_brains()))

@@ -151,6 +151,28 @@
   .feed{font-family:var(--mono);font-size:10px;line-height:1.85;max-height:150px;overflow:auto;color:var(--mut)}
   .feed div{opacity:0;animation:fade .4s forwards}.feed .t{color:var(--faint)}.feed .w{color:var(--warn)}
   @keyframes fade{to{opacity:1}}
+  /* API-key modal */
+  .keymodal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;
+    background:rgba(6,8,12,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  .keymodal.show{display:flex;animation:fade .2s both}
+  .keycard{width:min(420px,92vw);border:1px solid var(--line);border-radius:16px;padding:22px;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),rgba(14,17,22,.96);
+    box-shadow:0 40px 90px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.07)}
+  .keyttl{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--text);text-transform:uppercase}
+  .keysub{font-size:11.5px;color:var(--mut);line-height:1.6;margin:8px 0 16px}.keysub b{color:var(--accent-bright)}
+  .keylab{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--mut);text-transform:uppercase;margin:10px 0 5px}
+  .keyinput{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:10px;
+    color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 12px;outline:none;transition:border-color .2s,background .2s}
+  .keyinput:focus{border-color:rgba(255,255,255,.34);background:rgba(255,255,255,.08)}
+  .keyinput option{background:#12151a;color:var(--text)}
+  .keymsg{font-family:var(--mono);font-size:10.5px;line-height:1.5;margin-top:10px;min-height:14px}
+  .keymsg.ok{color:var(--ok)}.keymsg.err{color:var(--err)}.keymsg.busy{color:var(--mut)}
+  .keyrow{display:flex;gap:9px;justify-content:flex-end;margin-top:18px}
+  .keybtn{background:var(--accent-bright);color:#0b0d11;border:none;border-radius:10px;padding:10px 16px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;font-weight:600;cursor:pointer;transition:transform .08s,filter .2s}
+  .keybtn:hover{filter:brightness(1.08)}.keybtn:active{transform:translateY(1px) scale(.98)}
+  .keybtn.ghost{background:rgba(255,255,255,.05);color:var(--mut);border:1px solid var(--line)}
+  .keybtn.ghost:hover{color:var(--text);border-color:rgba(255,255,255,.3);filter:none}
   .console{grid-area:console;display:flex;flex-direction:column;min-height:170px}
   .log{flex:1;overflow:auto;padding:14px 16px;font-size:13px;line-height:1.65}
   .log .row{margin-bottom:11px}
@@ -257,17 +279,33 @@
 <div class="boot" id="boot">
   <div class="mini-reactor" style="width:60px;height:60px"></div>
   <h2>J.A.R.V.I.S.</h2>
-  <div style="font-size:10px;letter-spacing:4px;color:var(--cyan-dim)">NEURAL COMMAND DECK · BUILD v4.5</div>
+  <div style="font-size:10px;letter-spacing:4px;color:var(--cyan-dim)">NEURAL COMMAND DECK · BUILD v4.6</div>
   <div class="bl"><i></i></div>
   <p id="bootmsg">INITIALISING SYSTEMS…</p>
 </div>
 <div class="vbadge" id="vbadge"><span class="pip"></span><span id="vbadgetxt">LISTENING…</span></div>
 
+<div class="keymodal" id="keyModal">
+  <div class="keycard">
+    <div class="keyttl">CONNECT A PROVIDER</div>
+    <p class="keysub">Paste an API key to bring a brain online. It's saved locally to <b>jarvis.env</b> on this machine and never leaves it.</p>
+    <label class="keylab">Provider</label>
+    <select id="keyProvider" class="keyinput"></select>
+    <label class="keylab">API key</label>
+    <input id="keyValue" class="keyinput" type="password" autocomplete="off" spellcheck="false" placeholder="e.g. nvapi-…  /  sk-…" />
+    <div id="keyMsg" class="keymsg"></div>
+    <div class="keyrow">
+      <button id="keyCancel" class="keybtn ghost">CANCEL</button>
+      <button id="keySave" class="keybtn">SAVE &amp; CONNECT</button>
+    </div>
+  </div>
+</div>
+
 <div class="app">
   <header>
     <div class="brand">
       <div class="mini-reactor"></div>
-      <div><h1>J.A.R.V.I.S.</h1><small>NEURAL COMMAND DECK · AGENT MESH · v4.5</small></div>
+      <div><h1>J.A.R.V.I.S.</h1><small>NEURAL COMMAND DECK · AGENT MESH · v4.6</small></div>
     </div>
     <div class="greeting" id="greeting">Standing by, <b>Sir</b>.</div>
     <div class="clock"><div class="t" id="clock">--:--:--</div><div class="d" id="date">—</div></div>
@@ -285,6 +323,7 @@
         <div class="kv"><span>AI</span><span class="ai-ctl">
           <select id="brainSel" class="brainsel" title="Choose which AI answers"><option>…</option></select>
           <button id="brainTest" class="braintest" title="Test which AIs actually connect and reply">TEST</button>
+          <button id="brainKey" class="braintest" title="Paste an API key to enable a provider">+ KEY</button>
         </span></div>
         <div class="kv"><span>Telemetry</span><span id="telmode">—</span></div>
         <div class="kv"><span>Cores</span><span id="cores">—</span></div>
@@ -456,6 +495,40 @@
     btn.classList.remove('busy');btn.textContent='TEST';
   }
   $('brainTest').onclick=testBrains;
+
+  /* "+ KEY" — paste an API key to bring a provider online (no file editing) */
+  async function openKeyModal(){
+    const sel=$('keyProvider'),msg=$('keyMsg');
+    msg.textContent='';msg.className='keymsg';$('keyValue').value='';
+    try{
+      const d=await (await fetch(API+'/providers')).json();
+      sel.innerHTML=(d.providers||[]).map(p=>
+        `<option value="${p.id}">${esc(p.label)}${p.configured?' ✓ (set)':''}</option>`).join('');
+      sel.value='nvidia';
+    }catch(e){sel.innerHTML='<option value="nvidia">NVIDIA NIM</option>';}
+    $('keyModal').classList.add('show');setTimeout(()=>$('keyValue').focus(),60);
+  }
+  function closeKeyModal(){$('keyModal').classList.remove('show');}
+  async function saveKey(){
+    const provider=$('keyProvider').value,key=$('keyValue').value.trim(),msg=$('keyMsg');
+    if(!key){msg.textContent='Paste a key first, Sir.';msg.className='keymsg err';return;}
+    msg.textContent='Connecting…';msg.className='keymsg busy';
+    try{
+      const r=await fetch(API+'/brain/key',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({provider,key})});
+      const d=await r.json();
+      if(d.ok){msg.textContent=d.message||'Connected, Sir.';msg.className='keymsg ok';
+        await refreshBrains();logFeed('Key set → '+provider,'');say(d.message||'Provider connected, Sir.');
+        setTimeout(closeKeyModal,900);}
+      else{msg.textContent=d.error||'That key was not accepted, Sir.';msg.className='keymsg err';}
+    }catch(e){msg.textContent='Could not reach the backend, Sir.';msg.className='keymsg err';}
+  }
+  $('brainKey').onclick=openKeyModal;
+  $('keyCancel').onclick=closeKeyModal;
+  $('keySave').onclick=saveKey;
+  $('keyValue').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey();});
+  $('keyModal').addEventListener('click',e=>{if(e.target===$('keyModal'))closeKeyModal();});
+
   refreshBrains();
 
   /* activity feed */
