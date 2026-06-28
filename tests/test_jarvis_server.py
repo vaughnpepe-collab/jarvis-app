@@ -5,8 +5,8 @@ These use only the standard library (``unittest``), so they run with:
     python -m unittest discover -s tests        # no extra deps
     python -m pytest tests                        # if pytest is installed
 
-The network / subprocess boundary (OpenClaw) is always mocked — the tests never
-spawn a real model call, so they are fast and deterministic.
+The network boundary (provider HTTP calls) is always mocked — the tests never
+make a real API call, so they are fast and deterministic.
 """
 
 import io
@@ -26,133 +26,22 @@ if str(ROOT) not in sys.path:
 import jarvis_server as js  # noqa: E402
 
 
-class TestStripPreamble(unittest.TestCase):
-    def test_drops_metadata_lines(self):
-        raw = ("provider: anthropic\nmodel: claude-opus-4-8\noutputs: 1\n"
-               "Good evening, Sir.")
-        self.assertEqual(js._strip_preamble(raw), "Good evening, Sir.")
-
-    def test_keeps_body_without_preamble(self):
-        self.assertEqual(js._strip_preamble("Hello, Sir."), "Hello, Sir.")
-
-    def test_all_preamble_falls_back_to_original(self):
-        # If stripping leaves nothing, return the original rather than "".
-        raw = "provider: anthropic\nmodel: x\n"
-        self.assertEqual(js._strip_preamble(raw), raw)
-
-
-class TestExtractText(unittest.TestCase):
-    def test_empty(self):
-        self.assertEqual(js._extract_text(""), "")
-        self.assertEqual(js._extract_text(None), "")
-
-    def test_plain_text_with_preamble(self):
-        self.assertEqual(
-            js._extract_text("model: x\nAt your service, Sir."),
-            "At your service, Sir.")
-
-    def test_json_outputs_string(self):
-        self.assertEqual(
-            js._extract_text(json.dumps({"outputs": "Indeed, Sir."})),
-            "Indeed, Sir.")
-
-    def test_json_content_blocks(self):
-        blob = json.dumps({"content": [{"text": "Part one. "}, {"text": "Part two."}]})
-        self.assertEqual(js._extract_text(blob), "Part one. Part two.")
-
-    def test_json_embedded_in_preamble(self):
-        raw = 'transport: local\n{"reply": "Embedded reply, Sir."}'
-        self.assertEqual(js._extract_text(raw), "Embedded reply, Sir.")
-
-    def test_json_fallback_longest_string(self):
-        blob = json.dumps({"meta": {"a": "x", "deep": "the actual long answer here"}})
-        self.assertEqual(js._extract_text(blob), "the actual long answer here")
-
-
-class TestBuildPrompt(unittest.TestCase):
-    def setUp(self):
-        # Isolate global history for each test.
-        self._saved = list(js._history)
-        js._history.clear()
-
-    def tearDown(self):
-        js._history[:] = self._saved
-
-    def test_includes_persona_and_user(self):
-        p = js._build_prompt("What's the time?")
-        self.assertIn(js.JARVIS_PERSONA, p)
-        self.assertIn("Sir: What's the time?", p)
-        self.assertTrue(p.rstrip().endswith("JARVIS:"))
-
-    def test_includes_recent_history(self):
-        js._history.append(("Sir", "Hello"))
-        js._history.append(("JARVIS", "Good day, Sir."))
-        p = js._build_prompt("And now?")
-        self.assertIn("Conversation so far:", p)
-        self.assertIn("JARVIS: Good day, Sir.", p)
-
-    def test_history_window_capped(self):
-        for i in range(40):
-            js._history.append(("Sir", f"msg {i}"))
-        p = js._build_prompt("latest")
-        self.assertNotIn("msg 0", p)      # oldest dropped
-        self.assertIn("msg 39", p)        # newest kept
-
-
-class TestAttempt(unittest.TestCase):
-    def test_first_model_ok_short_circuits(self):
-        calls = []
-
-        def fake_run(model, prompt, timeout=None):
-            calls.append(model)
-            return ("Hello, Sir.", "blob", None)
-
-        with mock.patch.object(js, "MODELS", ["m1", "m2"]), \
-                mock.patch.object(js, "_run_model", side_effect=fake_run):
-            kind, payload = js._attempt("prompt")
-        self.assertEqual(kind, "ok")
-        self.assertEqual(payload, "Hello, Sir.")
-        self.assertEqual(calls, ["m1"])  # second model not tried
-
-    def test_fatal_returns_immediately(self):
-        with mock.patch.object(js, "MODELS", ["m1", "m2"]), \
-                mock.patch.object(js, "_run_model",
-                                  return_value=("", "", "fatal message")):
-            kind, payload = js._attempt("prompt")
-        self.assertEqual(kind, "fatal")
-        self.assertEqual(payload, "fatal message")
-
-    def test_auth_detected_across_models(self):
-        with mock.patch.object(js, "MODELS", ["m1", "m2"]), \
-                mock.patch.object(js, "_run_model",
-                                  return_value=("", "authentication_error 401", None)):
-            kind, payload = js._attempt("prompt")
-        self.assertEqual(kind, "auth")
-
-    def test_plain_failure(self):
-        with mock.patch.object(js, "MODELS", ["m1"]), \
-                mock.patch.object(js, "_run_model",
-                                  return_value=("", "some other noise", None)):
-            kind, _ = js._attempt("prompt")
-        self.assertEqual(kind, "fail")
-
-
 class TestActiveBrain(unittest.TestCase):
     def test_anthropic_wins_when_key_present(self):
-        with mock.patch.object(js, "ANTHROPIC_API_KEY", "sk-test"), \
-                mock.patch.object(js, "OPENCLAW_AVAILABLE", True):
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "sk-test"):
             self.assertEqual(js.active_brain(), "anthropic")
             self.assertEqual(js.active_model_label(), js.ANTHROPIC_MODEL)
 
-    def test_openclaw_when_no_key(self):
+    def test_nvidia_used_when_only_its_key_present(self):
         with mock.patch.object(js, "ANTHROPIC_API_KEY", ""), \
-                mock.patch.object(js, "OPENCLAW_AVAILABLE", True):
-            self.assertEqual(js.active_brain(), "openclaw")
-            self.assertEqual(js.active_model_label(), js.MODEL)
+                mock.patch.object(js, "OPENAI_API_KEY", ""), \
+                mock.patch.object(js, "NVIDIA_API_KEY", "nv-key"):
+            self.assertEqual(js.active_brain(), "nvidia")
+            self.assertEqual(js.active_model_label(), js.NVIDIA_MODEL)
 
     def test_demo_when_nothing_configured(self):
-        with mock.patch.object(js, "ANTHROPIC_API_KEY", ""), \
-                mock.patch.object(js, "OPENCLAW_AVAILABLE", False):
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", ""):
+            # no provider keys set in the test environment
             self.assertEqual(js.active_brain(), "demo")
             self.assertIn("demo", js.active_model_label().lower())
 
@@ -320,7 +209,6 @@ class TestBrainSelection(unittest.TestCase):
         with mock.patch.object(js, "ANTHROPIC_API_KEY", "a"), \
                 mock.patch.object(js, "OPENAI_API_KEY", "o"), \
                 mock.patch.object(js, "GEMINI_API_KEY", ""), \
-                mock.patch.object(js, "OPENCLAW_AVAILABLE", False), \
                 mock.patch.object(js, "DEFAULT_BRAIN", ""):
             self.assertEqual(js.available_brains(), ["anthropic", "openai", "demo"])
 
@@ -396,8 +284,8 @@ class TestAgents(unittest.TestCase):
             self.assertIn(sid, ids)
 
     def test_ask_agent_uses_persona_and_own_transcript(self):
-        with mock.patch.object(js, "active_brain", return_value="openclaw"), \
-                mock.patch.object(js, "_ask_openclaw",
+        with mock.patch.object(js, "active_brain", return_value="anthropic"), \
+                mock.patch.object(js, "_ask_anthropic",
                                   return_value=(True, "On it, Sir.")) as h:
             out = js.ask_agent("friday", "look this up")
         self.assertTrue(out["ok"])
@@ -577,35 +465,37 @@ class TestOrchestrate(unittest.TestCase):
         self.assertIn("jocasta", ids)
 
 
-class TestAskOpenclaw(unittest.TestCase):
-    def test_ok(self):
-        with mock.patch.object(js, "_attempt", return_value=("ok", "Certainly, Sir.")):
-            ok, reply = js._ask_openclaw("do it")
+class _FakeResp:
+    """Minimal context-manager stand-in for urlopen()'s response."""
+    def __init__(self, payload):
+        self._b = json.dumps(payload).encode("utf-8")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+    def read(self):
+        return self._b
+
+
+class TestAskAnthropic(unittest.TestCase):
+    def test_ok_parses_content_blocks(self):
+        payload = {"content": [{"type": "text", "text": "Certainly, Sir."}]}
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "sk-test"), \
+                mock.patch("urllib.request.urlopen", return_value=_FakeResp(payload)):
+            ok, reply = js._ask_anthropic("do it", system="s", history=[])
         self.assertTrue(ok)
         self.assertEqual(reply, "Certainly, Sir.")
 
-    def test_auth_triggers_refresh_then_retry(self):
-        with mock.patch.object(js, "_attempt",
-                               side_effect=[("auth", "b"), ("ok", "Recovered, Sir.")]), \
-                mock.patch.object(js, "_refresh_token", return_value=True) as refresh:
-            ok, reply = js._ask_openclaw("hi")
-        self.assertTrue(ok)
-        self.assertEqual(reply, "Recovered, Sir.")
-        refresh.assert_called_once()
-
-    def test_auth_refresh_fails(self):
-        with mock.patch.object(js, "_attempt", return_value=("auth", "b")), \
-                mock.patch.object(js, "_refresh_token", return_value=False):
-            ok, reply = js._ask_openclaw("hi")
+    def test_http_401_reports_bad_key(self):
+        err = urllib.error.HTTPError("u", 401, "Unauthorized", {}, io.BytesIO(b"{}"))
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "sk-test"), \
+                mock.patch("urllib.request.urlopen", side_effect=err):
+            ok, reply = js._ask_anthropic("hi", system="s", history=[])
         self.assertFalse(ok)
-        self.assertIn("authenticate", reply.lower())
-
-    def test_failure_snippet(self):
-        with mock.patch.object(js, "_attempt",
-                               return_value=("fail", "line one\nfinal error line")):
-            ok, reply = js._ask_openclaw("hi")
-        self.assertFalse(ok)
-        self.assertIn("final error line", reply)
+        self.assertIn("ANTHROPIC_API_KEY", reply)
 
 
 class TestDemoReply(unittest.TestCase):
@@ -627,20 +517,20 @@ class TestAskClaudeDispatch(unittest.TestCase):
     def tearDown(self):
         js._history[:] = self._saved
 
-    def test_dispatches_to_openclaw_and_records_history(self):
-        with mock.patch.object(js, "active_brain", return_value="openclaw"), \
-                mock.patch.object(js, "_ask_openclaw",
+    def test_dispatches_to_brain_and_records_history(self):
+        with mock.patch.object(js, "active_brain", return_value="anthropic"), \
+                mock.patch.object(js, "_ask_anthropic",
                                   return_value=(True, "Certainly, Sir.")):
             res = js.ask_claude("Do the thing")
         self.assertTrue(res["ok"])
-        self.assertEqual(res["brain"], "openclaw")
+        self.assertEqual(res["brain"], "anthropic")
         self.assertEqual(js._history[-2], ("Sir", "Do the thing"))
         self.assertEqual(js._history[-1], ("JARVIS", "Certainly, Sir."))
 
     def test_failure_records_no_history(self):
         before = len(js._history)
-        with mock.patch.object(js, "active_brain", return_value="openclaw"), \
-                mock.patch.object(js, "_ask_openclaw", return_value=(False, "nope")):
+        with mock.patch.object(js, "active_brain", return_value="anthropic"), \
+                mock.patch.object(js, "_ask_anthropic", return_value=(False, "nope")):
             res = js.ask_claude("hello")
         self.assertFalse(res["ok"])
         self.assertEqual(len(js._history), before)

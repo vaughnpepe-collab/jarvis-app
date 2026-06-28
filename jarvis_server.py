@@ -2,11 +2,9 @@
 """
 J.A.R.V.I.S. — local backend for the desktop HUD app.
 
-Serves the UI and bridges the command console to Claude via OpenClaw's
-`claude-cli` provider (your Claude.ai subscription — NO API KEY required).
-
-Brain command:
-    openclaw infer model run --model <MODEL> --prompt "<...>" --local
+Serves the UI and bridges the command console to your choice of AI provider
+(Anthropic, OpenAI, NVIDIA NIM, DeepSeek, Gemini, a local model, and more),
+selected by API key. Put keys in jarvis.env next to this file, or the env.
 
 Dependencies: standard library only. `psutil` is optional (real CPU/RAM);
 without it the app falls back to lightweight estimates.
@@ -66,14 +64,6 @@ _load_env_file()
 # ---------------------------------------------------------------- config
 HOST = os.environ.get("JARVIS_HOST", "127.0.0.1")
 PORT = int(os.environ.get("JARVIS_PORT", "8765"))
-# Candidate models, tried in order until one answers. This makes JARVIS work
-# whether the authenticated provider is `anthropic` (OAuth subscription) or
-# `claude-cli`. Override with JARVIS_MODELS="prov/model,prov/model".
-MODELS = [m.strip() for m in os.environ.get(
-    "JARVIS_MODELS",
-    "claude-cli/claude-opus-4-8,anthropic/claude-opus-4-8"
-).split(",") if m.strip()]
-MODEL = MODELS[0]  # shown in the UI
 ASK_TIMEOUT = int(os.environ.get("JARVIS_TIMEOUT", "240"))
 # Shorter timeout for connectivity probes (the "test brains" button).
 PROBE_TIMEOUT = int(os.environ.get("JARVIS_PROBE_TIMEOUT", "20"))
@@ -86,9 +76,9 @@ MAX_TOKENS = int(os.environ.get("JARVIS_MAX_TOKENS", "1024"))
 DEFAULT_BRAIN = os.environ.get("JARVIS_BRAIN", "").strip().lower()
 # When auto-selecting, the first available brain in this order wins.
 BRAIN_ORDER = ["anthropic", "openai", "deepseek", "grok", "mistral", "groq",
-               "nvidia", "minimax", "gemini", "local", "openclaw"]
+               "nvidia", "minimax", "gemini", "local"]
 
-# 1) Anthropic API (preferred) — just an API key, no OpenClaw.
+# 1) Anthropic API (preferred) — just an API key.
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
 ANTHROPIC_MODEL = os.environ.get("JARVIS_ANTHROPIC_MODEL", "claude-opus-4-8").strip()
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
@@ -235,83 +225,6 @@ try:
 except Exception:
     HAVE_PSUTIL = False
 
-# Resolve how to invoke OpenClaw. We prefer calling the node entrypoint directly:
-# the .cmd/.ps1 shims route through cmd.exe, which mangles multi-line prompt
-# arguments and drops flags like --json. node.exe receives argv intact.
-def _find_openclaw_cmd():
-    node = shutil.which("node")
-    npm_shim = shutil.which("openclaw.cmd") or shutil.which("openclaw")
-    if node:
-        candidates = [Path(os.environ.get("APPDATA", "")) / "npm"
-                      / "node_modules" / "openclaw" / "openclaw.mjs"]
-        if npm_shim:
-            candidates.append(Path(npm_shim).parent / "node_modules"
-                              / "openclaw" / "openclaw.mjs")
-        for mjs in candidates:
-            if mjs.exists():
-                return [node, str(mjs)]
-    return [npm_shim or "openclaw"]  # fallback (may mangle long prompts)
-
-OPENCLAW_CMD = _find_openclaw_cmd()
-# OpenClaw is genuinely usable only if we resolved a node entrypoint or a real
-# shim on PATH — the bare ["openclaw"] fallback means nothing was found.
-OPENCLAW_AVAILABLE = (
-    len(OPENCLAW_CMD) == 2  # [node, openclaw.mjs]
-    or bool(shutil.which("openclaw.cmd") or shutil.which("openclaw"))
-)
-
-# --- subscription token auto-refresh (keeps Claude alive without re-login) ---
-CRED_FILE = Path(os.path.expanduser("~/.claude/.credentials.json"))
-AUTH_PROFILES = Path(os.path.expanduser("~/.openclaw/agents/main/agent/auth-profiles.json"))
-OAUTH_CLIENT_ID = "9d1c250a-e61b-44d9-88ed-5944d1962f5e"   # Claude Code public client
-OAUTH_TOKEN_URL = "https://api.anthropic.com/v1/oauth/token"
-_refresh_lock = threading.Lock()
-
-
-def _refresh_token():
-    """Use the stored refresh token to mint a fresh access token, write it back
-    to both the Claude credentials file and OpenClaw's auth profile. Returns bool."""
-    with _refresh_lock:
-        try:
-            cred = json.loads(CRED_FILE.read_text(encoding="utf-8"))
-            oa = cred["claudeAiOauth"]
-            rt = oa.get("refreshToken")
-            if not rt:
-                return False
-            body = json.dumps({"grant_type": "refresh_token",
-                               "refresh_token": rt,
-                               "client_id": OAUTH_CLIENT_ID}).encode()
-            req = urllib.request.Request(
-                OAUTH_TOKEN_URL, data=body,
-                headers={"Content-Type": "application/json", "Accept": "application/json"})
-            with urllib.request.urlopen(req, timeout=30) as r:
-                resp = json.loads(r.read())
-            if not resp.get("access_token"):
-                return False
-            oa["accessToken"] = resp["access_token"]
-            if resp.get("refresh_token"):
-                oa["refreshToken"] = resp["refresh_token"]
-            if resp.get("expires_in"):
-                oa["expiresAt"] = int(time.time() * 1000 + resp["expires_in"] * 1000)
-            CRED_FILE.write_text(json.dumps(cred), encoding="utf-8")
-            # mirror into OpenClaw's auth profile if present
-            try:
-                ap = json.loads(AUTH_PROFILES.read_text(encoding="utf-8"))
-                prof = ap.get("profiles", {}).get("anthropic:claude-cli")
-                if prof:
-                    prof["access"] = oa["accessToken"]
-                    prof["refresh"] = oa["refreshToken"]
-                    prof["expires"] = oa["expiresAt"]
-                    AUTH_PROFILES.write_text(json.dumps(ap, indent=1), encoding="utf-8")
-            except Exception:
-                pass
-            log.info("[auth] subscription token refreshed automatically")
-            return True
-        except Exception as e:
-            log.warning("[auth] refresh failed: %s", e)
-            return False
-
-
 # Rolling conversation memory (kept short), one transcript per agent. JARVIS's
 # transcript is the module-level _history so existing callers/tests keep working.
 _history = []  # list of (speaker, text) — JARVIS's transcript
@@ -330,139 +243,6 @@ def _snapshot_history(history):
         return (history if history is not None else _history)[-12:]
 
 
-def _build_prompt(user_text, persona=None, history=None):
-    """Plain-text prompt for the OpenClaw path (persona + recent turns + speaker)."""
-    convo = _snapshot_history(history)
-    speaker = "JARVIS"
-    lines = [persona or JARVIS_PERSONA, ""]
-    if convo:
-        lines.append("Conversation so far:")
-        for who, txt in convo:
-            lines.append(f"{who}: {txt}")
-            if who not in ("Sir",):
-                speaker = who  # mirror the assistant's own name in the cue
-        lines.append("")
-    lines.append(f"Sir: {user_text}")
-    lines.append(f"{speaker}:")
-    return "\n".join(lines)
-
-
-_META_PREFIXES = ("model.run via", "provider:", "model:", "outputs:", "attempts:",
-                  "transport:", "capability:", "ok:", "mediaurl:", "warning:")
-
-
-def _strip_preamble(s):
-    """Drop OpenClaw's leading metadata lines, keep the actual reply."""
-    lines = s.splitlines()
-    i = 0
-    while i < len(lines):
-        ln = lines[i].strip().lower()
-        if ln == "" or any(ln.startswith(p) for p in _META_PREFIXES):
-            i += 1
-        else:
-            break
-    cleaned = "\n".join(lines[i:]).strip()
-    return cleaned or s
-
-
-def _extract_text(stdout):
-    """Pull the reply text out of openclaw output (json or plain)."""
-    s = (stdout or "").strip()
-    if not s:
-        return ""
-    # try JSON first; if stdout has a preamble, grab the embedded JSON object
-    data = None
-    try:
-        data = json.loads(s)
-    except Exception:
-        start = s.find("{")
-        end = s.rfind("}")
-        if start != -1 and end > start:
-            try:
-                data = json.loads(s[start:end + 1])
-            except Exception:
-                data = None
-    if data is None:
-        return _strip_preamble(s)  # human-format output
-    # search common shapes
-    for key in ("outputs", "text", "output", "reply", "response", "content", "message"):
-        v = data.get(key) if isinstance(data, dict) else None
-        if isinstance(v, str) and v.strip():
-            return v.strip()
-        if isinstance(v, list):  # e.g. content blocks
-            parts = [b.get("text", "") for b in v if isinstance(b, dict)]
-            joined = "".join(parts).strip()
-            if joined:
-                return joined
-    # fallback: longest string value anywhere
-    best = ""
-    def walk(o):
-        nonlocal best
-        if isinstance(o, str):
-            if len(o) > len(best):
-                best = o
-        elif isinstance(o, dict):
-            for x in o.values():
-                walk(x)
-        elif isinstance(o, list):
-            for x in o:
-                walk(x)
-    walk(data)
-    return best.strip() or s
-
-
-def _run_model(model, prompt, timeout=ASK_TIMEOUT):
-    """One subprocess call for a single model. Returns (text, blob, fatal_msg)."""
-    cmd = OPENCLAW_CMD + ["infer", "model", "run",
-                          "--model", model, "--prompt", prompt, "--local", "--json"]
-    try:
-        proc = subprocess.run(
-            cmd, capture_output=True, text=True,
-            encoding="utf-8", errors="replace",
-            timeout=timeout, cwd=str(HERE), shell=False,
-        )
-    except subprocess.TimeoutExpired:
-        log.warning("model %s timed out after %ss", model, timeout)
-        return "", "", ("Apologies, Sir — that took longer than I'm willing to keep "
-                        "you waiting. Do try again.")
-    except FileNotFoundError:
-        log.error("OpenClaw executable not found: %s", OPENCLAW_CMD[0])
-        return "", "", ("I can't locate the OpenClaw executable, Sir. Ensure "
-                        "`openclaw` is installed and on PATH.")
-    except OSError as e:
-        log.error("failed to invoke OpenClaw (%s): %s", model, e)
-        return "", "", ("I couldn't start the link to Claude, Sir — "
-                        f"the launcher reported: {e}")
-    blob = (proc.stdout or "") + "\n" + (proc.stderr or "")
-    text = _extract_text(proc.stdout or "")
-    if not text:
-        log.debug("model %s returned no usable text (rc=%s)", model, proc.returncode)
-    return text, blob, None
-
-
-_AUTH_MARKERS = ("authentication_error", "Invalid authentication", "401",
-                 "GatewayCredentials", "credentials before opening",
-                 "Unknown provider", "not configured", "No API key", "No text output")
-
-
-def _attempt(prompt, timeout=ASK_TIMEOUT):
-    """Try each candidate model. Returns (kind, payload):
-    ('ok', text) | ('fatal', msg) | ('auth', blob) | ('fail', blob)."""
-    auth_problem = False
-    last_blob = ""
-    for model in MODELS:
-        text, blob, fatal = _run_model(model, prompt, timeout)
-        if fatal:
-            return ("fatal", fatal)
-        last_blob = blob
-        if text:
-            return ("ok", text)
-        if any(s in blob for s in _AUTH_MARKERS):
-            auth_problem = True
-        # try the next candidate model regardless
-    return ("auth", last_blob) if auth_problem else ("fail", last_blob)
-
-
 # ---------------------------------------------------------------- brains
 # JARVIS can think through any of several "brains" (AI providers):
 #   anthropic — direct Anthropic API            (ANTHROPIC_API_KEY)
@@ -470,7 +250,6 @@ def _attempt(prompt, timeout=ASK_TIMEOUT):
 #   nvidia    — NVIDIA NIM (DeepSeek, Llama, …)  (NVIDIA_API_KEY [+ NVIDIA_MODEL])
 #   gemini    — Google Gemini                    (GEMINI_API_KEY)
 #   local     — local model, NO API KEY          (JARVIS_LOCAL_MODEL; Ollama/LM Studio)
-#   openclaw  — Claude.ai subscription via OpenClaw (no API key)
 #   demo      — always-available offline fallback so the HUD is never dead
 #
 # A brain is "available" when its credentials/tooling are present. The active
@@ -488,7 +267,6 @@ BRAIN_LABELS = {
     "minimax": "MiniMax M3",
     "gemini": "Google Gemini",
     "local": "Local model (no key)",
-    "openclaw": "Claude subscription (OpenClaw)",
     "demo": "Demo (offline)",
 }
 
@@ -509,7 +287,6 @@ def _brain_available(name):
         "minimax": bool(MINIMAX_API_KEY),
         "gemini": bool(GEMINI_API_KEY),
         "local": bool(LOCAL_MODEL),  # keyless — opt in by naming the local model
-        "openclaw": bool(OPENCLAW_AVAILABLE),
         "demo": True,
     }.get(name, False)
 
@@ -586,7 +363,6 @@ _BRAIN_MODEL_LABELS = {
     "minimax": MINIMAX_MODEL,
     "gemini": GEMINI_MODEL,
     "local": LOCAL_MODEL or "local",
-    "openclaw": MODEL,
     "demo": "demo (offline)",
 }
 
@@ -797,27 +573,6 @@ def _ask_gemini(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
     return True, text
 
 
-# --- brain: OpenClaw subscription -------------------------------------------
-def _ask_openclaw(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
-    """One turn via OpenClaw; auto-refresh the subscription token and retry once
-    on an auth failure. Returns (ok, reply)."""
-    prompt = _build_prompt(user_text, system, history)
-    kind, payload = _attempt(prompt, timeout)
-    if kind == "auth" and _refresh_token():
-        kind, payload = _attempt(prompt, timeout)  # retry with fresh token
-
-    if kind == "ok":
-        return True, payload
-    if kind == "fatal":
-        return False, payload
-    if kind == "auth":
-        return False, ("My link to Claude won't authenticate even after a refresh, "
-                       "Sir. The subscription login may need redoing:  openclaw.cmd "
-                       "infer model auth login --provider anthropic")
-    snippet = payload.strip().splitlines()[-1] if payload.strip() else "no output"
-    return False, f"Something went awry, Sir: {snippet[:300]}"
-
-
 # --- brain 3: offline demo --------------------------------------------------
 def _demo_reply(user_text, agent=None):
     """Canned, in-character replies so the HUD always responds, even with no
@@ -840,10 +595,9 @@ def _demo_reply(user_text, agent=None):
         return ("I am JARVIS, Sir — your executive assistant, with FRIDAY, EDITH, KAREN, "
                 "VERONICA and JOCASTA standing by. We're in demo mode until a brain is set.")
     return ("I'm in demo mode, Sir — no live AI is configured, so I can only offer "
-            "canned courtesies. To wake the team without an API key, run a local model "
-            "(set JARVIS_LOCAL_MODEL, e.g. llama3.2, with Ollama) or use your Claude "
-            "subscription via OpenClaw. An API key (ANTHROPIC_API_KEY / OPENAI_API_KEY "
-            "/ GEMINI_API_KEY) works too. Then restart me.")
+            "canned courtesies. Put an API key in jarvis.env (e.g. NVIDIA_API_KEY, "
+            "ANTHROPIC_API_KEY or OPENAI_API_KEY), or run a free local model "
+            "(JARVIS_LOCAL_MODEL, e.g. llama3.2, with Ollama). Then restart me.")
 
 
 def _handler_for(name):
@@ -860,7 +614,6 @@ def _handler_for(name):
         "minimax": _ask_minimax,
         "gemini": _ask_gemini,
         "local": _ask_local,
-        "openclaw": _ask_openclaw,
     }.get(name)
 
 
@@ -951,7 +704,7 @@ def orchestrate(goal):
     if not _handler_for(brain):  # demo / no brain
         return {"ok": False, "steps": [], "brain": brain,
                 "final": "Team mode needs a live brain, Sir — connect one (an API "
-                "key, a local model, or your subscription) and I'll convene the team."}
+                "key in jarvis.env, or a local model) and I'll convene the team."}
 
     plan = _plan(goal, brain)
     # Fan the specialists out in parallel — each works the shared goal at once,
@@ -1279,14 +1032,12 @@ def main(argv=None):
         env_path = Path(__file__).resolve().parent / "jarvis.env"
         log.info("Brain    : DEMO MODE — no AI key found. EASIEST FIX: put your key in "
                  "%s (e.g. a line `NVIDIA_API_KEY=nvapi-...`) and restart me. Keyless "
-                 "options: a local model (JARVIS_LOCAL_MODEL) or OpenClaw.", env_path)
+                 "option: a free local model via JARVIS_LOCAL_MODEL.", env_path)
     else:
         log.info("Brain    : %s (%s)", BRAIN_LABELS.get(brain, brain), active_model_label())
     log.info("Available: %s", ", ".join(avail))
     log.info("Telemetry: %s", "psutil (real)" if HAVE_PSUTIL
              else "estimated (install psutil for real)")
-    if brain == "openclaw":
-        log.info("OpenClaw : %s", " ".join(OPENCLAW_CMD))
     log.info("Logs     : %s", LOG_FILE)
 
     srv, port = _build_server()

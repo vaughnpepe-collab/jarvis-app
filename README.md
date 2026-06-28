@@ -1,8 +1,8 @@
 # J.A.R.V.I.S. — Desktop App
 
 A JARVIS-style HUD assistant. Python backend + holographic UI, powered by your
-choice of AI — Claude (API or subscription), OpenAI, Google Gemini, or any
-OpenAI-compatible/local model. Voice in and voice out.
+choice of AI — Anthropic Claude, OpenAI, NVIDIA NIM (DeepSeek / MiniMax),
+Google Gemini, or any OpenAI-compatible/local model. Voice in and voice out.
 
 ## Quick setup — getting off Demo mode (easiest way)
 
@@ -29,8 +29,10 @@ it auto-selects the best available one, and you can **switch live** from the HUD
 | **Anthropic (Claude API)** | `ANTHROPIC_API_KEY` | Preferred. `JARVIS_ANTHROPIC_MODEL` (default `claude-opus-4-8`). |
 | **OpenAI / compatible** | `OPENAI_API_KEY` | `OPENAI_MODEL` (default `gpt-4o-mini`). Point `OPENAI_BASE_URL` at any OpenAI-compatible server — OpenRouter, Groq, Together, or a local Ollama / LM Studio (`http://localhost:11434/v1`). |
 | **Google Gemini** | `GEMINI_API_KEY` | `GEMINI_MODEL` (default `gemini-2.0-flash`). |
+| **NVIDIA NIM** | `NVIDIA_API_KEY` | `NVIDIA_MODEL` (default `deepseek-ai/deepseek-v4-pro`). OpenAI-compatible; hosts DeepSeek, Llama, and more. |
+| **MiniMax M3** | `MINIMAX_API_KEY` | `MINIMAX_MODEL` (default `minimaxai/minimax-m3`). Runs on NVIDIA NIM — shares `NVIDIA_API_KEY` by default. |
+| **DeepSeek / xAI Grok / Mistral / Groq** | `DEEPSEEK_API_KEY` / `XAI_API_KEY` / `MISTRAL_API_KEY` / `GROQ_API_KEY` | Each OpenAI-compatible, with its own `*_MODEL`. |
 | **Local model (no key)** | `JARVIS_LOCAL_MODEL` | **No API key.** Any OpenAI-compatible local server — Ollama (default) or LM Studio. Free and private. See below. |
-| **Claude subscription (OpenClaw)** | install OpenClaw | **No API key.** Uses your Claude.ai subscription OAuth token. Auto-refreshes. |
 | **Demo (offline)** | nothing | Always available — responds in character and tells you how to enable a real brain, so the interface is never dead. |
 
 ## The agent team
@@ -63,8 +65,7 @@ with `{agent, text}`.)
 genuinely different providers at the same time — e.g. **FRIDAY on Claude and EDITH
 on DeepSeek** (set `ANTHROPIC_API_KEY` + `DEEPSEEK_API_KEY`, then pick each from its
 dropdown). Available providers: Anthropic, OpenAI (and compatible), DeepSeek, xAI
-Grok, Mistral, Groq, NVIDIA NIM, MiniMax M3, Google Gemini, a local model, or your
-Claude subscription.
+Grok, Mistral, Groq, NVIDIA NIM, MiniMax M3, Google Gemini, or a local model.
 (Backend: `POST /agent/brain`.) Each agent is shown in its own signature colour
 across the roster, chat and brain graph.
 
@@ -92,20 +93,22 @@ export JARVIS_LOCAL_MODEL=llama3.2   # Windows: set JARVIS_LOCAL_MODEL=llama3.2
 
 It appears in the **AI** dropdown as “Local model (no key)”. For **LM Studio**
 instead, start its local server and add `JARVIS_LOCAL_URL=http://localhost:1234/v1`.
-The other keyless route is the **Claude subscription** brain (install OpenClaw).
 
-Set whichever you have, e.g. on macOS/Linux:
+To use a hosted provider, put its key in `jarvis.env` (see the Quick setup at the
+top) or export it, e.g. on macOS/Linux:
 ```
+export NVIDIA_API_KEY=nvapi-...         # NVIDIA NIM (DeepSeek / MiniMax)
 export ANTHROPIC_API_KEY=sk-ant-...     # Claude
 export OPENAI_API_KEY=sk-...            # OpenAI / compatible
 export GEMINI_API_KEY=...               # Gemini
 ```
-(Windows `cmd`: `set ANTHROPIC_API_KEY=sk-ant-...`)
+(Windows `cmd`: `set NVIDIA_API_KEY=nvapi-...`)
 
-**Auto-selection order** is Anthropic → OpenAI → Gemini → Local → OpenClaw → Demo.
-Pin a default with `JARVIS_BRAIN` (e.g. `JARVIS_BRAIN=local`), or pick one live from the
-HUD **AI** dropdown. The active brain is shown in the HUD (the **Brain** readout:
-`ONLINE` for a real brain, `DEMO` for demo) and in the backend startup log.
+**Auto-selection order** is Anthropic → OpenAI → DeepSeek → Grok → Mistral → Groq →
+NVIDIA → MiniMax → Gemini → Local → Demo. Pin a default with `JARVIS_BRAIN`
+(e.g. `JARVIS_BRAIN=nvidia`), or pick one live from the HUD **AI** dropdown. The
+active brain is shown in the HUD (the **Brain** readout: `ONLINE` for a real brain,
+`DEMO` for demo) and in the backend startup log.
 
 ### See which brain actually works
 
@@ -125,24 +128,13 @@ jarvis-app/
 ├─ ui.html               ← the HUD interface
 ├─ requirements.txt      ← optional (psutil for real CPU/RAM)
 ├─ requirements-dev.txt  ← optional (pytest; tests also run on the stdlib alone)
+├─ jarvis.env.example    ← rename to jarvis.env and add your API key(s)
 └─ tests/                ← unit tests for the backend
-
-JARVIS talks to Claude through OpenClaw's `claude-cli` provider using your
-**Claude.ai subscription OAuth token** (no API key). The backend **auto-refreshes
-that token** when it expires, so normally you never touch this.
-
-If the subscription login is ever fully lost, re-link it once in a terminal:
-
 ```
-openclaw.cmd infer model auth login --provider anthropic
-```
-(choose the **Claude CLI / subscription** option, not API key).
 
-Notes for Windows PowerShell:
-- Use `openclaw.cmd ...` (the `.ps1` form is blocked by the script-execution policy),
-  or run once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
-- The backend invokes OpenClaw via `node openclaw.mjs` directly — the `.cmd` shim
-  mangles multi-line prompts, so don't change that.
+JARVIS talks to each provider over its normal HTTPS API using the key you supply.
+Keys are read from `jarvis.env` (or the shell environment) at startup and are never
+logged or written anywhere else.
 
 ## Run
 
@@ -187,12 +179,11 @@ so plainly instead of dumping a traceback.
 | `JARVIS_LOCAL_MODEL`    | (unset)                  | Enables the keyless Local brain (name of a pulled model, e.g. `llama3.2`) |
 | `JARVIS_LOCAL_URL`      | `http://localhost:11434/v1` | Local server URL (Ollama default; LM Studio = `:1234/v1`) |
 | `JARVIS_LOCAL_API_KEY`  | (unset)                  | Only if your local server requires a token (usually not) |
-| `JARVIS_BRAIN`          | (auto)                   | Pin a default brain (`anthropic`/`openai`/`gemini`/`openclaw`) |
+| `JARVIS_BRAIN`          | (auto)                   | Pin a default brain (`anthropic`/`openai`/`nvidia`/`gemini`/`local`) |
 | `JARVIS_MAX_TOKENS`     | `1024`                   | Max reply length for the API brains       |
 | `JARVIS_PROBE_TIMEOUT`  | `20`                     | Per-brain timeout (s) for the TEST button  |
 | `JARVIS_HOST`           | `127.0.0.1`              | Bind address                              |
 | `JARVIS_PORT`           | `8765`                   | Bind port                                 |
-| `JARVIS_MODELS`         | `claude-cli/...,anthropic/...` | OpenClaw models, tried in order     |
 | `JARVIS_TIMEOUT`        | `240`                    | Seconds to wait for a model reply         |
 | `JARVIS_OPEN`           | (unset)                  | `1` to auto-open the window (same as `--open`) |
 | `JARVIS_LOG_FILE`       | `jarvis.log` (next to the script) | Log file path                    |
@@ -216,12 +207,12 @@ Or, if you prefer pytest (`pip install -r requirements-dev.txt`):
 python -m pytest tests
 ```
 
-The OpenClaw/model boundary is mocked, so tests are fast and never make a real
-network or subprocess call.
+The provider HTTP boundary is mocked, so tests are fast and never make a real
+network call.
 
 ## Using it
 
-- **Type** in the console and press Enter — replies come from real Claude, in character.
+- **Type** in the console and press Enter — replies come from your chosen AI, in character.
 - **🎙 Mic** — click, then say **"Jarvis, …"** followed by your request (wake-word gated).
 - **🔊 Speaker** — mute / restore JARVIS's spoken replies.
 - Live telemetry, arc-reactor core (pulses faster while thinking), activity log.
@@ -232,10 +223,8 @@ network or subprocess call.
   permission and an internet connection for recognition.
 - **Telemetry**: install `psutil` (`pip install psutil`) for real CPU/RAM; otherwise
   estimated values are shown.
-- **Brain / model**: see *How JARVIS thinks* above. With an API key, set the model
-  via `JARVIS_ANTHROPIC_MODEL`; on the OpenClaw path, set `JARVIS_MODELS`.
+- **Brain / model**: see *How JARVIS thinks* above. Each provider has its own
+  `*_MODEL` variable (e.g. `JARVIS_ANTHROPIC_MODEL`, `NVIDIA_MODEL`).
 - **Conversation memory** is kept for the session in the backend (last ~12 turns).
-- If JARVIS says his "link to Claude has lapsed," re-run the auth login command above.
-- On the OpenClaw path this uses *your* Claude subscription via the `claude-cli`
-  provider; on the API path it uses your `ANTHROPIC_API_KEY`. Either way, usage
-  counts against that account.
+- Replies use whichever provider key you supplied; usage counts against that
+  provider account.
