@@ -49,7 +49,8 @@ with `{agent, text}`.)
 genuinely different providers at the same time — e.g. **FRIDAY on Claude and EDITH
 on DeepSeek** (set `ANTHROPIC_API_KEY` + `DEEPSEEK_API_KEY`, then pick each from its
 dropdown). Available providers: Anthropic, OpenAI (and compatible), DeepSeek, xAI
-Grok, Mistral, Groq, Google Gemini, a local model, or your Claude subscription.
+Grok, Mistral, Groq, NVIDIA NIM, Google Gemini, a local model, or your Claude
+subscription.
 (Backend: `POST /agent/brain`.) Each agent is shown in its own signature colour
 across the roster, chat and brain graph.
 
@@ -167,6 +168,7 @@ so plainly instead of dumping a traceback.
 | `XAI_API_KEY`           | (unset)                  | Enables xAI Grok (`XAI_MODEL`, default `grok-2-latest`) |
 | `MISTRAL_API_KEY`       | (unset)                  | Enables Mistral (`MISTRAL_MODEL`, default `mistral-large-latest`) |
 | `GROQ_API_KEY`          | (unset)                  | Enables Groq (`GROQ_MODEL`, default `llama-3.3-70b-versatile`) |
+| `NVIDIA_API_KEY`        | (unset)                  | Enables NVIDIA NIM (`NVIDIA_MODEL`, default `deepseek-ai/deepseek-v4-pro`) |
 | `JARVIS_LOCAL_MODEL`    | (unset)                  | Enables the keyless Local brain (name of a pulled model, e.g. `llama3.2`) |
 | `JARVIS_LOCAL_URL`      | `http://localhost:11434/v1` | Local server URL (Ollama default; LM Studio = `:1234/v1`) |
 | `JARVIS_LOCAL_API_KEY`  | (unset)                  | Only if your local server requires a token (usually not) |

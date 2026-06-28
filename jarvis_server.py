@@ -56,7 +56,7 @@ MAX_TOKENS = int(os.environ.get("JARVIS_MAX_TOKENS", "1024"))
 DEFAULT_BRAIN = os.environ.get("JARVIS_BRAIN", "").strip().lower()
 # When auto-selecting, the first available brain in this order wins.
 BRAIN_ORDER = ["anthropic", "openai", "deepseek", "grok", "mistral", "groq",
-               "gemini", "local", "openclaw"]
+               "nvidia", "gemini", "local", "openclaw"]
 
 # 1) Anthropic API (preferred) — just an API key, no OpenClaw.
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
@@ -90,6 +90,10 @@ MISTRAL_URL = "https://api.mistral.ai/v1"
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
 GROQ_URL = "https://api.groq.com/openai/v1"
+# NVIDIA NIM (build.nvidia.com) — OpenAI-compatible; hosts DeepSeek, Llama, etc.
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "").strip()
+NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "deepseek-ai/deepseek-v4-pro").strip()
+NVIDIA_URL = "https://integrate.api.nvidia.com/v1"
 
 # 5) Local model — NO API KEY. Any OpenAI-compatible local server: Ollama
 #    (default) or LM Studio. Opt in by naming the model you've pulled, e.g.
@@ -420,6 +424,7 @@ def _attempt(prompt, timeout=ASK_TIMEOUT):
 # JARVIS can think through any of several "brains" (AI providers):
 #   anthropic — direct Anthropic API            (ANTHROPIC_API_KEY)
 #   openai    — OpenAI / any OpenAI-compatible   (OPENAI_API_KEY [+ OPENAI_BASE_URL])
+#   nvidia    — NVIDIA NIM (DeepSeek, Llama, …)  (NVIDIA_API_KEY [+ NVIDIA_MODEL])
 #   gemini    — Google Gemini                    (GEMINI_API_KEY)
 #   local     — local model, NO API KEY          (JARVIS_LOCAL_MODEL; Ollama/LM Studio)
 #   openclaw  — Claude.ai subscription via OpenClaw (no API key)
@@ -436,6 +441,7 @@ BRAIN_LABELS = {
     "grok": "xAI Grok",
     "mistral": "Mistral",
     "groq": "Groq",
+    "nvidia": "NVIDIA NIM",
     "gemini": "Google Gemini",
     "local": "Local model (no key)",
     "openclaw": "Claude subscription (OpenClaw)",
@@ -455,6 +461,7 @@ def _brain_available(name):
         "grok": bool(XAI_API_KEY),
         "mistral": bool(MISTRAL_API_KEY),
         "groq": bool(GROQ_API_KEY),
+        "nvidia": bool(NVIDIA_API_KEY),
         "gemini": bool(GEMINI_API_KEY),
         "local": bool(LOCAL_MODEL),  # keyless — opt in by naming the local model
         "openclaw": bool(OPENCLAW_AVAILABLE),
@@ -526,6 +533,7 @@ _BRAIN_MODEL_LABELS = {
     "grok": XAI_MODEL,
     "mistral": MISTRAL_MODEL,
     "groq": GROQ_MODEL,
+    "nvidia": NVIDIA_MODEL,
     "gemini": GEMINI_MODEL,
     "local": LOCAL_MODEL or "local",
     "openclaw": MODEL,
@@ -637,17 +645,21 @@ def _post_json(url, payload, headers, label, timeout=ASK_TIMEOUT):
 
 # --- brains: OpenAI Chat Completions shape (OpenAI, compatible servers, local) ---
 def _chat_completions(base_url, model, api_key, label, user_text, timeout,
-                      system=None, history=None):
+                      system=None, history=None, extra=None):
     """Shared (ok, reply) call for any OpenAI-compatible /chat/completions API.
     `api_key` may be empty — local servers (Ollama/LM Studio) need no auth, so
-    the Authorization header is omitted entirely in that case."""
+    the Authorization header is omitted entirely in that case. `extra` merges
+    provider-specific fields into the request body (e.g. NVIDIA's
+    chat_template_kwargs to skip a reasoning model's slow hidden 'thinking')."""
     messages = ([{"role": "system", "content": system or JARVIS_PERSONA}]
                 + _build_messages(user_text, history))
     headers = {"authorization": f"Bearer {api_key}"} if api_key else {}
+    body = {"model": model, "max_tokens": MAX_TOKENS, "messages": messages}
+    if extra:
+        body.update(extra)
     data, err = _post_json(
         base_url.rstrip("/") + "/chat/completions",
-        {"model": model, "max_tokens": MAX_TOKENS, "messages": messages},
-        headers, label, timeout,
+        body, headers, label, timeout,
     )
     if err:
         return False, err
@@ -691,6 +703,14 @@ def _ask_mistral(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
 def _ask_groq(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
     return _chat_completions(GROQ_URL, GROQ_MODEL, GROQ_API_KEY,
                              "Groq", user_text, timeout, system, history)
+
+
+def _ask_nvidia(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
+    # Many NVIDIA-hosted models (e.g. DeepSeek v4) reason silently by default,
+    # which is slow; turn that off so replies come back promptly.
+    return _chat_completions(NVIDIA_URL, NVIDIA_MODEL, NVIDIA_API_KEY,
+                             "NVIDIA", user_text, timeout, system, history,
+                             extra={"chat_template_kwargs": {"thinking": False}})
 
 
 # --- brain: Google Gemini ---------------------------------------------------
@@ -781,6 +801,7 @@ def _handler_for(name):
         "grok": _ask_grok,
         "mistral": _ask_mistral,
         "groq": _ask_groq,
+        "nvidia": _ask_nvidia,
         "gemini": _ask_gemini,
         "local": _ask_local,
         "openclaw": _ask_openclaw,

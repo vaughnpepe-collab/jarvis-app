@@ -449,11 +449,32 @@ class TestAgentBrain(unittest.TestCase):
 class TestExtraProviders(unittest.TestCase):
     def test_each_provider_available_with_its_key(self):
         keys = {"deepseek": "DEEPSEEK_API_KEY", "grok": "XAI_API_KEY",
-                "mistral": "MISTRAL_API_KEY", "groq": "GROQ_API_KEY"}
+                "mistral": "MISTRAL_API_KEY", "groq": "GROQ_API_KEY",
+                "nvidia": "NVIDIA_API_KEY"}
         for brain, env in keys.items():
             with mock.patch.object(js, env, "k"):
                 self.assertTrue(js._brain_available(brain), brain)
                 self.assertIsNotNone(js._handler_for(brain), brain)
+
+    def test_nvidia_sends_openai_shape_without_thinking(self):
+        # NVIDIA NIM is OpenAI-compatible; we also disable slow hidden reasoning.
+        captured = {}
+
+        def fake_post(url, body, headers, label, timeout):
+            captured["url"] = url
+            captured["body"] = body
+            captured["headers"] = headers
+            return ({"choices": [{"message": {"content": "JARVIS online."}}]}, None)
+
+        with mock.patch.object(js, "NVIDIA_API_KEY", "nvapi-test"), \
+                mock.patch.object(js, "_post_json", side_effect=fake_post):
+            ok, reply = js._ask_nvidia("hello", system="be brief", history=[])
+
+        self.assertTrue(ok)
+        self.assertEqual(reply, "JARVIS online.")
+        self.assertTrue(captured["url"].endswith("/chat/completions"))
+        self.assertEqual(captured["headers"]["authorization"], "Bearer nvapi-test")
+        self.assertEqual(captured["body"]["chat_template_kwargs"], {"thinking": False})
 
     def test_different_agents_different_providers(self):
         # FRIDAY on Claude (anthropic), EDITH on DeepSeek — both available at once
