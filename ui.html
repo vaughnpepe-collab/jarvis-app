@@ -45,8 +45,11 @@
   .greeting{font-size:13px}.greeting b{color:var(--cyan)}
   .clock{text-align:right}.clock .t{font-size:28px;letter-spacing:3px;color:#eaf7ff}.clock .d{font-size:10px;letter-spacing:2px;color:var(--mut)}
   aside.left{grid-area:left}aside.right{grid-area:right}.projects{grid-area:projects}
-  .center{grid-area:center;display:flex;align-items:center;justify-content:center;position:relative}
-  .reactor-wrap{position:relative;width:min(44vh,420px);aspect-ratio:1}
+  .center{grid-area:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative;min-height:0;overflow:hidden}
+  /* size by the cell height (minus room for the status) so it never clips,
+     capped on tall screens; width follows via aspect-ratio */
+  .reactor-wrap{position:relative;aspect-ratio:1;height:min(30vh,280px);max-height:calc(100% - 48px);
+    width:auto;max-width:84%;flex:0 1 auto}
   .reactor-wrap svg{position:absolute;inset:0;width:100%;height:100%}
   .ring{fill:none;stroke:var(--cyan);stroke-width:1.2;opacity:.5;transform-origin:50% 50%}
   .ring.dim{stroke:var(--cyan-dim);opacity:.35}.seg{stroke:var(--cyan);stroke-width:6;stroke-linecap:round;opacity:.9;transform-origin:50% 50%}
@@ -59,8 +62,9 @@
   .core-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:2}
   .core-label .pct{font-size:28px;color:#02151f;font-weight:700;text-shadow:0 0 6px #fff}
   .core-label .sub{font-size:8px;letter-spacing:3px;color:#02151f;opacity:.8}
-  .center-status{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);text-align:center}
-  .center-status .big{font-size:13px;letter-spacing:5px;color:var(--cyan)}.center-status .small{font-size:9px;letter-spacing:2px;color:var(--mut)}
+  .center-status{text-align:center;flex:0 0 auto}
+  .center-status .big{font-size:13px;letter-spacing:5px;color:var(--cyan)}
+  .center-status .small{font-size:9px;letter-spacing:2px;color:var(--mut);white-space:nowrap;margin-top:4px}
   .metric{margin-bottom:15px}
   .metric .lab{display:flex;justify-content:space-between;font-size:10px;letter-spacing:2px;color:var(--mut);margin-bottom:5px;text-transform:uppercase}
   .metric .lab span:last-child{color:var(--cyan)}
@@ -238,8 +242,8 @@
       </svg>
       <div class="core" id="core"></div>
       <div class="core-label"><div class="pct" id="reactorPct">98</div><div class="sub">REACTOR OUTPUT</div></div>
-      <div class="center-status"><div class="big" id="cstat">ALL SYSTEMS NOMINAL</div><div class="small">CLAUDE SUBSCRIPTION · NO API KEY</div></div>
     </div>
+    <div class="center-status"><div class="big" id="cstat">ALL SYSTEMS NOMINAL</div><div class="small">INITIALISING…</div></div>
   </section>
 
   <aside class="right panel">
@@ -386,7 +390,9 @@
   const log=$('chatlog');
   function add(cls,txt,name){const r=document.createElement('div');r.className='row';
     const s=document.createElement('span');s.className=cls;if(name)s.dataset.name=name;
-    s.textContent=txt;r.appendChild(s);log.appendChild(r);log.scrollTop=log.scrollHeight;return s;}
+    s.textContent=txt;r.appendChild(s);log.appendChild(r);
+    while(log.children.length>80)log.removeChild(log.firstChild);   // cap DOM for long sessions
+    log.scrollTop=log.scrollHeight;return s;}
   function you(t){add('you',t)}
   function sys(t){return add('sys',t)}
   function sayAs(name,t){add('ag',t,name);speak(t);}      // an agent speaks (attributed + voiced)
@@ -405,7 +411,7 @@
   function setStatus(id,working){const el=document.querySelector('.agent[data-id="'+id+'"] .ast');
     if(el){el.textContent=working?'WORKING':'IDLE';el.classList.toggle('working',working);}
     if(working)gWorking.add(id);else gWorking.delete(id);
-    if(reduceMotion)drawGraph();}
+    if(reduceMotion)drawGraph();else kick();}
   function renderAgents(){
     const list=$('agent-list');if(!list)return;
     list.innerHTML=AGENTS.map(a=>{
@@ -428,7 +434,7 @@
   function selectAgent(id){target=id;
     [...document.querySelectorAll('.agent')].forEach(el=>el.classList.toggle('sel',el.dataset.id===id));
     $('consoleTarget').textContent=teamMode?'TEAM MODE — ALL AGENTS':'TALKING TO: '+agentName(id);
-    logFeed('Now talking to '+agentName(id),'');if(reduceMotion)drawGraph();}
+    logFeed('Now talking to '+agentName(id),'');if(reduceMotion)drawGraph();else kick();}
   async function loadAgents(){
     try{const d=await(await fetch(API+'/agents')).json();AGENTS=d.agents||[];renderAgents();initGraph();}catch(e){}
   }
@@ -438,7 +444,7 @@
   const gc=$('brainGraph'),gx=gc&&gc.getContext('2d');
   let gnodes=[],glinks=[],graphRAF=0,gFlows=[];
   // a travelling "data" pulse from one node to another (team hand-offs)
-  function addFlow(from,to,ms){if(from&&to&&from!==to)gFlows.push({from,to,start:performance.now(),ms:ms||1300});}
+  function addFlow(from,to,ms){if(from&&to&&from!==to){gFlows.push({from,to,start:performance.now(),ms:ms||1300});kick();}}
   function drawParticles(a,b,now,color,n,speed){for(let k=0;k<(n||3);k++){
     const p=((now/(speed||900))+k/(n||3))%1,x=a.x+(b.x-a.x)*p,y=a.y+(b.y-a.y)*p;
     gx.fillStyle=color;gx.beginPath();gx.arc(x,y,2,0,7);gx.fill();}}
@@ -468,8 +474,14 @@
       n.vx*=0.85;n.vy*=0.85;n.x+=n.vx;n.y+=n.vy;
       n.x=Math.max(n.r+2,Math.min(w-n.r-2,n.x));n.y=Math.max(n.r+14,Math.min(h-n.r-2,n.y));}
     c.x+=(w/2-c.x)*0.06;c.y+=(h/2-c.y)*0.06;
-    drawGraph();graphRAF=requestAnimationFrame(stepGraph);
+    drawGraph();
+    // performance: stop the loop once the layout settles and nothing is animating;
+    // kick() restarts it on any activity (selection, working agent, hand-off pulse)
+    let energy=0;for(const n of gnodes)energy+=Math.abs(n.vx)+Math.abs(n.vy);
+    if(energy<0.08 && !gFlows.length && !gWorking.size){graphRAF=0;return;}
+    graphRAF=requestAnimationFrame(stepGraph);
   }
+  function kick(){if(gc && !reduceMotion && !graphRAF)graphRAF=requestAnimationFrame(stepGraph);}
   function drawGraph(){
     if(!gx)return;const w=gc.clientWidth,h=gc.clientHeight,now=performance.now();gx.clearRect(0,0,w,h);
     for(const l of glinks){const a=nodeById(l.a),b=nodeById(l.b);if(!a||!b)continue;
