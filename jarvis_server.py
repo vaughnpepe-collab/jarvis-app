@@ -875,17 +875,20 @@ def orchestrate(goal):
                 "key, a local model, or your subscription) and I'll convene the team."}
 
     plan = _plan(goal, brain)
-    steps, context = [], ""
-    for st in plan:
+    # Fan the specialists out in parallel — each works the shared goal at once,
+    # so the team answers in roughly one specialist's time instead of the sum.
+    def _work(st):
         aid, task = st["agent"], st["task"]
-        ask = task if not context else (
-            task + "\n\nWhat the team has gathered so far:\n" + context)
+        ask = task + "\n\nThe overall goal Sir set for the team:\n" + goal
         out = ask_agent(aid, ask)
-        name = AGENT_BY_ID[aid]["name"]
-        steps.append({"agent": aid, "name": name, "task": task,
-                      "ok": out["ok"], "reply": out["reply"]})
-        if out["ok"]:
-            context += f"\n[{name}] {out['reply']}"
+        return {"agent": aid, "name": AGENT_BY_ID[aid]["name"], "task": task,
+                "ok": out["ok"], "reply": out["reply"]}
+
+    steps = []
+    if plan:
+        with ThreadPoolExecutor(max_workers=len(plan)) as pool:
+            steps = list(pool.map(_work, plan))  # preserves plan order
+    context = "".join(f"\n[{s['name']}] {s['reply']}" for s in steps if s["ok"])
 
     syn = ask_agent("jarvis", "Goal: " + goal + "\n\nYour specialists reported:\n"
                     + context + "\n\nSynthesise this into a clear, concise final "

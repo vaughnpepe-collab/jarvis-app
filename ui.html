@@ -20,22 +20,41 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
-  body{background:
-      radial-gradient(1100px 620px at 50% -8%,rgba(120,140,180,.08),transparent 62%),
-      radial-gradient(900px 820px at 50% 118%,rgba(80,100,150,.06),transparent 60%),
-      var(--bg);
+  body{background:var(--bg);
     color:var(--text);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;letter-spacing:.01em}
-  /* fine dot-field instead of the old scanlines/grid */
+  /* living aurora field — slow drifting volumetric light gives the deck depth */
+  body::before{content:"";position:fixed;inset:-25%;pointer-events:none;z-index:-2;
+    background:
+      radial-gradient(38vw 38vw at 22% 18%,rgba(70,120,200,.20),transparent 60%),
+      radial-gradient(42vw 42vw at 82% 26%,rgba(150,90,220,.15),transparent 62%),
+      radial-gradient(46vw 46vw at 50% 108%,rgba(40,150,170,.16),transparent 60%),
+      radial-gradient(30vw 30vw at 88% 88%,rgba(220,110,160,.10),transparent 60%);
+    filter:blur(8px);animation:aurora 34s ease-in-out infinite alternate}
+  @keyframes aurora{
+    33%{transform:translate3d(2%,-2%,0) scale(1.06) rotate(2deg)}
+    66%{transform:translate3d(-2%,2%,0) scale(1.02) rotate(-2deg)}
+    100%{transform:translate3d(1%,-1%,0) scale(1.08) rotate(1deg)}}
+  /* fine holographic dot-field over the aurora, masked toward the centre */
   body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
-    background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1.4px);background-size:24px 24px;
-    -webkit-mask-image:radial-gradient(circle at 50% 42%,#000,transparent 82%);
-            mask-image:radial-gradient(circle at 50% 42%,#000,transparent 82%)}
+    background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px);background-size:26px 26px;
+    -webkit-mask-image:radial-gradient(circle at 50% 42%,#000,transparent 84%);
+            mask-image:radial-gradient(circle at 50% 42%,#000,transparent 84%)}
   .app{display:grid;grid-template-columns:308px 1fr 308px;grid-template-rows:auto 1fr auto auto;gap:16px;height:100vh;padding:18px;
     grid-template-areas:"head head head" "left center right" "left console projects" "left console projects"}
   .panel{border:1px solid var(--line);border-radius:18px;position:relative;overflow:hidden;
-    background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.012)),rgba(13,15,19,.6);
-    box-shadow:0 26px 60px -28px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);
-    -webkit-backdrop-filter:blur(16px) saturate(1.1);backdrop-filter:blur(16px) saturate(1.1)}
+    background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012)),rgba(13,15,19,.52);
+    box-shadow:0 30px 70px -30px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.07),inset 0 0 0 1px rgba(120,150,210,.04);
+    -webkit-backdrop-filter:blur(18px) saturate(1.15);backdrop-filter:blur(18px) saturate(1.15)}
+  /* a faint chroma light sweeps slowly down each panel — holographic projection feel */
+  .panel::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;border-radius:inherit;
+    background:linear-gradient(180deg,transparent,rgba(120,160,230,.06) 48%,transparent);
+    transform:translateY(-100%);animation:sheen 9s ease-in-out infinite;animation-delay:var(--sd,0s)}
+  aside.right.panel::before{--sd:3s}.projects.panel::before{--sd:6s}
+  @keyframes sheen{0%,55%{transform:translateY(-100%)}80%,100%{transform:translateY(100%)}}
+  /* HUD corner brackets */
+  .panel>.ttl::after{content:"";position:absolute;top:6px;right:6px;width:13px;height:13px;
+    border-top:1px solid rgba(150,180,230,.4);border-right:1px solid rgba(150,180,230,.4);border-top-right-radius:5px}
+  .panel .body{position:relative;z-index:1}
   .ttl{font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--mut);text-transform:uppercase;
     padding:14px 16px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center}
   .ttl .dot{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:pulse 2.6s infinite}
@@ -48,7 +67,11 @@
     -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
   header button,header .iconbtn{-webkit-app-region:no-drag}
   .brand{display:flex;align-items:center;gap:15px}
-  .brand h1{font-size:21px;letter-spacing:.34em;font-weight:600;color:var(--text)}
+  .brand h1{font-size:21px;letter-spacing:.34em;font-weight:600;
+    background:linear-gradient(100deg,#dfe6f2 0%,#9fb6ff 30%,#e7ecf4 52%,#c79bff 74%,#dfe6f2 100%);
+    background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+    -webkit-text-fill-color:transparent;animation:chroma 12s linear infinite}
+  @keyframes chroma{to{background-position:220% center}}
   .brand small{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;color:var(--faint);margin-top:3px}
   .mini-reactor{width:30px;height:30px;border-radius:50%;
     background:radial-gradient(circle at 38% 34%,#fff,rgba(174,185,201,.5) 42%,rgba(20,24,30,.2) 72%);
@@ -66,7 +89,11 @@
   .reactor-wrap svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
   .ring{fill:none;stroke:rgba(255,255,255,.16);stroke-width:1;transform-origin:50% 50%}
   .ring.dim{stroke:rgba(255,255,255,.07)}
+  /* fine tick ring slowly counter-rotating, like a calibration scale */
+  .tickring{fill:none;stroke:rgba(150,180,230,.32);stroke-width:2.4;stroke-dasharray:.4 5.6;stroke-linecap:round;
+    transform-box:view-box;transform-origin:100px 100px;animation:spin 120s linear infinite reverse}
   .seg{fill:none;stroke:var(--accent-bright);stroke-width:2;stroke-linecap:round;opacity:.9;transform-origin:50% 50%}
+  .seg.chroma{stroke:url(#chromaGrad)}
   /* rotate around the reactor centre (100,100 in the viewBox), not each arc's own bbox */
   .r-spin,.r-spin-rev,.r-spin-fast{transform-box:view-box;transform-origin:100px 100px}
   .r-spin{animation:spin 60s linear infinite}.r-spin-rev{animation:spin 90s linear infinite reverse}
@@ -83,6 +110,14 @@
     box-shadow:inset 0 1px 1px rgba(255,255,255,.4),inset 0 0 50px rgba(150,180,230,.4),
       0 0 80px rgba(150,180,230,.3),0 0 0 1px rgba(255,255,255,.14)}
   @keyframes breathe{50%{transform:scale(1.035)}}
+  /* a slow conic energy sweep inside the core — the reactor "spinning up" */
+  .core::before{content:"";position:absolute;inset:-2px;border-radius:50%;pointer-events:none;
+    background:conic-gradient(from 0deg,transparent 0deg,rgba(150,190,255,.22) 40deg,transparent 120deg,
+      rgba(180,140,255,.16) 200deg,transparent 280deg,rgba(150,190,255,.22) 360deg);
+    -webkit-mask:radial-gradient(circle,transparent 52%,#000 70%,transparent 100%);
+            mask:radial-gradient(circle,transparent 52%,#000 70%,transparent 100%);
+    animation:spin 18s linear infinite;opacity:.9}
+  .core.think::before{animation:spin 5s linear infinite}
   .core-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:2}
   .core-label .pct{font-family:var(--mono);font-size:34px;font-weight:300;color:var(--text);font-variant-numeric:tabular-nums;text-shadow:0 0 18px rgba(150,180,230,.5)}
   .core-label .sub{font-family:var(--mono);font-size:7.5px;letter-spacing:.3em;color:var(--mut);margin-top:2px}
@@ -222,7 +257,7 @@
 <div class="boot" id="boot">
   <div class="mini-reactor" style="width:60px;height:60px"></div>
   <h2>J.A.R.V.I.S.</h2>
-  <div style="font-size:10px;letter-spacing:4px;color:var(--cyan-dim)">AGENT TEAM · BUILD v3.0</div>
+  <div style="font-size:10px;letter-spacing:4px;color:var(--cyan-dim)">NEURAL COMMAND DECK · BUILD v4.0</div>
   <div class="bl"><i></i></div>
   <p id="bootmsg">INITIALISING SYSTEMS…</p>
 </div>
@@ -232,7 +267,7 @@
   <header>
     <div class="brand">
       <div class="mini-reactor"></div>
-      <div><h1>J.A.R.V.I.S.</h1><small>EXECUTIVE INTELLIGENCE · AGENT TEAM · v3.0</small></div>
+      <div><h1>J.A.R.V.I.S.</h1><small>NEURAL COMMAND DECK · AGENT MESH · v4.0</small></div>
     </div>
     <div class="greeting" id="greeting">Standing by, <b>Sir</b>.</div>
     <div class="clock"><div class="t" id="clock">--:--:--</div><div class="d" id="date">—</div></div>
@@ -265,11 +300,19 @@
   <section class="center">
     <div class="reactor-wrap">
       <svg viewBox="0 0 200 200">
+        <defs>
+          <linearGradient id="chromaGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#8fb6ff"/><stop offset="0.5" stop-color="#e7ecf4"/><stop offset="1" stop-color="#c79bff"/>
+          </linearGradient>
+        </defs>
         <circle class="ring dim" cx="100" cy="100" r="96"/>
+        <circle class="tickring" cx="100" cy="100" r="90"/>
         <circle class="ring" cx="100" cy="100" r="80"/>
-        <g class="r-spin"><path class="seg" d="M100 20 A80 80 0 0 1 169 60"/></g>
+        <circle class="ring dim" cx="100" cy="100" r="64"/>
+        <g class="r-spin"><path class="seg chroma" d="M100 20 A80 80 0 0 1 169 60"/></g>
         <g class="r-spin-rev"><path class="seg" d="M100 180 A80 80 0 0 1 31 140" style="opacity:.45"/></g>
-        <g class="r-spin-fast"><path class="seg" d="M178 100 A78 78 0 0 1 168 139" style="stroke-width:3;opacity:.85"/></g>
+        <g class="r-spin-fast"><path class="seg chroma" d="M178 100 A78 78 0 0 1 168 139" style="stroke-width:3;opacity:.9"/></g>
+        <g class="r-spin-rev"><path class="seg" d="M36 64 A74 74 0 0 1 64 36" style="stroke-width:2.4;opacity:.6"/></g>
       </svg>
       <div class="core" id="core"></div>
       <div class="core-label"><div class="pct" id="reactorPct">98</div><div class="sub">REACTOR OUTPUT</div></div>
@@ -571,9 +614,9 @@
       for(const st of (d.steps||[])){
         addFlow(prev,st.agent);              // data passes from the previous worker to this one
         setStatus(st.agent,true);addAs(st.name,st.reply);logFeed(st.name+' contributed','');
-        await sleep(650);setStatus(st.agent,false);prev=st.agent;}
+        await sleep(140);setStatus(st.agent,false);prev=st.agent;}
       addFlow(prev,'jarvis');                 // results return to JARVIS for synthesis
-      await sleep(300);
+      await sleep(120);
       sayAs('JARVIS',d.final||'The team has nothing further, Sir.');
       logFeed('Team synthesis delivered','');
     }catch(e){ph.remove();say('The team run failed, Sir — '+e.message);}
