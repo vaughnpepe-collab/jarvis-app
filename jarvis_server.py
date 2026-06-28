@@ -73,7 +73,9 @@ PROBE_TIMEOUT = int(os.environ.get("JARVIS_PROBE_TIMEOUT", "20"))
 # Shared reply length and the preference order used for auto-selection.
 MAX_TOKENS = int(os.environ.get("JARVIS_MAX_TOKENS", "1024"))
 # Optional explicit default brain (e.g. JARVIS_BRAIN=openai). Empty = auto.
-DEFAULT_BRAIN = os.environ.get("JARVIS_BRAIN", "").strip().lower()
+# Default to NVIDIA when nothing is pinned; active_brain() falls back gracefully
+# if NVIDIA isn't configured, so this is safe even without an NVIDIA key.
+DEFAULT_BRAIN = os.environ.get("JARVIS_BRAIN", "nvidia").strip().lower()
 # When auto-selecting, the first available brain in this order wins.
 BRAIN_ORDER = ["anthropic", "openai", "deepseek", "grok", "mistral", "groq",
                "nvidia", "minimax", "gemini", "local"]

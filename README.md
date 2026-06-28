@@ -179,7 +179,7 @@ so plainly instead of dumping a traceback.
 | `JARVIS_LOCAL_MODEL`    | (unset)                  | Enables the keyless Local brain (name of a pulled model, e.g. `llama3.2`) |
 | `JARVIS_LOCAL_URL`      | `http://localhost:11434/v1` | Local server URL (Ollama default; LM Studio = `:1234/v1`) |
 | `JARVIS_LOCAL_API_KEY`  | (unset)                  | Only if your local server requires a token (usually not) |
-| `JARVIS_BRAIN`          | (auto)                   | Pin a default brain (`anthropic`/`openai`/`nvidia`/`gemini`/`local`) |
+| `JARVIS_BRAIN`          | `nvidia`                 | Default brain on launch (`anthropic`/`openai`/`nvidia`/`minimax`/`gemini`/`local`); falls back if not configured |
 | `JARVIS_MAX_TOKENS`     | `1024`                   | Max reply length for the API brains       |
 | `JARVIS_PROBE_TIMEOUT`  | `20`                     | Per-brain timeout (s) for the TEST button  |
 | `JARVIS_HOST`           | `127.0.0.1`              | Bind address                              |
