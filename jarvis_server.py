@@ -913,6 +913,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Access-Control-Allow-Origin", "*")
+        # never let the browser serve a stale HUD after an update
+        self.send_header("Cache-Control", "no-store, must-revalidate")
         self.end_headers()
         self.wfile.write(data)
 
@@ -1103,16 +1105,27 @@ def open_app_window(url):
 
 
 def _build_server():
-    """Bind the HTTP server, giving a clear message if the port is already taken."""
-    try:
-        return ThreadingHTTPServer((HOST, PORT), Handler)
-    except OSError as e:
-        if e.errno in (errno.EADDRINUSE, getattr(errno, "WSAEADDRINUSE", -1)):
-            log.error("Port %s on %s is already in use. Is JARVIS already running? "
-                      "Set JARVIS_PORT to use another port.", PORT, HOST)
-        else:
-            log.error("Could not start the server on %s:%s — %s", HOST, PORT, e)
-        return None
+    """Bind the HTTP server. If the preferred port is taken (e.g. a leftover old
+    JARVIS still running), automatically try the next few ports so the *new* app
+    always comes up rather than showing a stale instance. Returns (server, port)
+    or (None, None)."""
+    inuse = (errno.EADDRINUSE, getattr(errno, "WSAEADDRINUSE", -1))
+    for i in range(8):
+        port = PORT + i
+        try:
+            srv = ThreadingHTTPServer((HOST, port), Handler)
+            if i:
+                log.warning("Port %s was busy (an old JARVIS may still be running) "
+                            "— using port %s instead.", PORT, port)
+            return srv, port
+        except OSError as e:
+            if e.errno in inuse:
+                continue
+            log.error("Could not start the server on %s:%s — %s", HOST, port, e)
+            return None, None
+    log.error("Ports %s-%s are all in use, Sir. Close the old JARVIS window(s) "
+              "and try again.", PORT, PORT + 7)
+    return None, None
 
 
 def main(argv=None):
@@ -1138,12 +1151,12 @@ def main(argv=None):
              else "estimated (install psutil for real)")
     if brain == "openclaw":
         log.info("OpenClaw : %s", " ".join(OPENCLAW_CMD))
-    log.info("Serving  : http://%s:%s", HOST, PORT)
     log.info("Logs     : %s", LOG_FILE)
 
-    srv = _build_server()
+    srv, port = _build_server()
     if srv is None:
         return 1
+    log.info("Serving  : http://%s:%s", HOST, port)
 
     stopping = threading.Event()
 
@@ -1163,7 +1176,7 @@ def main(argv=None):
 
     want_open = (args.open or os.environ.get("JARVIS_OPEN") == "1") and not args.no_open
     if want_open:
-        open_app_window(f"http://{HOST}:{PORT}/")
+        open_app_window(f"http://{HOST}:{port}/")
 
     try:
         srv.serve_forever()
