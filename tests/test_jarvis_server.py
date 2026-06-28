@@ -450,11 +450,48 @@ class TestExtraProviders(unittest.TestCase):
     def test_each_provider_available_with_its_key(self):
         keys = {"deepseek": "DEEPSEEK_API_KEY", "grok": "XAI_API_KEY",
                 "mistral": "MISTRAL_API_KEY", "groq": "GROQ_API_KEY",
-                "nvidia": "NVIDIA_API_KEY"}
+                "nvidia": "NVIDIA_API_KEY", "minimax": "MINIMAX_API_KEY"}
         for brain, env in keys.items():
             with mock.patch.object(js, env, "k"):
                 self.assertTrue(js._brain_available(brain), brain)
                 self.assertIsNotNone(js._handler_for(brain), brain)
+
+    def test_minimax_uses_nvidia_endpoint_and_model(self):
+        captured = {}
+
+        def fake_post(url, body, headers, label, timeout):
+            captured.update(url=url, body=body, headers=headers, label=label)
+            return ({"choices": [{"message": {"content": "Ready, Sir."}}]}, None)
+
+        with mock.patch.object(js, "MINIMAX_API_KEY", "nvapi-x"), \
+                mock.patch.object(js, "MINIMAX_MODEL", "minimaxai/minimax-m3"), \
+                mock.patch.object(js, "_post_json", side_effect=fake_post):
+            ok, reply = js._ask_minimax("hi", system="s", history=[])
+
+        self.assertTrue(ok)
+        self.assertEqual(reply, "Ready, Sir.")
+        self.assertTrue(captured["url"].startswith("https://integrate.api.nvidia.com"))
+        self.assertEqual(captured["body"]["model"], "minimaxai/minimax-m3")
+
+    def test_env_file_loader_populates_missing_keys(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "jarvis.env").write_text(
+                "# a comment\nNVIDIA_API_KEY=nv-from-file\nFOO='bar'\n")
+            old = {k: os.environ.get(k) for k in ("NVIDIA_API_KEY", "FOO")}
+            for k in ("NVIDIA_API_KEY", "FOO"):
+                os.environ.pop(k, None)
+            try:
+                with mock.patch.object(js, "__file__", str(Path(d) / "jarvis_server.py")):
+                    js._load_env_file()
+                self.assertEqual(os.environ.get("NVIDIA_API_KEY"), "nv-from-file")
+                self.assertEqual(os.environ.get("FOO"), "bar")  # quotes stripped
+            finally:
+                for k, v in old.items():
+                    if v is None:
+                        os.environ.pop(k, None)
+                    else:
+                        os.environ[k] = v
 
     def test_nvidia_sends_openai_shape_without_thinking(self):
         # NVIDIA NIM is OpenAI-compatible; we also disable slow hidden reasoning.

@@ -33,6 +33,36 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
+# ------------------------------------------------------ env / key loading
+# So you don't have to fiddle with shell environment variables (especially when
+# you just double-click the launcher), JARVIS reads a plain-text key file sitting
+# next to it. Put one KEY=value per line, e.g.:
+#     NVIDIA_API_KEY=nvapi-xxxxxxxx
+#     ANTHROPIC_API_KEY=sk-ant-xxxx
+# Lines starting with # are ignored. Real shell env vars always take precedence.
+def _load_env_file():
+    here = Path(__file__).resolve().parent
+    for name in ("jarvis.env", ".env"):
+        path = here / name
+        if not path.is_file():
+            continue
+        try:
+            for raw in path.read_text(encoding="utf-8").splitlines():
+                line = raw.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, _, val = line.partition("=")
+                key = key.strip()
+                val = val.strip().strip('"').strip("'")
+                # don't override anything the user already set in the real shell
+                if key and key not in os.environ:
+                    os.environ[key] = val
+        except OSError:
+            pass
+
+
+_load_env_file()
+
 # ---------------------------------------------------------------- config
 HOST = os.environ.get("JARVIS_HOST", "127.0.0.1")
 PORT = int(os.environ.get("JARVIS_PORT", "8765"))
@@ -56,7 +86,7 @@ MAX_TOKENS = int(os.environ.get("JARVIS_MAX_TOKENS", "1024"))
 DEFAULT_BRAIN = os.environ.get("JARVIS_BRAIN", "").strip().lower()
 # When auto-selecting, the first available brain in this order wins.
 BRAIN_ORDER = ["anthropic", "openai", "deepseek", "grok", "mistral", "groq",
-               "nvidia", "gemini", "local", "openclaw"]
+               "nvidia", "minimax", "gemini", "local", "openclaw"]
 
 # 1) Anthropic API (preferred) — just an API key, no OpenClaw.
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
@@ -94,6 +124,11 @@ GROQ_URL = "https://api.groq.com/openai/v1"
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "").strip()
 NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "deepseek-ai/deepseek-v4-pro").strip()
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1"
+# MiniMax-M3 — also on NVIDIA NIM, so it shares the same key by default (set
+# MINIMAX_API_KEY to use a different one). Selectable as its own brain.
+MINIMAX_API_KEY = os.environ.get("MINIMAX_API_KEY", NVIDIA_API_KEY).strip()
+MINIMAX_MODEL = os.environ.get("MINIMAX_MODEL", "minimaxai/minimax-m3").strip()
+MINIMAX_URL = os.environ.get("MINIMAX_URL", NVIDIA_URL).rstrip("/")
 
 # 5) Local model — NO API KEY. Any OpenAI-compatible local server: Ollama
 #    (default) or LM Studio. Opt in by naming the model you've pulled, e.g.
@@ -450,6 +485,7 @@ BRAIN_LABELS = {
     "mistral": "Mistral",
     "groq": "Groq",
     "nvidia": "NVIDIA NIM",
+    "minimax": "MiniMax M3",
     "gemini": "Google Gemini",
     "local": "Local model (no key)",
     "openclaw": "Claude subscription (OpenClaw)",
@@ -470,6 +506,7 @@ def _brain_available(name):
         "mistral": bool(MISTRAL_API_KEY),
         "groq": bool(GROQ_API_KEY),
         "nvidia": bool(NVIDIA_API_KEY),
+        "minimax": bool(MINIMAX_API_KEY),
         "gemini": bool(GEMINI_API_KEY),
         "local": bool(LOCAL_MODEL),  # keyless — opt in by naming the local model
         "openclaw": bool(OPENCLAW_AVAILABLE),
@@ -546,6 +583,7 @@ _BRAIN_MODEL_LABELS = {
     "mistral": MISTRAL_MODEL,
     "groq": GROQ_MODEL,
     "nvidia": NVIDIA_MODEL,
+    "minimax": MINIMAX_MODEL,
     "gemini": GEMINI_MODEL,
     "local": LOCAL_MODEL or "local",
     "openclaw": MODEL,
@@ -725,6 +763,11 @@ def _ask_nvidia(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
                              extra={"chat_template_kwargs": {"thinking": False}})
 
 
+def _ask_minimax(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
+    return _chat_completions(MINIMAX_URL, MINIMAX_MODEL, MINIMAX_API_KEY,
+                             "MiniMax", user_text, timeout, system, history)
+
+
 # --- brain: Google Gemini ---------------------------------------------------
 def _ask_gemini(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
     """One turn via the Google Gemini generateContent API. Returns (ok, reply)."""
@@ -814,6 +857,7 @@ def _handler_for(name):
         "mistral": _ask_mistral,
         "groq": _ask_groq,
         "nvidia": _ask_nvidia,
+        "minimax": _ask_minimax,
         "gemini": _ask_gemini,
         "local": _ask_local,
         "openclaw": _ask_openclaw,
@@ -1232,9 +1276,10 @@ def main(argv=None):
     avail = available_brains()
     log.info("J.A.R.V.I.S. backend online")
     if brain == "demo":
-        log.info("Brain    : DEMO MODE — no AI configured. Keyless options: a local "
-                 "model (JARVIS_LOCAL_MODEL via Ollama/LM Studio) or OpenClaw. Or set "
-                 "ANTHROPIC_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY")
+        env_path = Path(__file__).resolve().parent / "jarvis.env"
+        log.info("Brain    : DEMO MODE — no AI key found. EASIEST FIX: put your key in "
+                 "%s (e.g. a line `NVIDIA_API_KEY=nvapi-...`) and restart me. Keyless "
+                 "options: a local model (JARVIS_LOCAL_MODEL) or OpenClaw.", env_path)
     else:
         log.info("Brain    : %s (%s)", BRAIN_LABELS.get(brain, brain), active_model_label())
     log.info("Available: %s", ", ".join(avail))

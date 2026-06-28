@@ -8,6 +8,10 @@ __pycache__/
 jarvis.log
 jarvis.log.*
 
+# Local API-key files — secrets, never commit. (jarvis.env.example is fine.)
+jarvis.env
+.env
+
 # Prospect data — repo is PUBLIC, so never commit leads/contacts/outreach.
 # (Generated locally by the scripts; the code stays, the data stays private.)
 leads/*.csv

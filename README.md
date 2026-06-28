@@ -4,6 +4,20 @@ A JARVIS-style HUD assistant. Python backend + holographic UI, powered by your
 choice of AI — Claude (API or subscription), OpenAI, Google Gemini, or any
 OpenAI-compatible/local model. Voice in and voice out.
 
+## Quick setup — getting off Demo mode (easiest way)
+
+If the HUD shows **DEMO**, JARVIS just hasn't found an API key yet. The simplest
+fix — no terminal, no environment variables:
+
+1. Find **`jarvis.env.example`** next to the app and **rename it to `jarvis.env`**.
+2. Open it in any text editor and paste your key after the matching `=`, e.g.
+   `NVIDIA_API_KEY=nvapi-xxxxxxxx`.
+3. Save and (re)start JARVIS. The header now shows your provider instead of DEMO.
+
+That single NVIDIA key powers both the **NVIDIA NIM** brain (DeepSeek by default)
+and the **MiniMax M3** brain. Real shell environment variables still work too and
+take precedence. `jarvis.env` is git-ignored, so your key won't be committed.
+
 ## How JARVIS thinks — the "brains"
 
 JARVIS can use several AI providers ("brains"). Configure as many as you like;
@@ -49,8 +63,8 @@ with `{agent, text}`.)
 genuinely different providers at the same time — e.g. **FRIDAY on Claude and EDITH
 on DeepSeek** (set `ANTHROPIC_API_KEY` + `DEEPSEEK_API_KEY`, then pick each from its
 dropdown). Available providers: Anthropic, OpenAI (and compatible), DeepSeek, xAI
-Grok, Mistral, Groq, NVIDIA NIM, Google Gemini, a local model, or your Claude
-subscription.
+Grok, Mistral, Groq, NVIDIA NIM, MiniMax M3, Google Gemini, a local model, or your
+Claude subscription.
 (Backend: `POST /agent/brain`.) Each agent is shown in its own signature colour
 across the roster, chat and brain graph.
 
@@ -169,6 +183,7 @@ so plainly instead of dumping a traceback.
 | `MISTRAL_API_KEY`       | (unset)                  | Enables Mistral (`MISTRAL_MODEL`, default `mistral-large-latest`) |
 | `GROQ_API_KEY`          | (unset)                  | Enables Groq (`GROQ_MODEL`, default `llama-3.3-70b-versatile`) |
 | `NVIDIA_API_KEY`        | (unset)                  | Enables NVIDIA NIM (`NVIDIA_MODEL`, default `deepseek-ai/deepseek-v4-pro`) |
+| `MINIMAX_API_KEY`       | (NVIDIA key)             | MiniMax M3 brain (`MINIMAX_MODEL`, default `minimaxai/minimax-m3`); shares the NVIDIA key by default |
 | `JARVIS_LOCAL_MODEL`    | (unset)                  | Enables the keyless Local brain (name of a pulled model, e.g. `llama3.2`) |
 | `JARVIS_LOCAL_URL`      | `http://localhost:11434/v1` | Local server URL (Ollama default; LM Studio = `:1234/v1`) |
 | `JARVIS_LOCAL_API_KEY`  | (unset)                  | Only if your local server requires a token (usually not) |
