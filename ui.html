@@ -71,6 +71,10 @@
   .bar{height:7px;border-radius:4px;background:rgba(57,199,255,.12);overflow:hidden}
   .bar i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--cyan-dim),var(--cyan));box-shadow:0 0 10px var(--cyan-glow);transition:width .6s}
   .bar.warn i{background:linear-gradient(90deg,#7a5a1f,var(--amber))}
+  /* a different hue per telemetry bar for some colour */
+  #memB i{background:linear-gradient(90deg,#1f6f5a,#52ffb8);box-shadow:0 0 10px rgba(82,255,184,.45)}
+  #batB i{background:linear-gradient(90deg,#7a5a1f,#ffb347);box-shadow:0 0 10px rgba(255,179,71,.45)}
+  #netB i{background:linear-gradient(90deg,#5a3f8f,#c79bff);box-shadow:0 0 10px rgba(180,139,255,.45)}
   .kv{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:6px 0;border-bottom:1px dashed rgba(57,199,255,.12)}
   .kv span:first-child{color:var(--mut)}.kv .ok{color:var(--green)}.kv .warn{color:var(--amber)}.kv .err{color:var(--red)}
   .brainsel{background:rgba(2,12,20,.85);border:1px solid var(--line);border-radius:5px;color:var(--cyan);
@@ -191,7 +195,7 @@
 <div class="boot" id="boot">
   <div class="mini-reactor" style="width:60px;height:60px"></div>
   <h2>J.A.R.V.I.S.</h2>
-  <div style="font-size:10px;letter-spacing:4px;color:var(--cyan-dim)">AGENT TEAM · BUILD v2.2</div>
+  <div style="font-size:10px;letter-spacing:4px;color:var(--cyan-dim)">AGENT TEAM · BUILD v2.3</div>
   <div class="bl"><i></i></div>
   <p id="bootmsg">INITIALISING SYSTEMS…</p>
 </div>
@@ -201,7 +205,7 @@
   <header>
     <div class="brand">
       <div class="mini-reactor"></div>
-      <div><h1>J.A.R.V.I.S.</h1><small>EXECUTIVE ASSISTANT · AGENT TEAM · BUILD v2.2</small></div>
+      <div><h1>J.A.R.V.I.S.</h1><small>EXECUTIVE ASSISTANT · AGENT TEAM · BUILD v2.3</small></div>
     </div>
     <div class="greeting" id="greeting">Standing by, <b>Sir</b>.</div>
     <div class="clock"><div class="t" id="clock">--:--:--</div><div class="d" id="date">—</div></div>
@@ -287,6 +291,10 @@
 (function(){
   const $=id=>document.getElementById(id);
   const API=location.origin;
+  // a signature colour per agent, used across the console, roster and graph
+  const AGENT_COLORS={JARVIS:'#7fd6ff',FRIDAY:'#52ffb8',EDITH:'#b48bff',KAREN:'#ffb347',VERONICA:'#ff6fae',JOCASTA:'#ffd24a'};
+  const agentColor=name=>AGENT_COLORS[(name||'').toUpperCase()]||'#39c7ff';
+  const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';};
 
   /* boot */
   const bm=["INITIALISING SYSTEMS…","LINKING TO CLAUDE…","CALIBRATING REACTOR…","SYSTEMS NOMINAL."];
@@ -396,7 +404,7 @@
     log.scrollTop=log.scrollHeight;return s;}
   function you(t){add('you',t)}
   function sys(t){return add('sys',t)}
-  function sayAs(name,t){add('ag',t,name);speak(t);}      // an agent speaks (attributed + voiced)
+  function sayAs(name,t){const s=add('ag',t,name);if(s)s.style.color=agentColor(name);speak(t);}  // attributed + coloured + voiced
   function say(t){sayAs('JARVIS',t);}                      // JARVIS by default
 
   let thinking=false;
@@ -418,8 +426,10 @@
     list.innerHTML=AGENTS.map(a=>{
       const opts=['<option value="auto">auto</option>'].concat(
         availBrains.map(b=>'<option value="'+b.id+'"'+(a.brain===b.id?' selected':'')+'>'+esc(b.id)+'</option>')).join('');
+      const col=agentColor(a.name);
       return '<div class="agent'+(a.id===target?' sel':'')+'" data-id="'+a.id+'">'+
-        '<div class="av"></div><div class="meta"><div class="an">'+esc(a.name)+'</div>'+
+        '<div class="av" style="background:radial-gradient(circle,#fff 0%,'+col+' 55%,transparent 80%);box-shadow:0 0 8px '+hexA(col,.6)+'"></div>'+
+        '<div class="meta"><div class="an" style="color:'+col+'">'+esc(a.name)+'</div>'+
         '<div class="ar">'+esc(a.role)+'</div></div>'+
         '<select class="agentbrain" data-id="'+a.id+'" title="AI for '+esc(a.name)+'">'+opts+'</select>'+
         '<span class="ast">IDLE</span></div>';}).join('');
@@ -486,11 +496,11 @@
   function drawGraph(){
     if(!gx)return;const w=gc.clientWidth,h=gc.clientHeight,now=performance.now();gx.clearRect(0,0,w,h);
     for(const l of glinks){const a=nodeById(l.a),b=nodeById(l.b);if(!a||!b)continue;
-      const active=gWorking.has(b.id)||target===b.id;
-      gx.strokeStyle=active?'rgba(57,199,255,.85)':'rgba(57,199,255,.16)';gx.lineWidth=active?2:1;
+      const active=gWorking.has(b.id)||target===b.id,col=agentColor(b.name);
+      gx.strokeStyle=active?hexA(col,.85):hexA(col,.18);gx.lineWidth=active?2:1;
       gx.beginPath();gx.moveTo(a.x,a.y);gx.lineTo(b.x,b.y);gx.stroke();
-      // a working agent shows data streaming to/from JARVIS
-      if(gWorking.has(b.id))drawParticles(a,b,now,'rgba(255,179,71,.95)');}
+      // a working agent shows data streaming to/from JARVIS, in its own colour
+      if(gWorking.has(b.id))drawParticles(a,b,now,hexA(col,.95));}
     // transient hand-off pulses between agents (team mode)
     for(let i=gFlows.length-1;i>=0;i--){const fl=gFlows[i],p=(now-fl.start)/fl.ms;
       if(p>=1){gFlows.splice(i,1);continue;}
@@ -499,15 +509,15 @@
       gx.beginPath();gx.moveTo(a.x,a.y);gx.lineTo(b.x,b.y);gx.stroke();
       const x=a.x+(b.x-a.x)*p,y=a.y+(b.y-a.y)*p;
       gx.fillStyle='#dffff1';gx.beginPath();gx.arc(x,y,3.2,0,7);gx.fill();}
-    for(const n of gnodes){const working=gWorking.has(n.id),sel=target===n.id;
+    for(const n of gnodes){const working=gWorking.has(n.id),sel=target===n.id,col=agentColor(n.name);
       const pulse=working?0.5+0.5*Math.abs(Math.sin(Date.now()/250)):0,r=n.r+(working?pulse*3:0);
       const g=gx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*2.4);
-      g.addColorStop(0,working?'rgba(255,179,71,.7)':(sel?'rgba(82,255,184,.6)':'rgba(57,199,255,.5)'));
-      g.addColorStop(1,'rgba(57,199,255,0)');gx.fillStyle=g;gx.beginPath();gx.arc(n.x,n.y,r*2.4,0,7);gx.fill();
-      gx.fillStyle=n.center?'#bff0ff':(working?'#ffd9a0':(sel?'#bfffe5':'#7fd6ff'));
+      g.addColorStop(0,working?'rgba(255,179,71,.75)':hexA(col,.6));
+      g.addColorStop(1,hexA(col,0));gx.fillStyle=g;gx.beginPath();gx.arc(n.x,n.y,r*2.4,0,7);gx.fill();
+      gx.fillStyle=working?'#ffd9a0':col;
       gx.beginPath();gx.arc(n.x,n.y,r,0,7);gx.fill();
-      if(sel){gx.strokeStyle='#52ffb8';gx.lineWidth=1.5;gx.beginPath();gx.arc(n.x,n.y,r+4,0,7);gx.stroke();}
-      gx.fillStyle='#cfeeff';gx.font='9px Consolas, monospace';gx.textAlign='center';
+      if(sel){gx.strokeStyle='#fff';gx.lineWidth=1.6;gx.beginPath();gx.arc(n.x,n.y,r+4,0,7);gx.stroke();}
+      gx.fillStyle=col;gx.font='9px Consolas, monospace';gx.textAlign='center';
       gx.fillText(n.name,n.x,n.y+r+11);}
   }
   if(gc){
@@ -519,7 +529,7 @@
 
   /* ---- team mode ---- */
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-  function addAs(name,t){add('ag',t,name);}      // attributed, not spoken
+  function addAs(name,t){const s=add('ag',t,name);if(s)s.style.color=agentColor(name);}  // attributed + coloured, not spoken
   let teamMode=false;
   $('team').onclick=function(){teamMode=!teamMode;this.classList.toggle('on',teamMode);
     $('consoleTarget').textContent=teamMode?'TEAM MODE — ALL AGENTS':'TALKING TO: '+agentName(target);

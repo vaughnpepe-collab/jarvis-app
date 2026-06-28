@@ -45,8 +45,13 @@ Replies are attributed by name in the console, and each agent shows an
 with `{agent, text}`.)
 
 **A different AI per agent.** Each agent row has its own little dropdown — leave it
-`auto` to follow the main brain, or pin that agent to a specific AI (e.g. FRIDAY on
-Gemini, VERONICA on a local code model). (Backend: `POST /agent/brain`.)
+`auto` to follow the main brain, or pin that agent to a specific AI. They can run on
+genuinely different providers at the same time — e.g. **FRIDAY on Claude and EDITH
+on DeepSeek** (set `ANTHROPIC_API_KEY` + `DEEPSEEK_API_KEY`, then pick each from its
+dropdown). Available providers: Anthropic, OpenAI (and compatible), DeepSeek, xAI
+Grok, Mistral, Groq, Google Gemini, a local model, or your Claude subscription.
+(Backend: `POST /agent/brain`.) Each agent is shown in its own signature colour
+across the roster, chat and brain graph.
 
 **Team mode — they work together.** Click the **🤝 TEAM** button, then type a goal.
 JARVIS plans which specialists to involve, runs them in sequence *passing each one
@@ -158,6 +163,10 @@ so plainly instead of dumping a traceback.
 | `OPENAI_BASE_URL`       | `https://api.openai.com/v1` | Point at any OpenAI-compatible server  |
 | `GEMINI_API_KEY`        | (unset)                  | Enables the Google Gemini brain           |
 | `GEMINI_MODEL`          | `gemini-2.0-flash`       | Model for the Gemini brain                |
+| `DEEPSEEK_API_KEY`      | (unset)                  | Enables DeepSeek (`DEEPSEEK_MODEL`, default `deepseek-chat`) |
+| `XAI_API_KEY`           | (unset)                  | Enables xAI Grok (`XAI_MODEL`, default `grok-2-latest`) |
+| `MISTRAL_API_KEY`       | (unset)                  | Enables Mistral (`MISTRAL_MODEL`, default `mistral-large-latest`) |
+| `GROQ_API_KEY`          | (unset)                  | Enables Groq (`GROQ_MODEL`, default `llama-3.3-70b-versatile`) |
 | `JARVIS_LOCAL_MODEL`    | (unset)                  | Enables the keyless Local brain (name of a pulled model, e.g. `llama3.2`) |
 | `JARVIS_LOCAL_URL`      | `http://localhost:11434/v1` | Local server URL (Ollama default; LM Studio = `:1234/v1`) |
 | `JARVIS_LOCAL_API_KEY`  | (unset)                  | Only if your local server requires a token (usually not) |

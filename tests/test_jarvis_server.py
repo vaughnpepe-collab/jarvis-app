@@ -446,6 +446,27 @@ class TestAgentBrain(unittest.TestCase):
             self.assertFalse(js.set_agent_brain("nobody", "openai"))
 
 
+class TestExtraProviders(unittest.TestCase):
+    def test_each_provider_available_with_its_key(self):
+        keys = {"deepseek": "DEEPSEEK_API_KEY", "grok": "XAI_API_KEY",
+                "mistral": "MISTRAL_API_KEY", "groq": "GROQ_API_KEY"}
+        for brain, env in keys.items():
+            with mock.patch.object(js, env, "k"):
+                self.assertTrue(js._brain_available(brain), brain)
+                self.assertIsNotNone(js._handler_for(brain), brain)
+
+    def test_different_agents_different_providers(self):
+        # FRIDAY on Claude (anthropic), EDITH on DeepSeek — both available at once
+        with mock.patch.object(js, "ANTHROPIC_API_KEY", "a"), \
+                mock.patch.object(js, "DEEPSEEK_API_KEY", "d"):
+            js._agent_brains.clear()
+            self.assertTrue(js.set_agent_brain("friday", "anthropic"))
+            self.assertTrue(js.set_agent_brain("edith", "deepseek"))
+            self.assertEqual(js.agent_brain("friday"), "anthropic")
+            self.assertEqual(js.agent_brain("edith"), "deepseek")
+        js._agent_brains.clear()
+
+
 class TestOrchestrate(unittest.TestCase):
     def test_demo_is_gated(self):
         with mock.patch.object(js, "agent_brain", return_value="demo"):

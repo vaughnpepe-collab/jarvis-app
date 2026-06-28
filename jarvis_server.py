@@ -55,7 +55,8 @@ MAX_TOKENS = int(os.environ.get("JARVIS_MAX_TOKENS", "1024"))
 # Optional explicit default brain (e.g. JARVIS_BRAIN=openai). Empty = auto.
 DEFAULT_BRAIN = os.environ.get("JARVIS_BRAIN", "").strip().lower()
 # When auto-selecting, the first available brain in this order wins.
-BRAIN_ORDER = ["anthropic", "openai", "gemini", "local", "openclaw"]
+BRAIN_ORDER = ["anthropic", "openai", "deepseek", "grok", "mistral", "groq",
+               "gemini", "local", "openclaw"]
 
 # 1) Anthropic API (preferred) — just an API key, no OpenClaw.
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
@@ -74,7 +75,23 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
-# 4) Local model — NO API KEY. Any OpenAI-compatible local server: Ollama
+# 4) More cloud providers, all OpenAI-compatible — each its own key & model, so
+#    different agents can run on genuinely different AIs at the same time
+#    (e.g. FRIDAY on Claude, EDITH on DeepSeek).
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "").strip()
+DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat").strip()
+DEEPSEEK_URL = "https://api.deepseek.com/v1"
+XAI_API_KEY = os.environ.get("XAI_API_KEY", "").strip()
+XAI_MODEL = os.environ.get("XAI_MODEL", "grok-2-latest").strip()
+XAI_URL = "https://api.x.ai/v1"
+MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY", "").strip()
+MISTRAL_MODEL = os.environ.get("MISTRAL_MODEL", "mistral-large-latest").strip()
+MISTRAL_URL = "https://api.mistral.ai/v1"
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
+GROQ_URL = "https://api.groq.com/openai/v1"
+
+# 5) Local model — NO API KEY. Any OpenAI-compatible local server: Ollama
 #    (default) or LM Studio. Opt in by naming the model you've pulled, e.g.
 #    JARVIS_LOCAL_MODEL=llama3.2 . Point JARVIS_LOCAL_URL at LM Studio if needed.
 LOCAL_MODEL = os.environ.get("JARVIS_LOCAL_MODEL", "").strip()
@@ -415,6 +432,10 @@ def _attempt(prompt, timeout=ASK_TIMEOUT):
 BRAIN_LABELS = {
     "anthropic": "Anthropic (Claude API)",
     "openai": "OpenAI / compatible",
+    "deepseek": "DeepSeek",
+    "grok": "xAI Grok",
+    "mistral": "Mistral",
+    "groq": "Groq",
     "gemini": "Google Gemini",
     "local": "Local model (no key)",
     "openclaw": "Claude subscription (OpenClaw)",
@@ -430,6 +451,10 @@ def _brain_available(name):
     return {
         "anthropic": bool(ANTHROPIC_API_KEY),
         "openai": bool(OPENAI_API_KEY),
+        "deepseek": bool(DEEPSEEK_API_KEY),
+        "grok": bool(XAI_API_KEY),
+        "mistral": bool(MISTRAL_API_KEY),
+        "groq": bool(GROQ_API_KEY),
         "gemini": bool(GEMINI_API_KEY),
         "local": bool(LOCAL_MODEL),  # keyless — opt in by naming the local model
         "openclaw": bool(OPENCLAW_AVAILABLE),
@@ -497,6 +522,10 @@ def set_agent_brain(agent_id, brain):
 _BRAIN_MODEL_LABELS = {
     "anthropic": ANTHROPIC_MODEL,
     "openai": OPENAI_MODEL,
+    "deepseek": DEEPSEEK_MODEL,
+    "grok": XAI_MODEL,
+    "mistral": MISTRAL_MODEL,
+    "groq": GROQ_MODEL,
     "gemini": GEMINI_MODEL,
     "local": LOCAL_MODEL or "local",
     "openclaw": MODEL,
@@ -644,6 +673,26 @@ def _ask_local(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
                              "Local model", user_text, timeout, system, history)
 
 
+def _ask_deepseek(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
+    return _chat_completions(DEEPSEEK_URL, DEEPSEEK_MODEL, DEEPSEEK_API_KEY,
+                             "DeepSeek", user_text, timeout, system, history)
+
+
+def _ask_grok(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
+    return _chat_completions(XAI_URL, XAI_MODEL, XAI_API_KEY,
+                             "xAI Grok", user_text, timeout, system, history)
+
+
+def _ask_mistral(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
+    return _chat_completions(MISTRAL_URL, MISTRAL_MODEL, MISTRAL_API_KEY,
+                             "Mistral", user_text, timeout, system, history)
+
+
+def _ask_groq(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
+    return _chat_completions(GROQ_URL, GROQ_MODEL, GROQ_API_KEY,
+                             "Groq", user_text, timeout, system, history)
+
+
 # --- brain: Google Gemini ---------------------------------------------------
 def _ask_gemini(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
     """One turn via the Google Gemini generateContent API. Returns (ok, reply)."""
@@ -728,6 +777,10 @@ def _handler_for(name):
     return {
         "anthropic": _ask_anthropic,
         "openai": _ask_openai,
+        "deepseek": _ask_deepseek,
+        "grok": _ask_grok,
+        "mistral": _ask_mistral,
+        "groq": _ask_groq,
         "gemini": _ask_gemini,
         "local": _ask_local,
         "openclaw": _ask_openclaw,
