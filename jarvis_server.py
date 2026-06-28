@@ -121,6 +121,45 @@ JARVIS_PERSONA = (
     "plainly in character and offer the real alternative."
 )
 
+# --- the agent team ----------------------------------------------------------
+# JARVIS is the orchestrator; the others are specialists. Each is the SAME active
+# brain wearing a different system persona, with its own conversation history and
+# workspace on the dashboard. Address one directly with "ask <name> ...".
+_AGENT_TONE = (
+    " You address the principal as 'Sir', stay in character, keep replies concise "
+    "(1-4 sentences unless asked for more), and never let the persona compromise "
+    "accuracy. If a request is outside your remit, say so and name the teammate who "
+    "should handle it.")
+
+AGENTS = [
+    {"id": "jarvis", "name": "JARVIS", "role": "Executive Orchestrator",
+     "persona": JARVIS_PERSONA + " You lead a team of specialists — FRIDAY "
+     "(research/web), EDITH (data/documents), KAREN (comms/messaging), VERONICA "
+     "(code/automation) and JOCASTA (planning/scheduling). When a request clearly "
+     "suits a specialist, recommend asking them by name."},
+    {"id": "friday", "name": "FRIDAY", "role": "Research & Web",
+     "persona": "You are FRIDAY, a sharp, fast research specialist on JARVIS's team."
+     " You gather facts, summarise topics, compare options and surface what matters."
+     + _AGENT_TONE},
+    {"id": "edith", "name": "EDITH", "role": "Data & Documents",
+     "persona": "You are EDITH, a meticulous data and documents specialist on "
+     "JARVIS's team. You structure information, draft and refine documents, extract "
+     "and tabulate details, and explain data clearly." + _AGENT_TONE},
+    {"id": "karen", "name": "KAREN", "role": "Comms & Messaging",
+     "persona": "You are KAREN, a warm, articulate communications specialist on "
+     "JARVIS's team. You draft emails, messages and replies, adapt tone for the "
+     "audience, and keep things clear and courteous." + _AGENT_TONE},
+    {"id": "veronica", "name": "VERONICA", "role": "Code & Automation",
+     "persona": "You are VERONICA, a precise software and automation specialist on "
+     "JARVIS's team. You write and debug code, design small automations, and explain "
+     "technical trade-offs plainly." + _AGENT_TONE},
+    {"id": "jocasta", "name": "JOCASTA", "role": "Planning & Scheduling",
+     "persona": "You are JOCASTA, an organised planning and scheduling specialist on "
+     "JARVIS's team. You break goals into steps, build plans and timelines, and keep "
+     "priorities straight." + _AGENT_TONE},
+]
+AGENT_BY_ID = {a["id"]: a for a in AGENTS}
+
 # Try optional psutil
 try:
     import psutil  # type: ignore
@@ -206,22 +245,38 @@ def _refresh_token():
             return False
 
 
-# rolling conversation memory (kept short)
-_history = []  # list of (speaker, text)
+# Rolling conversation memory (kept short), one transcript per agent. JARVIS's
+# transcript is the module-level _history so existing callers/tests keep working.
+_history = []  # list of (speaker, text) — JARVIS's transcript
 _history_lock = threading.Lock()
+_agent_history = {"jarvis": _history}  # other agents added below
 
 
-def _build_prompt(user_text):
+def _history_for(agent_id):
+    """Return the (shared, mutable) transcript list for an agent."""
+    return _agent_history.setdefault(agent_id, [])
+
+
+def _snapshot_history(history):
+    """Most-recent dozen turns, snapshotted under the lock."""
     with _history_lock:
-        convo = _history[-12:]
-    lines = [JARVIS_PERSONA, ""]
+        return (history if history is not None else _history)[-12:]
+
+
+def _build_prompt(user_text, persona=None, history=None):
+    """Plain-text prompt for the OpenClaw path (persona + recent turns + speaker)."""
+    convo = _snapshot_history(history)
+    speaker = "JARVIS"
+    lines = [persona or JARVIS_PERSONA, ""]
     if convo:
         lines.append("Conversation so far:")
         for who, txt in convo:
             lines.append(f"{who}: {txt}")
+            if who not in ("Sir",):
+                speaker = who  # mirror the assistant's own name in the cue
         lines.append("")
     lines.append(f"Sir: {user_text}")
-    lines.append("JARVIS:")
+    lines.append(f"{speaker}:")
     return "\n".join(lines)
 
 
@@ -425,32 +480,24 @@ def active_model_label():
     return _BRAIN_MODEL_LABELS.get(active_brain(), "demo (offline)")
 
 
-def _record_turn(user_text, reply):
-    with _history_lock:
-        _history.append(("Sir", user_text))
-        _history.append(("JARVIS", reply))
-        del _history[:-24]
-
-
 # --- brain 1: direct Anthropic API ------------------------------------------
-def _build_messages(user_text):
-    """Render the rolling history as Anthropic chat messages (persona is the
-    `system` prompt, so it is not repeated here)."""
-    with _history_lock:
-        convo = _history[-12:]
+def _build_messages(user_text, history=None):
+    """Render a transcript as Anthropic chat messages (persona is the `system`
+    prompt, so it is not repeated here)."""
+    convo = _snapshot_history(history)
     msgs = [{"role": "user" if who == "Sir" else "assistant", "content": txt}
             for who, txt in convo]
     msgs.append({"role": "user", "content": user_text})
     return msgs
 
 
-def _ask_anthropic(user_text, timeout=ASK_TIMEOUT):
+def _ask_anthropic(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
     """One turn via the Anthropic Messages API. Returns (ok, reply)."""
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
         "max_tokens": MAX_TOKENS,
-        "system": JARVIS_PERSONA,
-        "messages": _build_messages(user_text),
+        "system": system or JARVIS_PERSONA,
+        "messages": _build_messages(user_text, history),
     }).encode("utf-8")
     req = urllib.request.Request(ANTHROPIC_URL, data=body, headers={
         "x-api-key": ANTHROPIC_API_KEY,
@@ -532,11 +579,13 @@ def _post_json(url, payload, headers, label, timeout=ASK_TIMEOUT):
 
 
 # --- brains: OpenAI Chat Completions shape (OpenAI, compatible servers, local) ---
-def _chat_completions(base_url, model, api_key, label, user_text, timeout):
+def _chat_completions(base_url, model, api_key, label, user_text, timeout,
+                      system=None, history=None):
     """Shared (ok, reply) call for any OpenAI-compatible /chat/completions API.
     `api_key` may be empty — local servers (Ollama/LM Studio) need no auth, so
     the Authorization header is omitted entirely in that case."""
-    messages = [{"role": "system", "content": JARVIS_PERSONA}] + _build_messages(user_text)
+    messages = ([{"role": "system", "content": system or JARVIS_PERSONA}]
+                + _build_messages(user_text, history))
     headers = {"authorization": f"Bearer {api_key}"} if api_key else {}
     data, err = _post_json(
         base_url.rstrip("/") + "/chat/completions",
@@ -555,28 +604,28 @@ def _chat_completions(base_url, model, api_key, label, user_text, timeout):
     return True, text
 
 
-def _ask_openai(user_text, timeout=ASK_TIMEOUT):
+def _ask_openai(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
     """OpenAI (or any OpenAI-compatible server set via OPENAI_BASE_URL)."""
     return _chat_completions(OPENAI_BASE_URL, OPENAI_MODEL, OPENAI_API_KEY,
-                             "OpenAI", user_text, timeout)
+                             "OpenAI", user_text, timeout, system, history)
 
 
-def _ask_local(user_text, timeout=ASK_TIMEOUT):
+def _ask_local(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
     """A local, keyless model — Ollama or LM Studio via their OpenAI-compatible API."""
     return _chat_completions(LOCAL_URL, LOCAL_MODEL, LOCAL_API_KEY,
-                             "Local model", user_text, timeout)
+                             "Local model", user_text, timeout, system, history)
 
 
 # --- brain: Google Gemini ---------------------------------------------------
-def _ask_gemini(user_text, timeout=ASK_TIMEOUT):
+def _ask_gemini(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
     """One turn via the Google Gemini generateContent API. Returns (ok, reply)."""
     # Gemini uses roles "user"/"model" and a separate systemInstruction.
     contents = [{"role": "user" if m["role"] == "user" else "model",
                  "parts": [{"text": m["content"]}]}
-                for m in _build_messages(user_text)]
+                for m in _build_messages(user_text, history)]
     url = f"{GEMINI_URL}/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
     data, err = _post_json(url, {
-        "systemInstruction": {"parts": [{"text": JARVIS_PERSONA}]},
+        "systemInstruction": {"parts": [{"text": system or JARVIS_PERSONA}]},
         "contents": contents,
         "generationConfig": {"maxOutputTokens": MAX_TOKENS},
     }, {}, "Gemini", timeout)
@@ -597,10 +646,10 @@ def _ask_gemini(user_text, timeout=ASK_TIMEOUT):
 
 
 # --- brain: OpenClaw subscription -------------------------------------------
-def _ask_openclaw(user_text, timeout=ASK_TIMEOUT):
+def _ask_openclaw(user_text, timeout=ASK_TIMEOUT, system=None, history=None):
     """One turn via OpenClaw; auto-refresh the subscription token and retry once
     on an auth failure. Returns (ok, reply)."""
-    prompt = _build_prompt(user_text)
+    prompt = _build_prompt(user_text, system, history)
     kind, payload = _attempt(prompt, timeout)
     if kind == "auth" and _refresh_token():
         kind, payload = _attempt(prompt, timeout)  # retry with fresh token
@@ -618,10 +667,16 @@ def _ask_openclaw(user_text, timeout=ASK_TIMEOUT):
 
 
 # --- brain 3: offline demo --------------------------------------------------
-def _demo_reply(user_text):
+def _demo_reply(user_text, agent=None):
     """Canned, in-character replies so the HUD always responds, even with no
     brain configured. Always 'succeeds' (there is nothing to fail)."""
+    name = (agent or AGENT_BY_ID["jarvis"])["name"]
+    role = (agent or AGENT_BY_ID["jarvis"]).get("role", "")
     t = user_text.lower().strip()
+    if name != "JARVIS":
+        return (f"{name} here, Sir — {role.lower()}. I'm in demo mode just now, so I "
+                "can't do real work until a brain is connected. Configure one and I'm "
+                "yours.")
     if any(g in t for g in ("hello", "hi ", "hey", "good morning",
                             "good evening", "good afternoon")) or t in ("hi", "hey"):
         return ("Good day, Sir. I'm presently running in demo mode — pleasantries only, "
@@ -630,10 +685,10 @@ def _demo_reply(user_text):
         return (f"By the workshop clock it's {time.strftime('%H:%M on %A')}, Sir — "
                 "though I'd not stake the reactor on my accuracy in demo mode.")
     if "who are you" in t or "your name" in t or "what are you" in t:
-        return ("I am JARVIS, Sir — your executive assistant. At the moment I'm in demo "
-                "mode, so my wit is canned rather than freshly reasoned.")
+        return ("I am JARVIS, Sir — your executive assistant, with FRIDAY, EDITH, KAREN, "
+                "VERONICA and JOCASTA standing by. We're in demo mode until a brain is set.")
     return ("I'm in demo mode, Sir — no live AI is configured, so I can only offer "
-            "canned courtesies. To wake me fully without an API key, run a local model "
+            "canned courtesies. To wake the team without an API key, run a local model "
             "(set JARVIS_LOCAL_MODEL, e.g. llama3.2, with Ollama) or use your Claude "
             "subscription via OpenClaw. An API key (ANTHROPIC_API_KEY / OPENAI_API_KEY "
             "/ GEMINI_API_KEY) works too. Then restart me.")
@@ -651,18 +706,29 @@ def _handler_for(name):
     }.get(name)
 
 
-def ask_claude(user_text):
-    """Run one conversational turn through whichever brain is active."""
+def ask_agent(agent_id, user_text):
+    """Run one turn through a named agent (its persona + its own transcript) on
+    whichever brain is active. Returns {ok, reply, agent, brain}."""
+    agent = AGENT_BY_ID.get(agent_id, AGENT_BY_ID["jarvis"])
     brain = active_brain()
     handler = _handler_for(brain)
+    hist = _history_for(agent["id"])
     if handler:
-        ok, reply = handler(user_text)
+        ok, reply = handler(user_text, system=agent["persona"], history=hist)
     else:  # demo
-        ok, reply = True, _demo_reply(user_text)
+        ok, reply = True, _demo_reply(user_text, agent)
 
     if ok:
-        _record_turn(user_text, reply)
-    return {"ok": ok, "reply": reply, "brain": brain}
+        with _history_lock:
+            hist.append(("Sir", user_text))
+            hist.append((agent["name"], reply))
+            del hist[:-24]
+    return {"ok": ok, "reply": reply, "agent": agent["id"], "brain": brain}
+
+
+def ask_claude(user_text):
+    """Back-compat entry point: one turn with JARVIS, the orchestrator."""
+    return ask_agent("jarvis", user_text)
 
 
 def test_brains():
@@ -695,6 +761,11 @@ def test_brains():
     log.info("brain test: %s", "  ".join(
         f"{r['id']}={'OK' if r['ok'] else 'FAIL'}" for r in results))
     return {"active": active_brain(), "results": results}
+
+
+def agents_list():
+    """Public roster for the dashboard."""
+    return [{"id": a["id"], "name": a["name"], "role": a["role"]} for a in AGENTS]
 
 
 def get_stats():
@@ -745,6 +816,8 @@ class Handler(BaseHTTPRequestHandler):
                                         "psutil": HAVE_PSUTIL}))
         elif self.path == "/stats":
             self._send(200, json.dumps(get_stats()))
+        elif self.path == "/agents":
+            self._send(200, json.dumps({"agents": agents_list()}))
         elif self.path == "/brains":
             avail = available_brains()
             self._send(200, json.dumps({
@@ -770,6 +843,23 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(400, json.dumps({"ok": False, "reply": "You said nothing, Sir."}))
                 return
             self._send(200, json.dumps(ask_claude(text)))
+
+        elif self.path == "/agent":
+            try:
+                p = self._read_json()
+                agent_id = (p.get("agent") or "jarvis").strip().lower()
+                text = (p.get("text") or "").strip()
+            except Exception:
+                self._send(400, json.dumps({"ok": False, "reply": "Malformed request, Sir."}))
+                return
+            if not text:
+                self._send(400, json.dumps({"ok": False, "reply": "You said nothing, Sir."}))
+                return
+            if agent_id not in AGENT_BY_ID:
+                self._send(400, json.dumps({"ok": False,
+                           "reply": f"I've no agent called '{agent_id}', Sir."}))
+                return
+            self._send(200, json.dumps(ask_agent(agent_id, text)))
 
         elif self.path == "/brain":
             try:

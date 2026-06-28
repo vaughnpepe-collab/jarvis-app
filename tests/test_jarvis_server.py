@@ -379,6 +379,46 @@ class TestTestBrains(unittest.TestCase):
         self.assertTrue(out["results"][0]["ok"])
 
 
+class TestAgents(unittest.TestCase):
+    def setUp(self):
+        for h in js._agent_history.values():
+            h.clear()
+
+    def tearDown(self):
+        for h in js._agent_history.values():
+            h.clear()
+
+    def test_roster_has_jarvis_first_and_specialists(self):
+        ids = [a["id"] for a in js.agents_list()]
+        self.assertEqual(ids[0], "jarvis")
+        self.assertEqual(len(ids), 6)
+        for sid in ("friday", "edith", "karen", "veronica", "jocasta"):
+            self.assertIn(sid, ids)
+
+    def test_ask_agent_uses_persona_and_own_transcript(self):
+        with mock.patch.object(js, "active_brain", return_value="openclaw"), \
+                mock.patch.object(js, "_ask_openclaw",
+                                  return_value=(True, "On it, Sir.")) as h:
+            out = js.ask_agent("friday", "look this up")
+        self.assertTrue(out["ok"])
+        self.assertEqual(out["agent"], "friday")
+        self.assertIn("FRIDAY", h.call_args.kwargs["system"])      # its own persona
+        self.assertEqual(js._agent_history["friday"][-2], ("Sir", "look this up"))
+        self.assertEqual(js._agent_history["friday"][-1], ("FRIDAY", "On it, Sir."))
+        self.assertEqual(js._agent_history["jarvis"], [])           # kept separate
+
+    def test_unknown_agent_falls_back_to_jarvis(self):
+        with mock.patch.object(js, "active_brain", return_value="demo"):
+            out = js.ask_agent("nobody", "hi")
+        self.assertEqual(out["agent"], "jarvis")
+
+    def test_demo_reply_names_the_specialist(self):
+        with mock.patch.object(js, "active_brain", return_value="demo"):
+            out = js.ask_agent("veronica", "write code")
+        self.assertTrue(out["ok"])
+        self.assertIn("VERONICA", out["reply"])
+
+
 class TestAskOpenclaw(unittest.TestCase):
     def test_ok(self):
         with mock.patch.object(js, "_attempt", return_value=("ok", "Certainly, Sir.")):

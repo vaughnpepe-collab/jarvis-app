@@ -118,6 +118,22 @@
   .proj-item .pst.active{background:rgba(82,255,184,.12);color:var(--green);border:1px solid var(--green)}
   .proj-item .pst.paused{background:rgba(255,179,71,.12);color:var(--amber);border:1px solid var(--amber)}
   .proj-item .pst.done{background:rgba(57,199,255,.1);color:var(--cyan-dim);border:1px solid var(--cyan-dim)}
+  /* agent team roster */
+  .agent{display:flex;align-items:center;gap:9px;padding:8px;margin-bottom:6px;border:1px solid var(--line);
+    border-radius:8px;cursor:pointer;transition:border-color .2s,background .2s,transform .08s}
+  .agent:hover{border-color:var(--cyan);background:rgba(57,199,255,.06)}
+  .agent:active{transform:translateY(1px)}
+  .agent.sel{border-color:var(--cyan);background:rgba(57,199,255,.12);box-shadow:inset 0 0 14px rgba(57,199,255,.1)}
+  .agent .av{width:26px;height:26px;border-radius:50%;flex-shrink:0;
+    background:radial-gradient(circle,#bff0ff 0%,var(--cyan) 45%,#0a4a6b 80%,transparent 82%);box-shadow:0 0 8px var(--cyan-glow)}
+  .agent .meta{flex:1;min-width:0}
+  .agent .an{color:#eaf7ff;font-size:12px;letter-spacing:1px}
+  .agent .ar{color:var(--mut);font-size:9.5px;letter-spacing:.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .agent .ast{font-size:8.5px;letter-spacing:1px;border-radius:3px;padding:1px 5px;flex-shrink:0;
+    border:1px solid var(--cyan-dim);color:var(--cyan-dim)}
+  .agent .ast.working{border-color:var(--amber);color:var(--amber);animation:pulse 1s infinite}
+  .log .ag::before{content:"◆ "attr(data-name)"  ";color:var(--cyan-dim);font-size:10px}
+  .log .ag{color:var(--cyan)}
   ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--cyan-dim);border-radius:3px}
   .boot{position:fixed;inset:0;z-index:100;background:#01060c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .8s}
   .boot h2{letter-spacing:12px;color:var(--cyan);font-size:18px}
@@ -166,7 +182,7 @@
   <header>
     <div class="brand">
       <div class="mini-reactor"></div>
-      <div><h1>J.A.R.V.I.S.</h1><small>EXECUTIVE ASSISTANT · CLAUDE-POWERED</small></div>
+      <div><h1>J.A.R.V.I.S.</h1><small>EXECUTIVE ASSISTANT · CLAUDE-POWERED · AGENT TEAM</small></div>
     </div>
     <div class="greeting" id="greeting">Standing by, <b>Sir</b>.</div>
     <div class="clock"><div class="t" id="clock">--:--:--</div><div class="d" id="date">—</div></div>
@@ -222,17 +238,17 @@
   </aside>
 
   <aside class="projects panel">
-    <div class="ttl">Projects <span class="dot"></span></div>
+    <div class="ttl">Agent Team <span class="dot"></span></div>
     <div class="body" style="overflow:auto;max-height:calc(100% - 40px)">
-      <div id="proj-list"></div>
+      <div id="agent-list"></div>
       <div style="margin-top:10px;font-size:9.5px;color:var(--mut);letter-spacing:1px;line-height:1.7">
-        Say <span style="color:var(--cyan-dim)">"add project X"</span> · <span style="color:var(--cyan-dim)">"done project X"</span> · <span style="color:var(--cyan-dim)">"remove project X"</span>
+        Click an agent to talk to them, or say <span style="color:var(--cyan-dim)">"ask FRIDAY …"</span> to route one question.
       </div>
     </div>
   </aside>
 
   <section class="console panel">
-    <div class="ttl">Command Console <span style="color:var(--mut)">ASK CLAUDE ANYTHING — TYPE OR SPEAK</span></div>
+    <div class="ttl">Command Console <span id="consoleTarget" style="color:var(--mut)">TALKING TO: JARVIS</span></div>
     <div class="log" id="chatlog"></div>
     <div class="inbar">
       <button id="mic" class="iconbtn" title="Click to listen — say 'Jarvis' then your request">🎙</button>
@@ -346,26 +362,52 @@
 
   /* console */
   const log=$('chatlog');
-  function add(cls,txt){const r=document.createElement('div');r.className='row';const s=document.createElement('span');s.className=cls;s.textContent=txt;r.appendChild(s);log.appendChild(r);log.scrollTop=log.scrollHeight;return s;}
-  function you(t){add('you',t)}function say(t){add('jv',t);speak(t);}
-  function sys(t){add('sys',t)}
+  function add(cls,txt,name){const r=document.createElement('div');r.className='row';
+    const s=document.createElement('span');s.className=cls;if(name)s.dataset.name=name;
+    s.textContent=txt;r.appendChild(s);log.appendChild(r);log.scrollTop=log.scrollHeight;return s;}
+  function you(t){add('you',t)}
+  function sys(t){return add('sys',t)}
+  function sayAs(name,t){add('ag',t,name);speak(t);}      // an agent speaks (attributed + voiced)
+  function say(t){sayAs('JARVIS',t);}                      // JARVIS by default
 
   let thinking=false;
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function thinkOn(t){thinking=true;$('core').classList.add('think');$('cstat').textContent=t||'PROCESSING…';}
   function thinkOff(){thinking=false;$('core').classList.remove('think');$('cstat').textContent='ALL SYSTEMS NOMINAL';}
 
-  async function askJarvis(text){
-    logFeed('Query → Claude: '+text.slice(0,26),'');
-    thinkOn('PROCESSING…');
-    const ph=add('sys','JARVIS is thinking…');
+  /* ---- agent team ---- */
+  let AGENTS=[],target='jarvis';
+  const agentName=id=>{const a=AGENTS.find(x=>x.id===id);return a?a.name:id.toUpperCase();};
+  function setStatus(id,working){const el=document.querySelector('.agent[data-id="'+id+'"] .ast');
+    if(el){el.textContent=working?'WORKING':'IDLE';el.classList.toggle('working',working);}}
+  function renderAgents(){
+    const list=$('agent-list');
+    list.innerHTML=AGENTS.map(a=>'<div class="agent'+(a.id===target?' sel':'')+'" data-id="'+a.id+'">'+
+      '<div class="av"></div><div class="meta"><div class="an">'+esc(a.name)+'</div>'+
+      '<div class="ar">'+esc(a.role)+'</div></div><span class="ast">IDLE</span></div>').join('');
+    [...list.querySelectorAll('.agent')].forEach(el=>el.onclick=()=>selectAgent(el.dataset.id));
+  }
+  function selectAgent(id){target=id;
+    [...document.querySelectorAll('.agent')].forEach(el=>el.classList.toggle('sel',el.dataset.id===id));
+    $('consoleTarget').textContent='TALKING TO: '+agentName(id);
+    logFeed('Now talking to '+agentName(id),'');}
+  async function loadAgents(){
+    try{const d=await(await fetch(API+'/agents')).json();AGENTS=d.agents||[];renderAgents();}catch(e){}
+  }
+  loadAgents();
+
+  async function askAgent(id,text){
+    const nm=agentName(id);
+    logFeed('Query → '+nm+': '+text.slice(0,20),'');
+    thinkOn(nm+' PROCESSING…');setStatus(id,true);
+    const ph=sys(nm+' is thinking…');
     try{
-      const r=await fetch(API+'/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+      const r=await fetch(API+'/agent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent:id,text})});
       const data=await r.json();ph.remove();
-      say(data.reply||'I have nothing to say, Sir.');
-      logFeed(data.ok?'Response delivered':'Response error',data.ok?'':'w');
-    }catch(e){ph.remove();say('I can\'t reach my own backend, Sir. Is the server running?');logFeed('Backend unreachable','w');}
-    thinkOff();
+      sayAs(agentName(data.agent||id),data.reply||'I have nothing to say, Sir.');
+      logFeed(data.ok?(nm+' responded'):(nm+' error'),data.ok?'':'w');
+    }catch(e){ph.remove();sayAs(nm,'I can\'t reach my own backend, Sir. Is the server running?');logFeed('Backend unreachable','w');}
+    thinkOff();setStatus(id,false);
   }
 
   function renderProspects(d){
@@ -400,34 +442,23 @@
       logFeed('Audit complete: '+d.audited+' sites','');
       const top=d.results.slice(0,5).map((b,i)=>`${i+1}. ${b.name} [score ${b.audit.score}] flaws: ${(b.audit.flaws||[]).join('; ')||'none'}`).join('\n');
       thinkOff();
-      await askJarvis(`I just audited ${d.audited} ${niche} websites in ${location} (worst-first by flaw score):\n${top}\n\nIn 2-3 sentences, point me to the single best prospect to approach and the specific flaw to lead with in outreach. Stay in character.`);
+      await askAgent('jarvis',`I just audited ${d.audited} ${niche} websites in ${location} (worst-first by flaw score):\n${top}\n\nIn 2-3 sentences, point me to the single best prospect to approach and the specific flaw to lead with in outreach. Stay in character.`);
     }catch(e){ph.remove();say('The prospecting run failed, Sir — '+e.message);thinkOff();}
   }
 
-  /* ---- projects ---- */
-  const PROJ_KEY='jarvis_projects';
-  function loadProjects(){try{return JSON.parse(localStorage.getItem(PROJ_KEY)||'[]');}catch(e){return[];}}
-  function saveProjects(p){localStorage.setItem(PROJ_KEY,JSON.stringify(p));}
-  function renderProjects(){
-    const list=$('proj-list');const ps=loadProjects();
-    if(!ps.length){list.innerHTML='<div style="color:var(--mut);font-size:10.5px;padding:4px 0">No projects logged, Sir.</div>';return;}
-    list.innerHTML=ps.map(p=>`<div class="proj-item"><span class="pnm">${esc(p.name)}</span><span class="pst ${p.status}">${p.status}</span></div>`).join('');
-  }
-  renderProjects();
-
   function respond(text){
-    const addM=text.match(/^(?:add|new|create|log)\s+project\s+(.+)/i);
-    if(addM){const name=addM[1].trim();const ps=loadProjects();ps.unshift({name,status:'active',added:Date.now()});saveProjects(ps);renderProjects();say(`Project "${name}" has been added to your roster, Sir.`);logFeed('Project added: '+name,'');return;}
-    const rmM=text.match(/^(?:remove|delete|drop)\s+project\s+(.+)/i);
-    if(rmM){const name=rmM[1].trim();saveProjects(loadProjects().filter(p=>p.name.toLowerCase()!==name.toLowerCase()));renderProjects();say(`Project "${name}" removed from the roster, Sir.`);logFeed('Project removed: '+name,'');return;}
-    const doneM=text.match(/^(?:complete|finish|done|close)\s+project\s+(.+)/i);
-    if(doneM){const name=doneM[1].trim();const ps=loadProjects();const p=ps.find(p=>p.name.toLowerCase()===name.toLowerCase());if(p){p.status='done';saveProjects(ps);renderProjects();say(`Marked "${name}" as complete. Well done, Sir.`);}else{say(`I couldn't find a project called "${name}", Sir.`);}return;}
-    const pauseM=text.match(/^(?:pause|hold)\s+project\s+(.+)/i);
-    if(pauseM){const name=pauseM[1].trim();const ps=loadProjects();const p=ps.find(p=>p.name.toLowerCase()===name.toLowerCase());if(p){p.status='paused';saveProjects(ps);renderProjects();say(`Project "${name}" placed on hold, Sir.`);}return;}
-    if(/^(?:list|show)\s+projects?/i.test(text)){const ps=loadProjects();if(!ps.length){say('No projects in the roster, Sir.');}else{say(`You have ${ps.length} project${ps.length>1?'s':''}: `+ps.map(p=>p.name).join(', ')+'.');}return;}
-    const m=text.match(/\b(?:find|prospect|source|audit|scan)\b\s+(.+?)\s+\bin\b\s+(.+)/i);
-    if(m){return runProspect(m[1].trim().replace(/s$/i,''),m[2].trim());}
-    return askJarvis(text);
+    // "ask FRIDAY …" routes one question to a named agent without switching target
+    const m=text.match(/^\s*(?:ask|tell|get)\s+([a-z]+)[,:]?\s+(.+)/i);
+    if(m){
+      const who=m[1].toLowerCase();
+      const a=AGENTS.find(x=>x.id===who||x.name.toLowerCase()===who);
+      if(a)return askAgent(a.id,m[2].trim());
+    }
+    // business prospecting tool (handled by JARVIS)
+    const p=text.match(/\b(?:find|prospect|source|audit|scan)\b\s+(.+?)\s+\bin\b\s+(.+)/i);
+    if(p)return runProspect(p[1].trim().replace(/s$/i,''),p[2].trim());
+    // otherwise: talk to whichever agent is currently selected
+    return askAgent(target,text);
   }
   function submit(){const v=$('cmd').value.trim();if(!v)return;you(v);$('cmd').value='';respond(v);}
   $('send').onclick=submit;

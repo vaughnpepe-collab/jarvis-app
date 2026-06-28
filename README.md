@@ -19,6 +19,32 @@ it auto-selects the best available one, and you can **switch live** from the HUD
 | **Claude subscription (OpenClaw)** | install OpenClaw | **No API key.** Uses your Claude.ai subscription OAuth token. Auto-refreshes. |
 | **Demo (offline)** | nothing | Always available — responds in character and tells you how to enable a real brain, so the interface is never dead. |
 
+## The agent team
+
+JARVIS leads a team of specialists, shown in the **Agent Team** panel:
+
+| Agent | Speciality |
+|-------|------------|
+| **JARVIS** | Executive Orchestrator (default) |
+| **FRIDAY** | Research & web |
+| **EDITH** | Data & documents |
+| **KAREN** | Comms & messaging |
+| **VERONICA** | Code & automation |
+| **JOCASTA** | Planning & scheduling |
+
+Each agent is the active brain wearing a different persona, with its **own
+conversation memory** and its own workspace in the console. To use them:
+
+- **Click an agent** in the Agent Team panel → the console header shows
+  "TALKING TO: …" and everything you type goes to that agent.
+- Or, without switching, say/type **"ask FRIDAY …"** (or EDITH/KAREN/…) to route
+  a single question to that specialist.
+
+Replies are attributed by name in the console, and each agent shows an
+**IDLE / WORKING** status while it thinks. (Backend: `GET /agents`, `POST /agent`
+with `{agent, text}`.) The agents share whichever brain is active, so once a brain
+is connected they all work.
+
 ### No API key? Run a model locally (free)
 
 Install [Ollama](https://ollama.com), pull a model, then point JARVIS at it — no
