@@ -9,11 +9,19 @@
 //+------------------------------------------------------------------+
 #property copyright "Jarvis Trading Course"
 #property link      "https://github.com/vaughnpepe-collab/jarvis-app"
-#property version   "1.00"
-#property description "Macro bias + liquidity sweep + structure shift, with asymmetric risk."
+#property version   "2.00"
+#property description "Macro bias + liquidity sweep + structure shift, with"
+#property description "selectable entry models, scale-outs/pyramiding and safety controls."
 #property strict
 
 #include <Trade/Trade.mqh>
+
+//============================ ENUMS ===============================//
+enum ENUM_ENTRY_MODE
+{
+   ENTRY_BOS_MARKET,   // Market on the break of structure (default)
+   ENTRY_FVG_LIMIT     // Limit order into the fair-value-gap retrace (tighter risk)
+};
 
 //============================ INPUTS ===============================//
 
@@ -28,19 +36,42 @@ input int             InpSwingLookback = 25;          // Bars scanned for swing 
 input int             InpFractalWing   = 2;           // Bars each side that define a swing point
 input int             InpSweepWindow   = 3;           // Recent bars in which a liquidity sweep must have occurred
 
+input group "=== Entry model (which variant to trade) ==="
+input ENUM_ENTRY_MODE InpEntryMode     = ENTRY_BOS_MARKET; // BOS market, or FVG-retrace limit
+input int             InpFVGExpiryBars = 8;           // Cancel an unfilled FVG limit after N bars
+
 input group "=== Risk (Lipschutz / Krieger: survive first, size with conviction) ==="
 input double          InpRiskPercent   = 0.5;         // Base risk per trade (% of equity)
 input double          InpConvictionMult= 2.0;         // Risk multiplier when ALL filters align ("go for the jugular")
 input double          InpMinRR         = 3.0;         // Minimum reward-to-risk to take a trade
 input double          InpSLBufferATR   = 0.5;         // Extra stop buffer beyond the sweep, in ATR
 input int             InpATRPeriod     = 14;          // ATR period for buffers / volatility
-input double          InpMaxRiskPct    = 2.0;         // Hard cap on risk per trade (% of equity)
+input double          InpMaxRiskPct    = 2.0;         // Hard cap on risk per SINGLE trade (% of equity)
 
 input group "=== Trade management ==="
 input bool            InpMoveToBE      = true;        // Move stop to break-even at +1R
 input bool            InpTrailAfter1R  = true;        // Trail the stop after +1R (lock the trend in)
 input double          InpTrailATR      = 1.5;         // Trailing distance in ATR
-input int             InpMaxPositions  = 1;           // Max concurrent positions from this EA
+input bool            InpUsePartials   = true;        // Scale out part of the position at a profit target
+input double          InpPartialR      = 2.0;         // Take partial profit at this R-multiple
+input double          InpPartialPct    = 50.0;        // % of the position to close at the partial target
+
+input group "=== Pyramiding (add to winners, never to losers) ==="
+input bool            InpAllowPyramid  = false;       // Allow adding on fresh same-direction setups
+input int             InpMaxPyramids   = 2;           // Max ADD-ons on top of the first position
+input double          InpPyramidRiskMult = 0.5;       // Risk multiplier applied to each add-on
+input int             InpMaxPositions  = 1;           // Max positions when pyramiding is OFF
+
+input group "=== Safety: news filter (avoid high-impact releases) ==="
+input bool            InpUseNewsFilter = true;        // Block new trades around high-impact news
+input bool            InpNewsHighOnly  = true;        // true=High only, false=High+Moderate
+input int             InpNewsMinsBefore= 30;          // Minutes BEFORE an event to stop trading
+input int             InpNewsMinsAfter = 30;          // Minutes AFTER an event to resume trading
+
+input group "=== Safety: account guards ==="
+input double          InpDailyLossLimitPct  = 3.0;    // Stop trading for the day at this % equity loss (0=off)
+input bool            InpCloseAllOnDailyLimit = false;// Also flatten everything when the daily limit hits
+input double          InpMaxPortfolioRiskPct  = 3.0;  // Cap on TOTAL open risk across positions (0=off)
 
 input group "=== Sessions & filters (trade when liquidity is real) ==="
 input bool            InpUseSessions   = true;        // Only trade inside the windows below (server time)
@@ -63,6 +94,14 @@ int      hBiasEMA = INVALID_HANDLE;   // EMA on the bias timeframe
 int      hATR     = INVALID_HANDLE;   // ATR on the entry timeframe
 datetime lastBarTime = 0;             // for new-bar detection
 
+datetime g_currentDay     = 0;        // anchor for the daily loss limit
+double   g_dayStartEquity = 0;
+
+// Per-ticket bookkeeping so break-even/trailing/partials survive an SL move.
+ulong    g_riskTickets[];             // tickets we've recorded the original risk for
+double   g_riskValues[];              // original |open-SL| per ticket
+ulong    g_partialed[];               // tickets that have already been scaled out
+
 //+------------------------------------------------------------------+
 //| Initialisation                                                   |
 //+------------------------------------------------------------------+
@@ -84,9 +123,13 @@ int OnInit()
    if(InpRiskPercent <= 0 || InpRiskPercent > InpMaxRiskPct)
       Print("WARNING: base risk % is outside a sane range; it will be clamped to ", InpMaxRiskPct, "%.");
 
-   Print("JarvisMacroEA ready on ", _Symbol,
+   if(InpUseNewsFilter && MQLInfoInteger(MQL_TESTER))
+      Print("NOTE: the economic-calendar news filter is inactive in the Strategy Tester.");
+
+   Print("JarvisMacroEA v2 ready on ", _Symbol,
          " | bias=", EnumToString(InpBiasTF),
-         " entry=", EnumToString(InpEntryTF));
+         " entry=", EnumToString(InpEntryTF),
+         " mode=", EnumToString(InpEntryMode));
    return(INIT_SUCCEEDED);
 }
 
@@ -104,8 +147,16 @@ void OnDeinit(const int reason)
 //+------------------------------------------------------------------+
 void OnTick()
 {
-   // Manage what is already open on every tick (break-even / trailing).
-   ManageOpenPositions();
+   SyncBookkeeping();                 // drop records for positions that have closed
+   ManageOpenPositions();             // break-even / trailing / partials, every tick
+   CleanupStalePendings();            // expire unfilled FVG limit orders
+
+   UpdateDayAnchor();
+   if(InpCloseAllOnDailyLimit && DailyLimitHit())
+   {
+      CloseAllOwn();                  // flatten and stand down for the day
+      return;
+   }
 
    // The decision logic runs once per completed entry-TF bar.
    datetime t = iTime(_Symbol, InpEntryTF, 0);
@@ -113,9 +164,8 @@ void OnTick()
    lastBarTime = t;
 
    if(!IsTradingAllowed()) return;
-   if(CountOwnPositions() >= InpMaxPositions) return;
 
-   int bias = MacroBias();           // +1 long, -1 short, 0 stand aside
+   int bias = MacroBias();            // +1 long, -1 short, 0 stand aside
    if(bias == 0) return;
 
    if(bias > 0 && InpAllowLongs)  TryLong();
@@ -191,9 +241,15 @@ bool FindRecentSwingHigh(double &price, int &barIndex)
 //      above the prior swing high (break of structure / CHoCH),
 //   4) stop goes below the sweep, target at the next liquidity pool
 //      (swing high) and must clear InpMinRR.
+//
+//  Entry price depends on InpEntryMode: a market order on the BOS, or
+//  a limit order into the fair-value gap the impulse left behind.
 //+------------------------------------------------------------------+
 void TryLong()
 {
+   if(!CanOpenNew(1)) return;
+   if(InpEntryMode == ENTRY_FVG_LIMIT && HasPendingDir(1)) return;
+
    double swingLow; int lowIdx;
    if(!FindRecentSwingLow(swingLow, lowIdx)) return;
 
@@ -211,27 +267,54 @@ void TryLong()
    // (3) Structure shift up: last closed bar closes above prior swing high.
    double swingHigh; int highIdx;
    if(!FindRecentSwingHigh(swingHigh, highIdx)) return;
-   double lastClose = iClose(_Symbol, InpEntryTF, 1);
-   if(lastClose <= swingHigh) return;   // no break of structure yet
+   if(iClose(_Symbol, InpEntryTF, 1) <= swingHigh) return;   // no break of structure yet
 
    double atr = CurrentATR();
    if(atr <= 0) return;
 
-   double entry = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
-   double sl    = sweepLow - InpSLBufferATR * atr;
-   // (4) Target the next pool of buy-side liquidity above; ensure it clears min RR.
-   double tp    = NextLiquidityAbove(swingHigh);
-   double risk  = entry - sl;
-   if(risk <= 0) return;
-   if((tp - entry) / risk < InpMinRR)
-      tp = entry + InpMinRR * risk;     // fall back to a fixed R-multiple target
+   ENUM_ENTRY_MODE mode = InpEntryMode;
+   double entry, sl;
 
-   double convoy = ConvictionMultiplier(true);
-   OpenTrade(ORDER_TYPE_BUY, entry, sl, tp, convoy);
+   if(mode == ENTRY_FVG_LIMIT)
+   {
+      // Bullish FVG over the last three closed bars (3,2,1): gap if low[1] > high[3].
+      double gapLow  = iHigh(_Symbol, InpEntryTF, 3);
+      double gapHigh = iLow(_Symbol, InpEntryTF, 1);
+      if(gapHigh > gapLow)
+      {
+         entry = (gapLow + gapHigh) / 2.0;                 // limit into the gap
+         sl    = MathMin(gapLow, sweepLow) - InpSLBufferATR * atr;
+      }
+      else
+      {
+         mode  = ENTRY_BOS_MARKET;                         // no clean FVG → take the BOS
+         entry = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+         sl    = sweepLow - InpSLBufferATR * atr;
+      }
+   }
+   else
+   {
+      entry = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+      sl    = sweepLow - InpSLBufferATR * atr;
+   }
+
+   double risk = entry - sl;
+   if(risk <= 0) return;
+
+   double tp = NextLiquidityAbove(swingHigh);              // target the next pool of liquidity
+   if((tp - entry) / risk < InpMinRR)
+      tp = entry + InpMinRR * risk;                        // else a fixed R-multiple
+
+   bool   isAdd = (CountDir(1) > 0);
+   double rmult = ConvictionMultiplier(true) * (isAdd ? InpPyramidRiskMult : 1.0);
+   Execute(1, mode, entry, sl, tp, rmult);
 }
 
 void TryShort()
 {
+   if(!CanOpenNew(-1)) return;
+   if(InpEntryMode == ENTRY_FVG_LIMIT && HasPendingDir(-1)) return;
+
    double swingHigh; int highIdx;
    if(!FindRecentSwingHigh(swingHigh, highIdx)) return;
 
@@ -247,22 +330,47 @@ void TryShort()
 
    double swingLow; int lowIdx;
    if(!FindRecentSwingLow(swingLow, lowIdx)) return;
-   double lastClose = iClose(_Symbol, InpEntryTF, 1);
-   if(lastClose >= swingLow) return;
+   if(iClose(_Symbol, InpEntryTF, 1) >= swingLow) return;
 
    double atr = CurrentATR();
    if(atr <= 0) return;
 
-   double entry = SymbolInfoDouble(_Symbol, SYMBOL_BID);
-   double sl    = sweepHigh + InpSLBufferATR * atr;
-   double tp    = NextLiquidityBelow(swingLow);
-   double risk  = sl - entry;
+   ENUM_ENTRY_MODE mode = InpEntryMode;
+   double entry, sl;
+
+   if(mode == ENTRY_FVG_LIMIT)
+   {
+      // Bearish FVG over bars (3,2,1): gap if high[1] < low[3].
+      double gapHigh = iLow(_Symbol, InpEntryTF, 3);
+      double gapLow  = iHigh(_Symbol, InpEntryTF, 1);
+      if(gapLow < gapHigh)
+      {
+         entry = (gapLow + gapHigh) / 2.0;
+         sl    = MathMax(gapHigh, sweepHigh) + InpSLBufferATR * atr;
+      }
+      else
+      {
+         mode  = ENTRY_BOS_MARKET;
+         entry = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+         sl    = sweepHigh + InpSLBufferATR * atr;
+      }
+   }
+   else
+   {
+      entry = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+      sl    = sweepHigh + InpSLBufferATR * atr;
+   }
+
+   double risk = sl - entry;
    if(risk <= 0) return;
+
+   double tp = NextLiquidityBelow(swingLow);
    if((entry - tp) / risk < InpMinRR)
       tp = entry - InpMinRR * risk;
 
-   double convoy = ConvictionMultiplier(false);
-   OpenTrade(ORDER_TYPE_SELL, entry, sl, tp, convoy);
+   bool   isAdd = (CountDir(-1) > 0);
+   double rmult = ConvictionMultiplier(false) * (isAdd ? InpPyramidRiskMult : 1.0);
+   Execute(-1, mode, entry, sl, tp, rmult);
 }
 
 //  Next opposing liquidity pool used as a natural take-profit.
@@ -272,7 +380,7 @@ double NextLiquidityAbove(double fromPrice)
    for(int i = InpFractalWing + 1; i <= InpSwingLookback * 2; i++)
    {
       double h = iHigh(_Symbol, InpEntryTF, i);
-      if(h > best) best = h;             // highest high above = far liquidity target
+      if(h > best) best = h;
    }
    double extra = CurrentATR();
    return MathMax(best, fromPrice + 2 * extra);
@@ -290,6 +398,22 @@ double NextLiquidityBelow(double fromPrice)
    return MathMin(best, fromPrice - 2 * extra);
 }
 
+//===================== ENTRY PERMISSION ==========================//
+//  Pyramiding: add to winners, never to losers, never hedge.
+//+------------------------------------------------------------------+
+bool CanOpenNew(int dir)
+{
+   if(CountDir(-dir) > 0) return false;               // never hold both sides at once
+
+   int sameDir = CountDir(dir);
+   if(!InpAllowPyramid)
+      return sameDir < InpMaxPositions;
+
+   if(sameDir == 0)                  return true;      // first entry
+   if(sameDir >= InpMaxPyramids + 1) return false;     // pyramid is full
+   return AllInProfit(dir);                            // only add while it's working
+}
+
 //========================= CONVICTION ============================//
 //  Lipschutz/Krieger: keep base risk small, but when every condition
 //  lines up (right session + clean structure) press the advantage.
@@ -297,107 +421,181 @@ double NextLiquidityBelow(double fromPrice)
 double ConvictionMultiplier(bool isLong)
 {
    double mult = 1.0;
-   // In a prime session a clean sweep+shift is the A+ setup.
    if(InpUseSessions && InMainSession()) mult = InpConvictionMult;
    return MathMax(1.0, mult);
 }
 
 //========================= EXECUTION =============================//
-void OpenTrade(ENUM_ORDER_TYPE type, double price, double sl, double tp, double riskMult)
+void Execute(int dir, ENUM_ENTRY_MODE mode, double entry, double sl, double tp, double riskMult)
 {
    double riskPct = MathMin(InpRiskPercent * riskMult, InpMaxRiskPct);
-   double lots    = LotsForRisk(price, sl, riskPct);
+   double lots    = LotsForRisk(entry, sl, riskPct);
    if(lots <= 0) { Print("Lot sizing returned 0 — trade skipped."); return; }
 
-   sl = NormalizeDouble(sl, _Digits);
-   tp = NormalizeDouble(tp, _Digits);
+   lots = ApplyPortfolioCap(entry, sl, lots);         // total-risk guardrail
+   if(lots <= 0) { Print("Portfolio risk cap reached — trade skipped."); return; }
 
-   bool ok = (type == ORDER_TYPE_BUY)
-             ? trade.Buy(lots, _Symbol, 0.0, sl, tp, InpComment)
-             : trade.Sell(lots, _Symbol, 0.0, sl, tp, InpComment);
+   entry = NormalizeDouble(entry, _Digits);
+   sl    = NormalizeDouble(sl,    _Digits);
+   tp    = NormalizeDouble(tp,    _Digits);
+
+   bool ok;
+   if(mode == ENTRY_FVG_LIMIT)
+   {
+      datetime expiry = TimeTradeServer() + InpFVGExpiryBars * PeriodSeconds(InpEntryTF);
+      ok = (dir > 0)
+           ? trade.BuyLimit (lots, entry, _Symbol, sl, tp, ORDER_TIME_SPECIFIED, expiry, InpComment)
+           : trade.SellLimit(lots, entry, _Symbol, sl, tp, ORDER_TIME_SPECIFIED, expiry, InpComment);
+   }
+   else
+   {
+      ok = (dir > 0)
+           ? trade.Buy (lots, _Symbol, 0.0, sl, tp, InpComment)
+           : trade.Sell(lots, _Symbol, 0.0, sl, tp, InpComment);
+   }
 
    if(!ok)
       Print("Order failed: ", trade.ResultRetcode(), " ", trade.ResultRetcodeDescription());
    else
-      Print((type == ORDER_TYPE_BUY ? "LONG " : "SHORT "), lots, " lots @~", price,
-            " SL=", sl, " TP=", tp, " risk%=", riskPct);
+      Print((dir > 0 ? "LONG " : "SHORT "), EnumToString(mode), " ", lots,
+            " lots @~", entry, " SL=", sl, " TP=", tp, " risk%=", riskPct);
 }
 
 //  Position sizing from money at risk and stop distance — the single
 //  most important function in the whole EA.
 double LotsForRisk(double entry, double sl, double riskPct)
 {
-   double equity   = AccountInfoDouble(ACCOUNT_EQUITY);
-   double riskMoney= equity * riskPct / 100.0;
+   double equity    = AccountInfoDouble(ACCOUNT_EQUITY);
+   double riskMoney = equity * riskPct / 100.0;
 
-   double tickVal  = SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_VALUE);
-   double tickSize = SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_SIZE);
-   if(tickVal <= 0 || tickSize <= 0) return 0;
-
-   double slDist   = MathAbs(entry - sl);
-   if(slDist <= 0) return 0;
-
-   double lossPerLot = (slDist / tickSize) * tickVal;   // money lost per 1.0 lot if SL hit
+   double lossPerLot = LossPerLot(entry, sl);
    if(lossPerLot <= 0) return 0;
 
-   double lots = riskMoney / lossPerLot;
+   return NormalizeVolume(riskMoney / lossPerLot);
+}
 
-   // Snap to the broker's volume constraints.
+//  Money lost per 1.0 lot if the stop is hit.
+double LossPerLot(double entry, double sl)
+{
+   double tickVal  = SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_VALUE);
+   double tickSize = SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_SIZE);
+   double slDist   = MathAbs(entry - sl);
+   if(tickVal <= 0 || tickSize <= 0 || slDist <= 0) return 0;
+   return (slDist / tickSize) * tickVal;
+}
+
+double NormalizeVolume(double lots)
+{
    double minLot = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MIN);
    double maxLot = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MAX);
    double step   = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_STEP);
    if(step > 0) lots = MathFloor(lots / step) * step;
-   lots = MathMax(minLot, MathMin(maxLot, lots));
+   return MathMax(minLot, MathMin(maxLot, lots));
+}
+
+//  Trim a new position so total open risk stays under InpMaxPortfolioRiskPct.
+double ApplyPortfolioCap(double entry, double sl, double lots)
+{
+   if(InpMaxPortfolioRiskPct <= 0) return lots;
+
+   double lossPerLot = LossPerLot(entry, sl);
+   if(lossPerLot <= 0) return lots;
+
+   double equity = AccountInfoDouble(ACCOUNT_EQUITY);
+   double budget = equity * InpMaxPortfolioRiskPct / 100.0 - OpenRiskMoney();
+   if(budget <= 0) return 0;
+
+   double maxByBudget = budget / lossPerLot;
+   if(lots > maxByBudget) lots = NormalizeVolume(maxByBudget);
+
+   if(lots < SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MIN)) return 0;
    return lots;
+}
+
+//  Sum of money at risk across this EA's open positions (entry → stop).
+double OpenRiskMoney()
+{
+   double total = 0;
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      ulong ticket = PositionGetTicket(i);
+      if(ticket == 0 || !PositionSelectByTicket(ticket)) continue;
+      if(PositionGetInteger(POSITION_MAGIC) != InpMagic) continue;
+      if(PositionGetString(POSITION_SYMBOL) != _Symbol)  continue;
+
+      double open = PositionGetDouble(POSITION_PRICE_OPEN);
+      double sl   = PositionGetDouble(POSITION_SL);
+      double vol  = PositionGetDouble(POSITION_VOLUME);
+      if(sl <= 0) continue;                            // no defined risk to add
+      total += LossPerLot(open, sl) * vol;
+   }
+   return total;
 }
 
 //===================== POSITION MANAGEMENT =======================//
 void ManageOpenPositions()
 {
-   if(!InpMoveToBE && !InpTrailAfter1R) return;
    double atr = CurrentATR();
 
    for(int i = PositionsTotal() - 1; i >= 0; i--)
    {
       ulong ticket = PositionGetTicket(i);
-      if(ticket == 0) continue;
-      if(!PositionSelectByTicket(ticket)) continue;
+      if(ticket == 0 || !PositionSelectByTicket(ticket)) continue;
       if(PositionGetInteger(POSITION_MAGIC) != InpMagic) continue;
-      if(PositionGetString(POSITION_SYMBOL) != _Symbol) continue;
+      if(PositionGetString(POSITION_SYMBOL) != _Symbol)  continue;
 
-      long   type   = PositionGetInteger(POSITION_TYPE);
-      double open   = PositionGetDouble(POSITION_PRICE_OPEN);
-      double sl     = PositionGetDouble(POSITION_SL);
-      double tp     = PositionGetDouble(POSITION_TP);
-      double curSL  = sl;
+      long   type = PositionGetInteger(POSITION_TYPE);
+      double open = PositionGetDouble(POSITION_PRICE_OPEN);
+      double sl   = PositionGetDouble(POSITION_SL);
+      double tp   = PositionGetDouble(POSITION_TP);
+      double vol  = PositionGetDouble(POSITION_VOLUME);
 
-      double price  = (type == POSITION_TYPE_BUY)
-                      ? SymbolInfoDouble(_Symbol, SYMBOL_BID)
-                      : SymbolInfoDouble(_Symbol, SYMBOL_ASK);
-
-      double initialRisk = MathAbs(open - sl);
+      // Original risk is captured the first time we see the ticket, so it
+      // stays correct even after we move the stop to break-even.
+      double initialRisk = GetInitialRisk(ticket, open, sl);
       if(initialRisk <= 0) continue;
 
+      double price = (type == POSITION_TYPE_BUY)
+                     ? SymbolInfoDouble(_Symbol, SYMBOL_BID)
+                     : SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+
+      double rMultiple = (type == POSITION_TYPE_BUY)
+                         ? (price - open) / initialRisk
+                         : (open - price) / initialRisk;
+
+      // --- Partial scale-out (Lipschutz: bank some, ride the rest) ---
+      if(InpUsePartials && rMultiple >= InpPartialR && !IsPartialed(ticket))
+      {
+         double closeVol = NormalizeVolume(vol * InpPartialPct / 100.0);
+         double minLot   = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MIN);
+         if(closeVol >= minLot && (vol - closeVol) >= minLot)
+         {
+            if(trade.PositionClosePartial(ticket, closeVol))
+               Print("Partial close ", closeVol, " lots of #", ticket, " at +", InpPartialR, "R");
+         }
+         MarkPartialed(ticket);                        // mark either way so we don't retry
+         if(!PositionSelectByTicket(ticket)) continue; // position may be gone if it couldn't split
+         vol = PositionGetDouble(POSITION_VOLUME);
+      }
+
+      // --- Break-even and ATR trailing ---
+      double newSL = sl;
       if(type == POSITION_TYPE_BUY)
       {
-         double rMultiple = (price - open) / initialRisk;
-         if(InpMoveToBE && rMultiple >= 1.0 && curSL < open)
-            curSL = open;
+         if(InpMoveToBE && rMultiple >= 1.0 && (newSL < open || newSL == 0)) newSL = open;
          if(InpTrailAfter1R && rMultiple >= 1.0 && atr > 0)
-            curSL = MathMax(curSL, price - InpTrailATR * atr);
-         if(curSL > sl + _Point)
-            trade.PositionModify(ticket, NormalizeDouble(curSL, _Digits), tp);
+            newSL = MathMax(newSL, price - InpTrailATR * atr);
+         if(newSL > sl + _Point)
+            trade.PositionModify(ticket, NormalizeDouble(newSL, _Digits), tp);
       }
       else
       {
-         double rMultiple = (open - price) / initialRisk;
-         if(InpMoveToBE && rMultiple >= 1.0 && (curSL > open || curSL == 0))
-            curSL = open;
+         if(InpMoveToBE && rMultiple >= 1.0 && (newSL > open || newSL == 0)) newSL = open;
          if(InpTrailAfter1R && rMultiple >= 1.0 && atr > 0)
-            curSL = (curSL == 0) ? price + InpTrailATR * atr
-                                 : MathMin(curSL, price + InpTrailATR * atr);
-         if(curSL < sl - _Point || (sl == 0 && curSL > 0))
-            trade.PositionModify(ticket, NormalizeDouble(curSL, _Digits), tp);
+            newSL = (newSL == 0) ? price + InpTrailATR * atr
+                                 : MathMin(newSL, price + InpTrailATR * atr);
+         if((sl == 0 && newSL > 0) || (newSL > 0 && newSL < sl - _Point))
+            trade.PositionModify(ticket, NormalizeDouble(newSL, _Digits), tp);
       }
    }
 }
@@ -412,6 +610,8 @@ bool IsTradingAllowed()
    if(spread > InpMaxSpreadPts) return false;
 
    if(InpUseSessions && !InMainSession()) return false;
+   if(DailyLimitHit())                    return false;
+   if(NewsBlackout())                     return false;
    return true;
 }
 
@@ -425,6 +625,58 @@ bool InMainSession()
    return (s1 || s2);
 }
 
+//  Daily loss limit — anchored to equity at the start of each server day.
+void UpdateDayAnchor()
+{
+   MqlDateTime dt;
+   TimeToStruct(TimeCurrent(), dt);
+   datetime day = StringToTime(StringFormat("%04d.%02d.%02d", dt.year, dt.mon, dt.day));
+   if(day != g_currentDay)
+   {
+      g_currentDay     = day;
+      g_dayStartEquity = AccountInfoDouble(ACCOUNT_EQUITY);
+   }
+}
+
+bool DailyLimitHit()
+{
+   if(InpDailyLossLimitPct <= 0 || g_dayStartEquity <= 0) return false;
+   double loss  = g_dayStartEquity - AccountInfoDouble(ACCOUNT_EQUITY);
+   double limit = g_dayStartEquity * InpDailyLossLimitPct / 100.0;
+   return loss >= limit;
+}
+
+//  High-impact news blackout via the MT5 economic calendar.
+//  (Calendar data is unavailable in the Strategy Tester, so this is a no-op there.)
+bool NewsBlackout()
+{
+   if(!InpUseNewsFilter)          return false;
+   if(MQLInfoInteger(MQL_TESTER)) return false;
+
+   datetime now  = TimeTradeServer();
+   datetime from = now - InpNewsMinsAfter  * 60;
+   datetime to   = now + InpNewsMinsBefore * 60;
+
+   string cur[2];
+   cur[0] = SymbolInfoString(_Symbol, SYMBOL_CURRENCY_BASE);
+   cur[1] = SymbolInfoString(_Symbol, SYMBOL_CURRENCY_PROFIT);
+
+   for(int c = 0; c < 2; c++)
+   {
+      if(cur[c] == "") continue;
+      MqlCalendarValue values[];
+      int n = CalendarValueHistory(values, from, to, "", cur[c]);
+      for(int i = 0; i < n; i++)
+      {
+         MqlCalendarEvent ev;
+         if(!CalendarEventById(values[i].event_id, ev)) continue;
+         int impFloor = InpNewsHighOnly ? CALENDAR_IMPORTANCE_HIGH : CALENDAR_IMPORTANCE_MODERATE;
+         if((int)ev.importance >= impFloor) return true;
+      }
+   }
+   return false;
+}
+
 double CurrentATR()
 {
    double atr[];
@@ -432,18 +684,146 @@ double CurrentATR()
    return atr[0];
 }
 
-int CountOwnPositions()
+//======================== COUNTS / STATE =========================//
+int CountDir(int dir)   // +1 = buys, -1 = sells (this EA, this symbol)
 {
    int n = 0;
    for(int i = PositionsTotal() - 1; i >= 0; i--)
    {
       ulong ticket = PositionGetTicket(i);
-      if(ticket == 0) continue;
-      if(!PositionSelectByTicket(ticket)) continue;
-      if(PositionGetInteger(POSITION_MAGIC) == InpMagic &&
-         PositionGetString(POSITION_SYMBOL) == _Symbol)
-         n++;
+      if(ticket == 0 || !PositionSelectByTicket(ticket)) continue;
+      if(PositionGetInteger(POSITION_MAGIC) != InpMagic) continue;
+      if(PositionGetString(POSITION_SYMBOL) != _Symbol)  continue;
+      long type = PositionGetInteger(POSITION_TYPE);
+      if((dir > 0 && type == POSITION_TYPE_BUY) || (dir < 0 && type == POSITION_TYPE_SELL)) n++;
    }
    return n;
+}
+
+bool AllInProfit(int dir)
+{
+   bool any = false;
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      ulong ticket = PositionGetTicket(i);
+      if(ticket == 0 || !PositionSelectByTicket(ticket)) continue;
+      if(PositionGetInteger(POSITION_MAGIC) != InpMagic) continue;
+      if(PositionGetString(POSITION_SYMBOL) != _Symbol)  continue;
+      long type = PositionGetInteger(POSITION_TYPE);
+      if((dir > 0 && type != POSITION_TYPE_BUY) || (dir < 0 && type != POSITION_TYPE_SELL)) continue;
+      any = true;
+      if(PositionGetDouble(POSITION_PROFIT) <= 0) return false;
+   }
+   return any;
+}
+
+bool HasPendingDir(int dir)
+{
+   for(int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      ulong ticket = OrderGetTicket(i);
+      if(ticket == 0 || !OrderSelect(ticket)) continue;
+      if(OrderGetInteger(ORDER_MAGIC) != InpMagic) continue;
+      if(OrderGetString(ORDER_SYMBOL) != _Symbol)  continue;
+      long t = OrderGetInteger(ORDER_TYPE);
+      if(dir > 0 && (t == ORDER_TYPE_BUY_LIMIT  || t == ORDER_TYPE_BUY_STOP))  return true;
+      if(dir < 0 && (t == ORDER_TYPE_SELL_LIMIT || t == ORDER_TYPE_SELL_STOP)) return true;
+   }
+   return false;
+}
+
+//  Backup expiry: delete unfilled FVG pendings older than InpFVGExpiryBars.
+void CleanupStalePendings()
+{
+   long maxAge = (long)InpFVGExpiryBars * PeriodSeconds(InpEntryTF);
+   for(int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      ulong ticket = OrderGetTicket(i);
+      if(ticket == 0 || !OrderSelect(ticket)) continue;
+      if(OrderGetInteger(ORDER_MAGIC) != InpMagic) continue;
+      if(OrderGetString(ORDER_SYMBOL) != _Symbol)  continue;
+      datetime setup = (datetime)OrderGetInteger(ORDER_TIME_SETUP);
+      if(TimeTradeServer() - setup > maxAge)
+         trade.OrderDelete(ticket);
+   }
+}
+
+void CloseAllOwn()
+{
+   for(int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      ulong ticket = OrderGetTicket(i);
+      if(ticket == 0 || !OrderSelect(ticket)) continue;
+      if(OrderGetInteger(ORDER_MAGIC) == InpMagic && OrderGetString(ORDER_SYMBOL) == _Symbol)
+         trade.OrderDelete(ticket);
+   }
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      ulong ticket = PositionGetTicket(i);
+      if(ticket == 0 || !PositionSelectByTicket(ticket)) continue;
+      if(PositionGetInteger(POSITION_MAGIC) == InpMagic && PositionGetString(POSITION_SYMBOL) == _Symbol)
+         trade.PositionClose(ticket);
+   }
+}
+
+//===================== PER-TICKET BOOKKEEPING ====================//
+double GetInitialRisk(ulong ticket, double open, double sl)
+{
+   for(int i = 0; i < ArraySize(g_riskTickets); i++)
+      if(g_riskTickets[i] == ticket) return g_riskValues[i];
+
+   double r = MathAbs(open - sl);                       // first sighting → record it
+   int n = ArraySize(g_riskTickets);
+   ArrayResize(g_riskTickets, n + 1);
+   ArrayResize(g_riskValues,  n + 1);
+   g_riskTickets[n] = ticket;
+   g_riskValues[n]  = r;
+   return r;
+}
+
+bool IsPartialed(ulong ticket)
+{
+   for(int i = 0; i < ArraySize(g_partialed); i++)
+      if(g_partialed[i] == ticket) return true;
+   return false;
+}
+
+void MarkPartialed(ulong ticket)
+{
+   if(IsPartialed(ticket)) return;
+   int n = ArraySize(g_partialed);
+   ArrayResize(g_partialed, n + 1);
+   g_partialed[n] = ticket;
+}
+
+//  Drop records for tickets that are no longer open, so the arrays stay small.
+void SyncBookkeeping()
+{
+   PruneList(g_riskTickets, g_riskValues);
+   PruneTickets(g_partialed);
+}
+
+void PruneList(ulong &tickets[], double &values[])
+{
+   ulong  kt[]; double kv[]; int kc = 0;
+   for(int i = 0; i < ArraySize(tickets); i++)
+   {
+      if(PositionSelectByTicket(tickets[i]))
+      {
+         ArrayResize(kt, kc + 1); ArrayResize(kv, kc + 1);
+         kt[kc] = tickets[i]; kv[kc] = values[i]; kc++;
+      }
+   }
+   ArrayResize(tickets, kc); ArrayResize(values, kc);
+   for(int i = 0; i < kc; i++) { tickets[i] = kt[i]; values[i] = kv[i]; }
+}
+
+void PruneTickets(ulong &tickets[])
+{
+   ulong kt[]; int kc = 0;
+   for(int i = 0; i < ArraySize(tickets); i++)
+      if(PositionSelectByTicket(tickets[i])) { ArrayResize(kt, kc + 1); kt[kc++] = tickets[i]; }
+   ArrayResize(tickets, kc);
+   for(int i = 0; i < kc; i++) tickets[i] = kt[i];
 }
 //+------------------------------------------------------------------+

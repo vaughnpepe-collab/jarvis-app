@@ -69,12 +69,20 @@ Open trades are moved to break-even at +1R and trailed by ATR to ride trends.
 | `InpEntryTF` | M15 | Timeframe the EA executes on |
 | `InpSwingLookback` / `InpFractalWing` | 25 / 2 | How swing highs/lows (liquidity) are detected |
 | `InpSweepWindow` | 3 | Recent bars in which the sweep must occur |
+| `InpEntryMode` | BOS market | Entry variant: market on the break, or **FVG-retrace limit** (tighter risk) |
+| `InpFVGExpiryBars` | 8 | Cancel an unfilled FVG limit after N bars |
 | `InpRiskPercent` | 0.5 | Base risk per trade (% equity) |
 | `InpConvictionMult` | 2.0 | Risk multiplier on A+ session setups |
-| `InpMaxRiskPct` | 2.0 | Hard cap on risk per trade |
+| `InpMaxRiskPct` | 2.0 | Hard cap on risk per single trade |
 | `InpMinRR` | 3.0 | Minimum reward:risk to take a trade |
 | `InpSLBufferATR` / `InpATRPeriod` | 0.5 / 14 | Stop buffer beyond the sweep, in ATR |
-| `InpMoveToBE` / `InpTrailAfter1R` / `InpTrailATR` | on / on / 1.5 | Trade management |
+| `InpMoveToBE` / `InpTrailAfter1R` / `InpTrailATR` | on / on / 1.5 | Break-even & ATR trailing |
+| `InpUsePartials` / `InpPartialR` / `InpPartialPct` | on / 2.0R / 50% | **Scale-out**: bank part of the position at a profit target |
+| `InpAllowPyramid` / `InpMaxPyramids` / `InpPyramidRiskMult` | off / 2 / 0.5 | **Pyramiding**: add to winners only, smaller size, capped count |
+| `InpMaxPositions` | 1 | Max positions when pyramiding is off |
+| `InpUseNewsFilter` / `InpNewsHighOnly` / `InpNewsMinsBefore` / `InpNewsMinsAfter` | on / High / 30 / 30 | **News pause** around high-impact calendar events (live only) |
+| `InpDailyLossLimitPct` / `InpCloseAllOnDailyLimit` | 3.0 / off | **Daily loss-limit** auto-stop (optionally flatten too) |
+| `InpMaxPortfolioRiskPct` | 3.0 | **Cap on total open risk** across all positions |
 | `InpUseSessions` + session hours | on, 7–11 & 13–17 | **Server-time** London/NY windows |
 | `InpMaxSpreadPts` | 30 | Skip when spread is too wide |
 | `InpMagic` | 920628 | Identifies this EA's trades |
@@ -96,7 +104,10 @@ Open trades are moved to break-even at +1R and trailed by ATR to ride trends.
 | Asymmetric targets | `NextLiquidityAbove/Below()` + `InpMinRR` |
 | Risk-based sizing | `LotsForRisk()` |
 | Conviction sizing | `ConvictionMultiplier()` |
+| FVG-retrace limit entry | `TryLong()` / `TryShort()` (FVG branch) + `Execute()` |
+| Scale-out & pyramiding | `ManageOpenPositions()` (partials) / `CanOpenNew()` |
 | Break-even & trailing | `ManageOpenPositions()` |
+| News pause / daily limit / total-risk cap | `NewsBlackout()` / `DailyLimitHit()` / `ApplyPortfolioCap()` |
 | Session/spread discipline | `IsTradingAllowed()` / `InMainSession()` |
 
 Read [`../course/08-how-the-ea-works.md`](../course/08-how-the-ea-works.md) for
@@ -104,8 +115,12 @@ the line-by-line walkthrough.
 
 ## Known limitations (by design)
 
-- It is a **single model**; the legends were discretionary. Use it as a
+- It is **one model** with variants; the legends were discretionary. Use it as a
   disciplined assistant, not an oracle.
-- No news filter — avoid running it blindly through high-impact releases.
-- Swing/sweep detection is intentionally simple so you can read and modify it.
+- The **news filter needs the MT5 economic calendar**, which is unavailable in
+  the Strategy Tester — it only protects you on a live/demo terminal. Backtests
+  therefore ignore news; keep that in mind when reading results.
+- The **daily loss-limit** resets at the start of each server day and is anchored
+  to equity at that moment.
+- Swing/sweep/FVG detection is intentionally simple so you can read and modify it.
 - One symbol per chart instance.
