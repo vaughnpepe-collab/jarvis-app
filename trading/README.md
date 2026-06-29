@@ -36,10 +36,21 @@ risk and an enormous potential reward, and manage the winners ruthlessly.**
 | 09 | [Backtesting & deployment](course/09-backtesting-and-deployment.md) |
 | 10 | [Your trading plan (template)](course/10-trading-plan-template.md) |
 
-## The Expert Advisor
+## The Expert Advisor (MetaTrader 5)
 
 - Code: [`expert-advisor/JarvisMacroEA.mq5`](expert-advisor/JarvisMacroEA.mq5)
 - Install & inputs: [`expert-advisor/README.md`](expert-advisor/README.md)
+
+## The TradingView indicator (Pine v5)
+
+A chart companion that *marks* the same setups (no trading, no sizing):
+
+- Code: [`pinescript/JarvisMacroStructure.pine`](pinescript/JarvisMacroStructure.pine)
+- Install & inputs: [`pinescript/README.md`](pinescript/README.md)
+
+## Quick reference
+
+- One-page printable cheat sheet: [`course/CHEATSHEET.md`](course/CHEATSHEET.md)
 
 ## The one-paragraph summary
 
