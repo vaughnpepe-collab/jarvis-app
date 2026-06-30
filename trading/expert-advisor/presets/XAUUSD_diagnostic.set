@@ -8,12 +8,14 @@
 InpBiasTF=16388
 InpBiasEMA=50
 InpRequireSlope=false
+InpUseBias=false
 InpEntryTF=15
 InpSwingLookback=25
 InpFractalWing=2
 InpSweepWindow=4
 InpEntryMode=0
 InpFVGExpiryBars=8
+InpRequireBOS=false
 InpRiskPercent=0.25
 InpConvictionMult=1.0
 InpMinRR=1.5

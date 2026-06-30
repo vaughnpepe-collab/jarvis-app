@@ -8,6 +8,7 @@
 InpBiasTF=16388
 InpBiasEMA=50
 InpRequireSlope=true
+InpUseBias=true
 ; --- Structure & liquidity ---
 InpEntryTF=15
 InpSwingLookback=25
@@ -16,6 +17,7 @@ InpSweepWindow=3
 ; --- Entry model ---
 InpEntryMode=0
 InpFVGExpiryBars=8
+InpRequireBOS=false
 ; --- Risk (kept small: gold moves fast) ---
 InpRiskPercent=0.25
 InpConvictionMult=1.5

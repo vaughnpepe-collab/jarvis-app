@@ -9,7 +9,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Jarvis Trading Course"
 #property link      "https://github.com/vaughnpepe-collab/jarvis-app"
-#property version   "2.10"
+#property version   "2.20"
 #property description "Macro bias + liquidity sweep + structure shift, with"
 #property description "selectable entry models, scale-outs/pyramiding, safety controls"
 #property description "and an on-chart status dashboard."
@@ -30,6 +30,7 @@ input group "=== Bias (Druckenmiller / Soros: trade with the macro tide) ==="
 input ENUM_TIMEFRAMES InpBiasTF        = PERIOD_H4;   // Higher-timeframe for directional bias
 input int             InpBiasEMA       = 50;          // EMA period used to read the macro tide
 input bool            InpRequireSlope  = true;        // Require the EMA to be sloping in trade direction
+input bool            InpUseBias       = true;        // Only trade WITH the HTF bias (off = trade both directions)
 
 input group "=== Structure & Liquidity (TJR / ICT: where price is going) ==="
 input ENUM_TIMEFRAMES InpEntryTF       = PERIOD_M15;  // Timeframe the EA executes on
@@ -40,6 +41,7 @@ input int             InpSweepWindow   = 3;           // Recent bars in which a 
 input group "=== Entry model (which variant to trade) ==="
 input ENUM_ENTRY_MODE InpEntryMode     = ENTRY_BOS_MARKET; // BOS market, or FVG-retrace limit
 input int             InpFVGExpiryBars = 8;           // Cancel an unfilled FVG limit after N bars
+input bool            InpRequireBOS    = false;       // Require an extra structure-shift after the sweep (stricter, fewer trades)
 
 input group "=== Risk (Lipschutz / Krieger: survive first, size with conviction) ==="
 input double          InpRiskPercent   = 0.5;         // Base risk per trade (% of equity)
@@ -175,10 +177,13 @@ void OnTick()
    lastBarTime = t;
 
    if(block != "") { g_setupNote = "blocked: " + block; return; }
-   if(bias == 0)   { g_setupNote = "no macro bias — standing aside"; return; }
+   if(InpUseBias && bias == 0) { g_setupNote = "no macro bias — standing aside"; return; }
 
-   if(bias > 0 && InpAllowLongs)  TryLong();
-   if(bias < 0 && InpAllowShorts) TryShort();
+   bool allowLong  = InpAllowLongs  && (!InpUseBias || bias > 0);
+   bool allowShort = InpAllowShorts && (!InpUseBias || bias < 0);
+
+   if(allowLong)  TryLong();
+   if(allowShort) TryShort();
 }
 
 //============================ BIAS ================================//
@@ -259,25 +264,30 @@ void TryLong()
    if(!CanOpenNew(1)) { g_setupNote = "long: position/pyramid limit reached"; return; }
    if(InpEntryMode == ENTRY_FVG_LIMIT && HasPendingDir(1)) { g_setupNote = "long: FVG limit order already pending"; return; }
 
-   double swingLow; int lowIdx;
-   if(!FindRecentSwingLow(swingLow, lowIdx)) { g_setupNote = "long: no swing low found"; return; }
+   // (1) The PRIOR pool of sell-side liquidity = lowest low *before* the recent
+   //     sweep window. (Older lows are what a sweep reaches down to grab.)
+   double priorLow = DBL_MAX;
+   for(int i = InpSweepWindow + 1; i <= InpSwingLookback; i++)
+      priorLow = MathMin(priorLow, iLow(_Symbol, InpEntryTF, i));
+   if(priorLow == DBL_MAX) { g_setupNote = "long: not enough history yet"; return; }
 
-   // (2) Was that low swept inside the recent window, then reclaimed?
-   bool swept = false;
-   double sweepLow = swingLow;
+   // (2) Sweep: a recent bar pierced BELOW that pool, taking the liquidity.
+   double sweepLow = DBL_MAX; bool pierced = false;
    for(int i = 1; i <= InpSweepWindow; i++)
    {
       double lo = iLow(_Symbol, InpEntryTF, i);
-      double cl = iClose(_Symbol, InpEntryTF, i);
-      if(lo < swingLow && cl > swingLow) { swept = true; sweepLow = MathMin(sweepLow, lo); }
+      if(lo < priorLow) { pierced = true; sweepLow = MathMin(sweepLow, lo); }
    }
-   if(!swept) { g_setupNote = "long: waiting for a liquidity sweep"; return; }
+   if(!pierced) { g_setupNote = "long: waiting for a liquidity sweep"; return; }
 
-   // (3) Structure shift up: last closed bar closes above prior swing high.
-   double swingHigh; int highIdx;
-   if(!FindRecentSwingHigh(swingHigh, highIdx)) { g_setupNote = "long: no swing high found"; return; }
-   if(iClose(_Symbol, InpEntryTF, 1) <= swingHigh) { g_setupNote = "long: swept, waiting for break of structure"; return; }
+   // (3) Reclaim: the last closed bar closed back ABOVE the pool (trap sprung).
+   if(iClose(_Symbol, InpEntryTF, 1) <= priorLow) { g_setupNote = "long: swept, waiting to reclaim"; return; }
 
+   // (4) Optional structure shift: close above the previous bar's high.
+   if(InpRequireBOS && iClose(_Symbol, InpEntryTF, 1) <= iHigh(_Symbol, InpEntryTF, 2))
+   { g_setupNote = "long: reclaimed, waiting for structure shift"; return; }
+
+   double swingHigh = priorLow;                          // for the liquidity target below
    double atr = CurrentATR();
    if(atr <= 0) { g_setupNote = "long: ATR not ready"; return; }
 
@@ -324,23 +334,29 @@ void TryShort()
    if(!CanOpenNew(-1)) { g_setupNote = "short: position/pyramid limit reached"; return; }
    if(InpEntryMode == ENTRY_FVG_LIMIT && HasPendingDir(-1)) { g_setupNote = "short: FVG limit order already pending"; return; }
 
-   double swingHigh; int highIdx;
-   if(!FindRecentSwingHigh(swingHigh, highIdx)) { g_setupNote = "short: no swing high found"; return; }
+   // (1) The PRIOR pool of buy-side liquidity = highest high *before* the window.
+   double priorHigh = -DBL_MAX;
+   for(int i = InpSweepWindow + 1; i <= InpSwingLookback; i++)
+      priorHigh = MathMax(priorHigh, iHigh(_Symbol, InpEntryTF, i));
+   if(priorHigh == -DBL_MAX) { g_setupNote = "short: not enough history yet"; return; }
 
-   bool swept = false;
-   double sweepHigh = swingHigh;
+   // (2) Sweep: a recent bar pierced ABOVE that pool.
+   double sweepHigh = -DBL_MAX; bool pierced = false;
    for(int i = 1; i <= InpSweepWindow; i++)
    {
       double hi = iHigh(_Symbol, InpEntryTF, i);
-      double cl = iClose(_Symbol, InpEntryTF, i);
-      if(hi > swingHigh && cl < swingHigh) { swept = true; sweepHigh = MathMax(sweepHigh, hi); }
+      if(hi > priorHigh) { pierced = true; sweepHigh = MathMax(sweepHigh, hi); }
    }
-   if(!swept) { g_setupNote = "short: waiting for a liquidity sweep"; return; }
+   if(!pierced) { g_setupNote = "short: waiting for a liquidity sweep"; return; }
 
-   double swingLow; int lowIdx;
-   if(!FindRecentSwingLow(swingLow, lowIdx)) { g_setupNote = "short: no swing low found"; return; }
-   if(iClose(_Symbol, InpEntryTF, 1) >= swingLow) { g_setupNote = "short: swept, waiting for break of structure"; return; }
+   // (3) Reclaim: the last closed bar closed back BELOW the pool.
+   if(iClose(_Symbol, InpEntryTF, 1) >= priorHigh) { g_setupNote = "short: swept, waiting to reclaim"; return; }
 
+   // (4) Optional structure shift: close below the previous bar's low.
+   if(InpRequireBOS && iClose(_Symbol, InpEntryTF, 1) >= iLow(_Symbol, InpEntryTF, 2))
+   { g_setupNote = "short: reclaimed, waiting for structure shift"; return; }
+
+   double swingLow = priorHigh;                           // for the liquidity target below
    double atr = CurrentATR();
    if(atr <= 0) { g_setupNote = "short: ATR not ready"; return; }
 
