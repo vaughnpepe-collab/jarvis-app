@@ -94,6 +94,17 @@
   details[open] summary::after{content:"–"}
   details p{color:var(--muted); margin:12px 0 2px}
 
+  /* proof / wins */
+  .wins{display:grid; grid-template-columns:repeat(3,1fr); gap:20px}
+  .win{background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px}
+  .win .quote{font-size:16px; margin:0 0 16px}
+  .win .who{display:flex; align-items:center; gap:10px}
+  .win .av{width:36px;height:36px;border-radius:50%;background:#e7f6ee;color:var(--brand-d);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .win .who b{display:block; font-size:14px}
+  .win .who span{font-size:13px; color:var(--muted)}
+  .win .tag{display:inline-block; background:#e7f6ee; color:var(--brand-d); font-weight:700; font-size:12px; padding:4px 10px; border-radius:999px; margin-bottom:14px}
+  @media(max-width:560px){ .wins{grid-template-columns:1fr} }
+
   footer{padding:40px 0; border-top:1px solid var(--line); text-align:center; color:var(--muted); font-size:14px}
 </style>
 </head>
@@ -153,6 +164,35 @@
     <div class="roi">
       <p class="big">Have <em>$8,000</em> in late invoices? PaidUp costs <em>$29.</em></p>
       <p>Getting paid even ten days sooner is worth far more than that — every month. It pays for itself on your first chased invoice.</p>
+    </div>
+  </div>
+</section>
+
+<!--
+  PROOF SECTION — swap these for REAL wins as they come in during validation.
+  Use a real first name + city, the actual amount recovered, and the days saved.
+  Real, specific proof is the single biggest lever on conversion here.
+-->
+<section>
+  <div class="wrap">
+    <h2>Money that was stuck — unstuck</h2>
+    <p class="lead">Early users, real overdue invoices, paid sooner. (Replace with your own wins.)</p>
+    <div class="wins">
+      <div class="win">
+        <div class="tag">$4,200 recovered</div>
+        <p class="quote">"Two invoices I'd basically written off. PaidUp's reminders went out, and both paid within a week. I didn't write a single awkward email."</p>
+        <div class="who"><div class="av">SM</div><div><b>Sara M.</b><span>Brand designer</span></div></div>
+      </div>
+      <div class="win">
+        <div class="tag">18 days sooner</div>
+        <p class="quote">"My client always pays — eventually. PaidUp got it done almost three weeks faster than usual, in my own tone. Felt completely natural."</p>
+        <div class="who"><div class="av">DK</div><div><b>Daniel K.</b><span>Marketing consultant</span></div></div>
+      </div>
+      <div class="win">
+        <div class="tag">$1,150 recovered</div>
+        <p class="quote">"Chasing money is the worst part of freelancing. Handing it off and just tapping 'approve' is the most relief I've felt all year."</p>
+        <div class="who"><div class="av">PR</div><div><b>Priya R.</b><span>Freelance developer</span></div></div>
+      </div>
     </div>
   </div>
 </section>
