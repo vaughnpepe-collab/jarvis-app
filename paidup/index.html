@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PaidUp — Get your late invoices paid, automatically</title>
+<meta name="description" content="PaidUp is the AI that chases your late-paying clients for you — politely, persistently, automatically. You only win when you get paid." />
+<style>
+  :root{
+    --ink:#0f1419; --muted:#5b6672; --line:#e6e9ee;
+    --brand:#1d8f5b; --brand-d:#157048; --bg:#ffffff; --soft:#f6f8fa;
+    --accent:#0b7;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  .wrap{max-width:980px; margin:0 auto; padding:0 22px}
+  .btn{
+    display:inline-block; background:var(--brand); color:#fff; text-decoration:none;
+    font-weight:700; padding:15px 26px; border-radius:11px; border:0; cursor:pointer;
+    font-size:17px; transition:transform .06s ease, background .15s ease;
+  }
+  .btn:hover{background:var(--brand-d)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:transparent; color:var(--brand); border:1.5px solid var(--brand)}
+  .btn.ghost:hover{background:var(--soft)}
+
+  /* nav */
+  nav{display:flex; align-items:center; justify-content:space-between; padding:20px 0}
+  .logo{font-weight:800; font-size:20px; letter-spacing:-.02em}
+  .logo span{color:var(--brand)}
+
+  /* hero */
+  header{background:linear-gradient(180deg,#f4fbf7 0%,#ffffff 100%); border-bottom:1px solid var(--line)}
+  .hero{padding:34px 0 64px; text-align:center}
+  .pill{
+    display:inline-block; background:#e7f6ee; color:var(--brand-d); font-weight:700;
+    font-size:13px; padding:6px 13px; border-radius:999px; margin-bottom:22px;
+  }
+  h1{font-size:clamp(32px,5vw,52px); line-height:1.08; letter-spacing:-.03em; margin:0 0 18px; font-weight:800}
+  h1 .hl{color:var(--brand)}
+  .sub{font-size:clamp(17px,2.4vw,21px); color:var(--muted); max-width:660px; margin:0 auto 30px}
+  .cta-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
+  .reassure{margin-top:16px; font-size:14px; color:var(--muted)}
+
+  /* proof bar */
+  .proof{display:flex; gap:34px; justify-content:center; flex-wrap:wrap; padding:26px 0; border-bottom:1px solid var(--line); background:var(--soft)}
+  .proof .stat{text-align:center}
+  .proof .num{font-size:26px; font-weight:800; color:var(--ink)}
+  .proof .lbl{font-size:13px; color:var(--muted)}
+
+  /* sections */
+  section{padding:60px 0}
+  h2{font-size:clamp(26px,3.4vw,34px); letter-spacing:-.02em; margin:0 0 14px; text-align:center}
+  .lead{color:var(--muted); text-align:center; max-width:620px; margin:0 auto 40px; font-size:18px}
+
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:20px}
+  .card{background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px}
+  .card .n{width:34px;height:34px;border-radius:9px;background:#e7f6ee;color:var(--brand-d);font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .card h3{margin:0 0 8px; font-size:18px}
+  .card p{margin:0; color:var(--muted); font-size:15px}
+
+  /* roi */
+  .roi{background:var(--soft); border:1px solid var(--line); border-radius:18px; padding:34px; text-align:center}
+  .roi .big{font-size:clamp(24px,3.2vw,30px); font-weight:800; letter-spacing:-.02em; margin:0 0 8px}
+  .roi .big em{color:var(--brand); font-style:normal}
+  .roi p{color:var(--muted); margin:6px 0 0}
+
+  /* pricing */
+  .price{max-width:440px; margin:0 auto; background:#fff; border:2px solid var(--brand); border-radius:20px; padding:32px; text-align:center; box-shadow:0 14px 40px rgba(29,143,91,.10)}
+  .price .amt{font-size:46px; font-weight:800; letter-spacing:-.02em}
+  .price .amt small{font-size:17px; color:var(--muted); font-weight:600}
+  .price .plus{color:var(--brand-d); font-weight:700; margin:4px 0 18px}
+  .price ul{list-style:none; padding:0; margin:0 0 24px; text-align:left}
+  .price li{padding:8px 0 8px 28px; position:relative; color:var(--ink)}
+  .price li::before{content:"✓"; position:absolute; left:0; color:var(--brand); font-weight:800}
+
+  /* signup form */
+  .signup{max-width:520px; margin:0 auto; text-align:center}
+  .form-row{display:flex; gap:10px; margin-top:18px}
+  .form-row input{flex:1; padding:15px 16px; border:1.5px solid var(--line); border-radius:11px; font-size:16px}
+  .form-row input:focus{outline:none; border-color:var(--brand)}
+  @media(max-width:560px){ .form-row{flex-direction:column} .steps{grid-template-columns:1fr} }
+
+  /* faq */
+  details{border-bottom:1px solid var(--line); padding:18px 4px}
+  summary{cursor:pointer; font-weight:700; font-size:17px; list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+"; float:right; color:var(--brand); font-weight:800}
+  details[open] summary::after{content:"–"}
+  details p{color:var(--muted); margin:12px 0 2px}
+
+  footer{padding:40px 0; border-top:1px solid var(--line); text-align:center; color:var(--muted); font-size:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="logo">Paid<span>Up</span></div>
+      <a class="btn ghost" href="#start">Get started</a>
+    </nav>
+    <div class="hero">
+      <div class="pill">For freelancers, consultants &amp; agencies</div>
+      <h1>Your clients pay late.<br><span class="hl">PaidUp</span> chases them so you don't have to.</h1>
+      <p class="sub">PaidUp is the AI that follows up on every overdue invoice — politely, persistently, in your voice — until the money lands in your account. You approve, it sends, you get paid sooner.</p>
+      <div class="cta-row">
+        <a class="btn" href="#start">Get my invoices paid →</a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+      <div class="reassure">No card to start • You approve every message • You only win when you get paid</div>
+    </div>
+  </div>
+</header>
+
+<div class="proof">
+  <div class="stat"><div class="num">39 days</div><div class="lbl">avg. freelancer waits on an invoice</div></div>
+  <div class="stat"><div class="num">1 in 4</div><div class="lbl">invoices are paid late</div></div>
+  <div class="stat"><div class="num">0 awkward</div><div class="lbl">follow-ups you have to write</div></div>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="lead">Forward your invoices once. PaidUp handles the rest and stops the moment you're paid.</p>
+    <div class="steps">
+      <div class="card">
+        <div class="n">1</div>
+        <h3>Connect your invoices</h3>
+        <p>Forward an overdue invoice or connect your invoicing tool. PaidUp reads who owes what, and when it was due.</p>
+      </div>
+      <div class="card">
+        <div class="n">2</div>
+        <h3>It writes the chase, in your voice</h3>
+        <p>A friendly nudge, then a firm reminder, then a final notice — perfectly timed and professional. You approve with one tap.</p>
+      </div>
+      <div class="card">
+        <div class="n">3</div>
+        <h3>You get paid sooner</h3>
+        <p>PaidUp keeps following up automatically and stops the instant payment clears. Money in, awkwardness out.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="roi">
+      <p class="big">Have <em>$8,000</em> in late invoices? PaidUp costs <em>$29.</em></p>
+      <p>Getting paid even ten days sooner is worth far more than that — every month. It pays for itself on your first chased invoice.</p>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--soft); border-top:1px solid var(--line); border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <h2>Simple, aligned pricing</h2>
+    <p class="lead">We only do well when you get paid. That's the whole idea.</p>
+    <div class="price">
+      <div class="amt">$29<small>/mo</small></div>
+      <div class="plus">+ 1% of invoices we recover</div>
+      <ul>
+        <li>Unlimited invoices chased</li>
+        <li>Follow-ups written in your voice</li>
+        <li>You approve every message before it sends</li>
+        <li>Auto-stops the moment you're paid</li>
+        <li>Cancel anytime</li>
+      </ul>
+      <!-- Replace href with your Stripe Payment Link to start collecting real cards -->
+      <a class="btn" style="width:100%" href="#start">Start getting paid →</a>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <div class="signup">
+      <h2>Get your first invoice paid — free</h2>
+      <p class="lead" style="margin-bottom:8px">Drop your email. We'll personally help you chase one overdue invoice, free, so you can see it work before you pay a cent.</p>
+      <!-- Point action= at a Formspree/Tally/Mailchimp endpoint to capture leads -->
+      <form action="https://formspree.io/f/your-form-id" method="POST">
+        <div class="form-row">
+          <input type="email" name="email" placeholder="you@business.com" required />
+          <button class="btn" type="submit">Chase my invoice →</button>
+        </div>
+      </form>
+      <div class="reassure">No spam. No card. Just your money, sooner.</div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:10px">
+  <div class="wrap" style="max-width:720px">
+    <h2 style="margin-bottom:26px">Questions</h2>
+    <details open>
+      <summary>Will it email my clients without my say-so?</summary>
+      <p>Never. PaidUp drafts every message and you approve it with one tap before anything sends. You're always in control of what your clients see.</p>
+    </details>
+    <details>
+      <summary>Won't chasing make me look pushy?</summary>
+      <p>The opposite. PaidUp's reminders are warm, professional, and well-timed — the way a great accounts team would do it. Most late payers simply forgot; a polite nudge is welcome.</p>
+    </details>
+    <details>
+      <summary>What does the 1% actually cost me?</summary>
+      <p>On a recovered $5,000 invoice, that's $50 — on money you might not have seen for weeks, or at all. We only charge it when the cash actually lands.</p>
+    </details>
+    <details>
+      <summary>What tools do you work with?</summary>
+      <p>Any invoice you can forward by email works today. Direct integrations with popular invoicing tools are rolling out — tell us which one you use when you sign up.</p>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo" style="font-size:18px; margin-bottom:8px">Paid<span>Up</span></div>
+    <div>Get paid sooner. © 2026 PaidUp.</div>
+  </div>
+</footer>
+
+</body>
+</html>
