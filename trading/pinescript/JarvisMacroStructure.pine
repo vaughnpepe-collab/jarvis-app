@@ -1,0 +1,130 @@
+//@version=5
+// ============================================================================
+//  Jarvis Macro-Structure Model — TradingView (Pine v5) indicator
+//  A chart companion to the MT5 EA: it MARKS the same setups (macro bias +
+//  liquidity sweep + structure shift) and draws the stop / 3R target so you
+//  can eyeball the method live. It does NOT place trades or size positions.
+//
+//  EDUCATIONAL ONLY. Not financial advice. See ../course/ for the full method.
+//  Add to a chart: TradingView ▸ Pine Editor ▸ paste ▸ Add to chart.
+// ============================================================================
+indicator("Jarvis Macro-Structure Model", overlay = true,
+          max_labels_count = 500, max_lines_count = 500)
+
+// ----------------------------- Inputs ---------------------------------------
+grpBias = "Bias (macro tide)"
+biasTF      = input.timeframe("240", "Bias timeframe",            group = grpBias)
+emaLen      = input.int(50,         "Bias EMA length", minval = 2, group = grpBias)
+requireSlope= input.bool(true,      "Require EMA to slope with trade", group = grpBias)
+
+grpStruct = "Structure & liquidity"
+pivLeft     = input.int(2, "Pivot left bars",  minval = 1, group = grpStruct)
+pivRight    = input.int(2, "Pivot right bars", minval = 1, group = grpStruct)
+sweepWin    = input.int(3, "Sweep window (recent bars)", minval = 1, group = grpStruct)
+
+grpRisk = "Risk drawing"
+minRR       = input.float(3.0, "Min reward:risk", minval = 0.5, step = 0.5, group = grpRisk)
+atrLen      = input.int(14,    "ATR length",      minval = 2,             group = grpRisk)
+slBufATR    = input.float(0.5, "Stop buffer (ATR)", minval = 0.0, step = 0.1, group = grpRisk)
+showLevels  = input.bool(true, "Draw SL / TP lines", group = grpRisk)
+
+grpDir = "Direction"
+allowLongs  = input.bool(true, "Allow long setups",  group = grpDir)
+allowShorts = input.bool(true, "Allow short setups", group = grpDir)
+
+// ----------------------------- Bias -----------------------------------------
+// Higher-timeframe EMA; slope read over a few HTF bars. lookahead_off avoids
+// repainting the confirmed HTF value.
+f_bias() =>
+    e = ta.ema(close, emaLen)
+    [e, e > e[3]]
+[emaHTF, emaRising] = request.security(syminfo.tickerid, biasTF, f_bias(),
+                                       lookahead = barmerge.lookahead_off)
+
+biasUp = not na(emaHTF) and close > emaHTF and (not requireSlope or emaRising)
+biasDn = not na(emaHTF) and close < emaHTF and (not requireSlope or not emaRising)
+
+// ----------------------- Swing points (liquidity) ---------------------------
+ph = ta.pivothigh(high, pivLeft, pivRight)
+pl = ta.pivotlow(low,  pivLeft, pivRight)
+
+var float lastSwingHigh = na
+var float lastSwingLow  = na
+if not na(ph)
+    lastSwingHigh := ph
+if not na(pl)
+    lastSwingLow := pl
+
+atr = ta.atr(atrLen)
+
+// ----------------------- Sweep + structure shift ----------------------------
+// LONG: a recent bar dipped below the swing low and closed back above it
+// (sweep of sell-side liquidity), then price closes above the swing high (BOS).
+sweptLow      = false
+sweepLowPrice = lastSwingLow
+if not na(lastSwingLow)
+    for i = 1 to sweepWin
+        if low[i] < lastSwingLow and close[i] > lastSwingLow
+            sweptLow := true
+            sweepLowPrice := math.min(sweepLowPrice, low[i])
+
+sweptHigh      = false
+sweepHighPrice = lastSwingHigh
+if not na(lastSwingHigh)
+    for i = 1 to sweepWin
+        if high[i] > lastSwingHigh and close[i] < lastSwingHigh
+            sweptHigh := true
+            sweepHighPrice := math.max(sweepHighPrice, high[i])
+
+longCond  = allowLongs  and biasUp and sweptLow  and not na(lastSwingHigh) and close > lastSwingHigh
+shortCond = allowShorts and biasDn and sweptHigh and not na(lastSwingLow)  and close < lastSwingLow
+
+// Fire once on the bar the structure actually breaks, not every bar after.
+longTrig  = longCond  and not longCond[1]
+shortTrig = shortCond and not shortCond[1]
+
+// ----------------------------- Levels ---------------------------------------
+slLong  = sweepLowPrice  - slBufATR * atr
+slShort = sweepHighPrice + slBufATR * atr
+riskL   = close - slLong
+riskS   = slShort - close
+tpLong  = close + minRR * riskL
+tpShort = close - minRR * riskS
+
+// ----------------------------- Plots ----------------------------------------
+plotshape(longTrig,  title = "Long",  style = shape.triangleup,
+          location = location.belowbar, color = color.new(color.teal, 0),
+          size = size.small, text = "LONG")
+plotshape(shortTrig, title = "Short", style = shape.triangledown,
+          location = location.abovebar, color = color.new(color.red, 0),
+          size = size.small, text = "SHORT")
+
+// Context: HTF EMA and the active swing levels.
+plot(emaHTF, "Bias EMA (HTF)", color = color.new(color.orange, 0), linewidth = 2)
+plot(lastSwingHigh, "Swing high", color = color.new(color.gray, 60), style = plot.style_circles)
+plot(lastSwingLow,  "Swing low",  color = color.new(color.gray, 60), style = plot.style_circles)
+
+// Draw SL/TP rays on each new signal.
+f_levels(_isLong, _sl, _tp) =>
+    if showLevels
+        col = _isLong ? color.teal : color.red
+        line.new(bar_index, _sl, bar_index + 8, _sl, color = color.new(color.red, 0), width = 1)
+        line.new(bar_index, _tp, bar_index + 8, _tp, color = color.new(col, 0), width = 1)
+        label.new(bar_index + 8, _sl, "SL", style = label.style_label_left,
+                  color = color.new(color.red, 80), textcolor = color.red, size = size.tiny)
+        label.new(bar_index + 8, _tp, "TP " + str.tostring(minRR, "#.#") + "R",
+                  style = label.style_label_left, color = color.new(col, 80),
+                  textcolor = col, size = size.tiny)
+
+if longTrig
+    f_levels(true, slLong, tpLong)
+if shortTrig
+    f_levels(false, slShort, tpShort)
+
+// ----------------------------- Alerts ---------------------------------------
+alertcondition(longTrig,  "Jarvis LONG setup",  "Macro-structure LONG: bias up, sweep + BOS")
+alertcondition(shortTrig, "Jarvis SHORT setup", "Macro-structure SHORT: bias down, sweep + BOS")
+
+// Background tint for the active macro bias (orientation only).
+bgcolor(biasUp ? color.new(color.teal, 92) : biasDn ? color.new(color.red, 92) : na,
+        title = "Bias tint")

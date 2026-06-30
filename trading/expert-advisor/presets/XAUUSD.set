@@ -1,0 +1,60 @@
+; ------------------------------------------------------------------
+;  JarvisMacroEA — XAUUSD (Gold) starter preset
+;  Conservative, gold-tuned defaults. EDUCATIONAL — demo-test first.
+;  Load via the EA Inputs tab ▸ "Load", or the Strategy Tester ▸ "Load".
+;  NOTE: session hours are SERVER time — adjust them to your broker (see README).
+; ------------------------------------------------------------------
+; --- Bias ---
+InpBiasTF=16388
+InpBiasEMA=50
+InpRequireSlope=true
+InpUseBias=true
+; --- Structure & liquidity ---
+InpEntryTF=15
+InpSwingLookback=25
+InpFractalWing=2
+InpSweepWindow=3
+; --- Entry model ---
+InpEntryMode=0
+InpFVGExpiryBars=8
+InpRequireBOS=false
+; --- Risk (kept small: gold moves fast) ---
+InpRiskPercent=0.25
+InpConvictionMult=1.5
+InpMinRR=3.0
+InpSLBufferATR=0.7
+InpATRPeriod=14
+InpMaxRiskPct=1.0
+; --- Trade management (wider trail for gold's bigger swings) ---
+InpMoveToBE=true
+InpTrailAfter1R=true
+InpTrailATR=2.0
+InpUsePartials=true
+InpPartialR=2.0
+InpPartialPct=50.0
+; --- Pyramiding (off by default) ---
+InpAllowPyramid=false
+InpMaxPyramids=2
+InpPyramidRiskMult=0.5
+InpMaxPositions=1
+; --- Safety: news ---
+InpUseNewsFilter=true
+InpNewsHighOnly=true
+InpNewsMinsBefore=30
+InpNewsMinsAfter=30
+; --- Safety: account guards ---
+InpDailyLossLimitPct=3.0
+InpCloseAllOnDailyLimit=false
+InpMaxPortfolioRiskPct=2.0
+; --- Sessions & filters (WIDER spread cap for gold) ---
+InpUseSessions=true
+InpSession1Start=7
+InpSession1End=11
+InpSession2Start=13
+InpSession2End=17
+InpMaxSpreadPts=50
+InpAllowLongs=true
+InpAllowShorts=true
+; --- Bookkeeping ---
+InpMagic=920628
+InpComment=JarvisMacro

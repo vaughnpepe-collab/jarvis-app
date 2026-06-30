@@ -1,0 +1,51 @@
+; ------------------------------------------------------------------
+;  JarvisMacroEA — XAUUSD DIAGNOSTIC preset
+;  Purpose: PROVE the EA places trades. Filters are relaxed so setups
+;  fire often — this is NOT a profitable config, it is a test harness.
+;  Sessions OFF, news OFF, spread cap wide, lower min R:R.
+;  Once you see trades appear, switch back to XAUUSD.set and tune.
+; ------------------------------------------------------------------
+InpBiasTF=16388
+InpBiasEMA=50
+InpRequireSlope=false
+InpUseBias=false
+InpEntryTF=15
+InpSwingLookback=25
+InpFractalWing=2
+InpSweepWindow=4
+InpEntryMode=0
+InpFVGExpiryBars=8
+InpRequireBOS=false
+InpRiskPercent=0.25
+InpConvictionMult=1.0
+InpMinRR=1.5
+InpSLBufferATR=0.7
+InpATRPeriod=14
+InpMaxRiskPct=1.0
+InpMoveToBE=true
+InpTrailAfter1R=true
+InpTrailATR=2.0
+InpUsePartials=true
+InpPartialR=1.5
+InpPartialPct=50.0
+InpAllowPyramid=false
+InpMaxPyramids=2
+InpPyramidRiskMult=0.5
+InpMaxPositions=1
+InpUseNewsFilter=false
+InpNewsHighOnly=true
+InpNewsMinsBefore=30
+InpNewsMinsAfter=30
+InpDailyLossLimitPct=0.0
+InpCloseAllOnDailyLimit=false
+InpMaxPortfolioRiskPct=0.0
+InpUseSessions=false
+InpSession1Start=7
+InpSession1End=11
+InpSession2Start=13
+InpSession2End=17
+InpMaxSpreadPts=300
+InpAllowLongs=true
+InpAllowShorts=true
+InpMagic=920628
+InpComment=JarvisDiag
