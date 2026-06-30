@@ -9,9 +9,10 @@
 //+------------------------------------------------------------------+
 #property copyright "Jarvis Trading Course"
 #property link      "https://github.com/vaughnpepe-collab/jarvis-app"
-#property version   "2.00"
+#property version   "2.10"
 #property description "Macro bias + liquidity sweep + structure shift, with"
-#property description "selectable entry models, scale-outs/pyramiding and safety controls."
+#property description "selectable entry models, scale-outs/pyramiding, safety controls"
+#property description "and an on-chart status dashboard."
 #property strict
 
 #include <Trade/Trade.mqh>
@@ -102,6 +103,11 @@ ulong    g_riskTickets[];             // tickets we've recorded the original ris
 double   g_riskValues[];              // original |open-SL| per ticket
 ulong    g_partialed[];               // tickets that have already been scaled out
 
+// On-chart status / diagnostics.
+string   g_setupNote     = "starting up";   // last reason a setup was/ wasn't taken
+datetime g_lastSignalTime= 0;               // time of the last order placed
+int      g_tradesPlaced  = 0;               // count of orders placed this run
+
 //+------------------------------------------------------------------+
 //| Initialisation                                                   |
 //+------------------------------------------------------------------+
@@ -140,6 +146,7 @@ void OnDeinit(const int reason)
 {
    if(hBiasEMA != INVALID_HANDLE) IndicatorRelease(hBiasEMA);
    if(hATR     != INVALID_HANDLE) IndicatorRelease(hATR);
+   Comment("");   // clear the on-chart dashboard
 }
 
 //+------------------------------------------------------------------+
@@ -150,8 +157,12 @@ void OnTick()
    SyncBookkeeping();                 // drop records for positions that have closed
    ManageOpenPositions();             // break-even / trailing / partials, every tick
    CleanupStalePendings();            // expire unfilled FVG limit orders
-
    UpdateDayAnchor();
+
+   int    bias  = MacroBias();        // +1 long, -1 short, 0 stand aside
+   string block = BlockReason();      // "" if trading is allowed, else why not
+   UpdateDashboard(bias, block);      // refresh the on-chart status every tick
+
    if(InpCloseAllOnDailyLimit && DailyLimitHit())
    {
       CloseAllOwn();                  // flatten and stand down for the day
@@ -163,10 +174,8 @@ void OnTick()
    if(t == lastBarTime) return;
    lastBarTime = t;
 
-   if(!IsTradingAllowed()) return;
-
-   int bias = MacroBias();            // +1 long, -1 short, 0 stand aside
-   if(bias == 0) return;
+   if(block != "") { g_setupNote = "blocked: " + block; return; }
+   if(bias == 0)   { g_setupNote = "no macro bias — standing aside"; return; }
 
    if(bias > 0 && InpAllowLongs)  TryLong();
    if(bias < 0 && InpAllowShorts) TryShort();
@@ -247,11 +256,11 @@ bool FindRecentSwingHigh(double &price, int &barIndex)
 //+------------------------------------------------------------------+
 void TryLong()
 {
-   if(!CanOpenNew(1)) return;
-   if(InpEntryMode == ENTRY_FVG_LIMIT && HasPendingDir(1)) return;
+   if(!CanOpenNew(1)) { g_setupNote = "long: position/pyramid limit reached"; return; }
+   if(InpEntryMode == ENTRY_FVG_LIMIT && HasPendingDir(1)) { g_setupNote = "long: FVG limit order already pending"; return; }
 
    double swingLow; int lowIdx;
-   if(!FindRecentSwingLow(swingLow, lowIdx)) return;
+   if(!FindRecentSwingLow(swingLow, lowIdx)) { g_setupNote = "long: no swing low found"; return; }
 
    // (2) Was that low swept inside the recent window, then reclaimed?
    bool swept = false;
@@ -262,15 +271,15 @@ void TryLong()
       double cl = iClose(_Symbol, InpEntryTF, i);
       if(lo < swingLow && cl > swingLow) { swept = true; sweepLow = MathMin(sweepLow, lo); }
    }
-   if(!swept) return;
+   if(!swept) { g_setupNote = "long: waiting for a liquidity sweep"; return; }
 
    // (3) Structure shift up: last closed bar closes above prior swing high.
    double swingHigh; int highIdx;
-   if(!FindRecentSwingHigh(swingHigh, highIdx)) return;
-   if(iClose(_Symbol, InpEntryTF, 1) <= swingHigh) return;   // no break of structure yet
+   if(!FindRecentSwingHigh(swingHigh, highIdx)) { g_setupNote = "long: no swing high found"; return; }
+   if(iClose(_Symbol, InpEntryTF, 1) <= swingHigh) { g_setupNote = "long: swept, waiting for break of structure"; return; }
 
    double atr = CurrentATR();
-   if(atr <= 0) return;
+   if(atr <= 0) { g_setupNote = "long: ATR not ready"; return; }
 
    ENUM_ENTRY_MODE mode = InpEntryMode;
    double entry, sl;
@@ -299,7 +308,7 @@ void TryLong()
    }
 
    double risk = entry - sl;
-   if(risk <= 0) return;
+   if(risk <= 0) { g_setupNote = "long: invalid stop distance"; return; }
 
    double tp = NextLiquidityAbove(swingHigh);              // target the next pool of liquidity
    if((tp - entry) / risk < InpMinRR)
@@ -312,11 +321,11 @@ void TryLong()
 
 void TryShort()
 {
-   if(!CanOpenNew(-1)) return;
-   if(InpEntryMode == ENTRY_FVG_LIMIT && HasPendingDir(-1)) return;
+   if(!CanOpenNew(-1)) { g_setupNote = "short: position/pyramid limit reached"; return; }
+   if(InpEntryMode == ENTRY_FVG_LIMIT && HasPendingDir(-1)) { g_setupNote = "short: FVG limit order already pending"; return; }
 
    double swingHigh; int highIdx;
-   if(!FindRecentSwingHigh(swingHigh, highIdx)) return;
+   if(!FindRecentSwingHigh(swingHigh, highIdx)) { g_setupNote = "short: no swing high found"; return; }
 
    bool swept = false;
    double sweepHigh = swingHigh;
@@ -326,14 +335,14 @@ void TryShort()
       double cl = iClose(_Symbol, InpEntryTF, i);
       if(hi > swingHigh && cl < swingHigh) { swept = true; sweepHigh = MathMax(sweepHigh, hi); }
    }
-   if(!swept) return;
+   if(!swept) { g_setupNote = "short: waiting for a liquidity sweep"; return; }
 
    double swingLow; int lowIdx;
-   if(!FindRecentSwingLow(swingLow, lowIdx)) return;
-   if(iClose(_Symbol, InpEntryTF, 1) >= swingLow) return;
+   if(!FindRecentSwingLow(swingLow, lowIdx)) { g_setupNote = "short: no swing low found"; return; }
+   if(iClose(_Symbol, InpEntryTF, 1) >= swingLow) { g_setupNote = "short: swept, waiting for break of structure"; return; }
 
    double atr = CurrentATR();
-   if(atr <= 0) return;
+   if(atr <= 0) { g_setupNote = "short: ATR not ready"; return; }
 
    ENUM_ENTRY_MODE mode = InpEntryMode;
    double entry, sl;
@@ -362,7 +371,7 @@ void TryShort()
    }
 
    double risk = sl - entry;
-   if(risk <= 0) return;
+   if(risk <= 0) { g_setupNote = "short: invalid stop distance"; return; }
 
    double tp = NextLiquidityBelow(swingLow);
    if((entry - tp) / risk < InpMinRR)
@@ -455,10 +464,18 @@ void Execute(int dir, ENUM_ENTRY_MODE mode, double entry, double sl, double tp, 
    }
 
    if(!ok)
+   {
+      g_setupNote = "ORDER FAILED: " + (string)trade.ResultRetcode() + " " + trade.ResultRetcodeDescription();
       Print("Order failed: ", trade.ResultRetcode(), " ", trade.ResultRetcodeDescription());
+   }
    else
+   {
+      g_tradesPlaced++;
+      g_lastSignalTime = TimeCurrent();
+      g_setupNote = (dir > 0 ? "LONG " : "SHORT ") + EnumToString(mode) + " placed " + DoubleToString(lots, 2) + " lots";
       Print((dir > 0 ? "LONG " : "SHORT "), EnumToString(mode), " ", lots,
             " lots @~", entry, " SL=", sl, " TP=", tp, " risk%=", riskPct);
+   }
 }
 
 //  Position sizing from money at risk and stop distance — the single
@@ -601,18 +618,52 @@ void ManageOpenPositions()
 }
 
 //=========================== FILTERS =============================//
-bool IsTradingAllowed()
+//  Returns an empty string if trading is allowed, otherwise a short
+//  human-readable reason (shown on the dashboard so you can see WHY
+//  the EA is standing aside).
+string BlockReason()
 {
-   if(!MQLInfoInteger(MQL_TESTER) && !TerminalInfoInteger(TERMINAL_TRADE_ALLOWED)) return false;
-   if(!MQLInfoInteger(MQL_TRADE_ALLOWED)) return false;
+   if(!MQLInfoInteger(MQL_TESTER) && !TerminalInfoInteger(TERMINAL_TRADE_ALLOWED))
+      return "Algo Trading OFF (toolbar button)";
+   if(!MQLInfoInteger(MQL_TRADE_ALLOWED))
+      return "Algo Trading not allowed for this EA";
 
    double spread = (double)SymbolInfoInteger(_Symbol, SYMBOL_SPREAD);
-   if(spread > InpMaxSpreadPts) return false;
+   if(spread > InpMaxSpreadPts)
+      return StringFormat("Spread %.0f > cap %.0f", spread, InpMaxSpreadPts);
 
-   if(InpUseSessions && !InMainSession()) return false;
-   if(DailyLimitHit())                    return false;
-   if(NewsBlackout())                     return false;
-   return true;
+   if(InpUseSessions && !InMainSession()) return "Outside session hours (server time)";
+   if(DailyLimitHit())                    return "Daily loss limit hit";
+   if(NewsBlackout())                     return "High-impact news window";
+   return "";
+}
+
+bool IsTradingAllowed() { return BlockReason() == ""; }
+
+//  Live on-chart status panel. Top-left of the chart, refreshed every tick.
+void UpdateDashboard(int bias, string block)
+{
+   string biasStr = (bias > 0) ? "LONG only" : (bias < 0) ? "SHORT only" : "neutral (stand aside)";
+   string algo    = MQLInfoInteger(MQL_TRADE_ALLOWED) ? "ON" : "OFF";
+   double spread  = (double)SymbolInfoInteger(_Symbol, SYMBOL_SPREAD);
+   double dayPL   = (g_dayStartEquity > 0) ? AccountInfoDouble(ACCOUNT_EQUITY) - g_dayStartEquity : 0.0;
+   string state   = (block == "") ? "READY — scanning for setups" : "WAITING — " + block;
+   int    openN   = CountDir(1) + CountDir(-1);
+
+   string txt =
+      "──────── JarvisMacroEA v2 ────────\n" +
+      "STATUS    : ONLINE\n" +
+      "           " + state + "\n" +
+      "Symbol/TF : " + _Symbol + "  " + EnumToString(InpEntryTF) + "   (mode: " + EnumToString(InpEntryMode) + ")\n" +
+      "Algo trade: " + algo + "     Spread: " + DoubleToString(spread, 0) + " / cap " + DoubleToString(InpMaxSpreadPts, 0) + "\n" +
+      "Bias (" + EnumToString(InpBiasTF) + "): " + biasStr + "\n" +
+      "Session   : " + (InMainSession() ? "IN session" : "out of session") + "\n" +
+      "Positions : " + (string)openN + "    Trades this run: " + (string)g_tradesPlaced + "\n" +
+      "Day P/L   : " + DoubleToString(dayPL, 2) + " " + AccountInfoString(ACCOUNT_CURRENCY) + "\n" +
+      "Last note : " + g_setupNote + "\n" +
+      "Last trade: " + (g_lastSignalTime > 0 ? TimeToString(g_lastSignalTime, TIME_DATE | TIME_MINUTES) : "none yet");
+
+   Comment(txt);
 }
 
 bool InMainSession()
