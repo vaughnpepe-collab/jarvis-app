@@ -334,8 +334,9 @@ h2{font-size:var(--f-h2);font-weight:850;line-height:1.1;letter-spacing:-.02em;c
 .cpill:hover{transform:translateX(5px);box-shadow:var(--sh-md);border-color:#cbd5e1}
 .cpill .ci{width:46px;height:46px;border-radius:12px;background:#eff6ff;color:var(--accent-600);display:grid;place-items:center;flex-shrink:0}
 .cpill .ci.wa{background:#dcfce7;color:#16a34a}
-.cpill .cl{font-size:.74rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:700}
-.cpill .cv{font-size:1rem;font-weight:750;color:var(--ink);word-break:break-word}
+.cpill .ctext{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cpill .cl{display:block;font-size:.72rem;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-weight:700;line-height:1}
+.cpill .cv{display:block;font-size:clamp(.86rem, 3.2vw, 1rem);font-weight:750;color:var(--ink);line-height:1.2;word-break:break-word}
 form{display:flex;flex-direction:column;gap:15px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:34px;box-shadow:var(--sh-md)}
 .field{display:flex;flex-direction:column;gap:6px}
 .field label{font-size:.82rem;font-weight:700;color:var(--text)}
@@ -665,10 +666,10 @@ textarea{resize:vertical;min-height:120px}
       <h2>Let's talk about your website</h2>
       <p class="lead">Based in High Wycombe, working with businesses across Buckinghamshire. Get in touch for a free, no-obligation quote — I'll get back to you the same day.</p>
       <div class="cpills">
-        <a class="cpill" href="tel:+447359881818"><span class="ci"><svg class="ic"><use href="#i-phone"/></svg></span><span><span class="cl">Call</span><span class="cv">07359 881818</span></span></a>
-        <a class="cpill" href="https://wa.me/447359881818" target="_blank" rel="noopener"><span class="ci wa"><svg class="ic"><use href="#i-msg"/></svg></span><span><span class="cl">WhatsApp</span><span class="cv">Message me</span></span></a>
-        <a class="cpill" href="mailto:hellohwwebdesign@gmail.com"><span class="ci"><svg class="ic"><use href="#i-mail"/></svg></span><span><span class="cl">Email</span><span class="cv">hellohwwebdesign@gmail.com</span></span></a>
-        <div class="cpill"><span class="ci"><svg class="ic"><use href="#i-pin"/></svg></span><span><span class="cl">Based in</span><span class="cv">High Wycombe, Bucks</span></span></div>
+        <a class="cpill" href="tel:+447359881818"><span class="ci"><svg class="ic"><use href="#i-phone"/></svg></span><span class="ctext"><span class="cl">Call</span><span class="cv">07359 881818</span></span></a>
+        <a class="cpill" href="https://wa.me/447359881818" target="_blank" rel="noopener"><span class="ci wa"><svg class="ic"><use href="#i-msg"/></svg></span><span class="ctext"><span class="cl">WhatsApp</span><span class="cv">Message me</span></span></a>
+        <a class="cpill" href="mailto:hellohwwebdesign@gmail.com"><span class="ci"><svg class="ic"><use href="#i-mail"/></svg></span><span class="ctext"><span class="cl">Email</span><span class="cv">hellohwwebdesign@gmail.com</span></span></a>
+        <div class="cpill"><span class="ci"><svg class="ic"><use href="#i-pin"/></svg></span><span class="ctext"><span class="cl">Based in</span><span class="cv">High Wycombe, Bucks</span></span></div>
       </div>
     </div>
     <!-- Zero-backend: submits via the visitor's email client. Swap for a free
