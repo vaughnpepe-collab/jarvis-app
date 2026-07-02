@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tenly — Never get a 2am tenant call again</title>
+<meta name="description" content="Tenly is the AI property manager for independent landlords. It answers tenant maintenance requests, triages emergencies, and dispatches trusted contractors — so you stop being on call 24/7." />
+<style>
+  :root{
+    --bg:#0e1320; --bg2:#141b2d; --card:#1a2336; --line:#26304a;
+    --ink:#eef2fb; --muted:#9aa6c2; --brand:#4f7cff; --brand-d:#3a63e0;
+    --accent:#36d6a6; --warn:#ffcf6b;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.55; -webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1000px; margin:0 auto; padding:0 22px}
+  .btn{display:inline-block; background:var(--brand); color:#fff; text-decoration:none; font-weight:700;
+    padding:15px 26px; border-radius:11px; border:0; cursor:pointer; font-size:17px;
+    transition:transform .06s ease, background .15s ease}
+  .btn:hover{background:var(--brand-d)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:transparent; color:var(--ink); border:1.5px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--brand); color:#fff}
+
+  nav{display:flex; align-items:center; justify-content:space-between; padding:20px 0}
+  .logo{font-weight:800; font-size:21px; letter-spacing:-.02em; display:flex; align-items:center; gap:9px}
+  .logo .dot{width:18px;height:18px;border-radius:6px;background:linear-gradient(135deg,var(--brand),var(--accent))}
+  .logo span{color:var(--accent)}
+  .navlinks{display:flex; gap:26px; align-items:center; font-size:15px; color:var(--muted)}
+  .navlinks a:hover{color:#fff}
+  @media(max-width:640px){ .navlinks{display:none} }
+
+  header{background:radial-gradient(1200px 500px at 50% -120px, rgba(79,124,255,.20), transparent), var(--bg)}
+  .hero{padding:40px 0 70px; text-align:center}
+  .pill{display:inline-block; background:rgba(54,214,166,.12); color:var(--accent); font-weight:700;
+    font-size:13px; padding:6px 14px; border-radius:999px; margin-bottom:24px; border:1px solid rgba(54,214,166,.25)}
+  h1{font-size:clamp(34px,5.4vw,56px); line-height:1.06; letter-spacing:-.03em; margin:0 0 20px; font-weight:800}
+  h1 .hl{background:linear-gradient(120deg,var(--brand),var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .sub{font-size:clamp(17px,2.4vw,21px); color:var(--muted); max-width:680px; margin:0 auto 32px}
+  .cta-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
+  .reassure{margin-top:16px; font-size:14px; color:var(--muted)}
+
+  .proof{display:flex; gap:40px; justify-content:center; flex-wrap:wrap; padding:26px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--bg2)}
+  .proof .num{font-size:26px; font-weight:800}
+  .proof .lbl{font-size:13px; color:var(--muted)}
+  .proof .stat{text-align:center}
+
+  section{padding:64px 0}
+  h2{font-size:clamp(27px,3.4vw,35px); letter-spacing:-.02em; margin:0 0 14px; text-align:center}
+  .lead{color:var(--muted); text-align:center; max-width:640px; margin:0 auto 44px; font-size:18px}
+
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:20px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:26px}
+  .card .n{width:36px;height:36px;border-radius:10px;background:rgba(79,124,255,.16);color:var(--brand);font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:16px}
+  .card h3{margin:0 0 8px; font-size:18px}
+  .card p{margin:0; color:var(--muted); font-size:15px}
+
+  .features{display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-top:8px}
+  .feat{display:flex; gap:14px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px}
+  .feat .ico{font-size:22px; line-height:1}
+  .feat b{display:block; margin-bottom:4px}
+  .feat p{margin:0; color:var(--muted); font-size:14px}
+
+  .roi{background:linear-gradient(135deg, rgba(79,124,255,.12), rgba(54,214,166,.10)); border:1px solid var(--line); border-radius:18px; padding:36px; text-align:center}
+  .roi .big{font-size:clamp(24px,3.2vw,30px); font-weight:800; letter-spacing:-.02em; margin:0 0 8px}
+  .roi .big em{color:var(--accent); font-style:normal}
+  .roi p{color:var(--muted); margin:6px 0 0}
+
+  .wins{display:grid; grid-template-columns:repeat(3,1fr); gap:20px}
+  .win{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:24px}
+  .win .quote{font-size:15px; margin:0 0 16px}
+  .win .who{display:flex; align-items:center; gap:10px}
+  .win .av{width:36px;height:36px;border-radius:50%;background:rgba(79,124,255,.18);color:var(--brand);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .win .who b{display:block; font-size:14px}
+  .win .who span{font-size:13px; color:var(--muted)}
+  .win .tag{display:inline-block; background:rgba(54,214,166,.12); color:var(--accent); font-weight:700; font-size:12px; padding:4px 10px; border-radius:999px; margin-bottom:14px}
+
+  .price{max-width:440px; margin:0 auto; background:var(--card); border:2px solid var(--brand); border-radius:20px; padding:34px; text-align:center; box-shadow:0 20px 50px rgba(79,124,255,.18)}
+  .price .amt{font-size:46px; font-weight:800; letter-spacing:-.02em}
+  .price .amt small{font-size:17px; color:var(--muted); font-weight:600}
+  .price .plus{color:var(--accent); font-weight:700; margin:4px 0 18px}
+  .price ul{list-style:none; padding:0; margin:0 0 24px; text-align:left}
+  .price li{padding:8px 0 8px 28px; position:relative}
+  .price li::before{content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:800}
+
+  .signup{max-width:520px; margin:0 auto; text-align:center}
+  .form-row{display:flex; gap:10px; margin-top:18px}
+  .form-row input{flex:1; padding:15px 16px; border:1.5px solid var(--line); border-radius:11px; font-size:16px; background:var(--bg2); color:var(--ink)}
+  .form-row input::placeholder{color:#6b7794}
+  .form-row input:focus{outline:none; border-color:var(--brand)}
+  @media(max-width:600px){ .form-row{flex-direction:column} .steps,.features,.wins{grid-template-columns:1fr} }
+
+  details{border-bottom:1px solid var(--line); padding:18px 4px}
+  summary{cursor:pointer; font-weight:700; font-size:17px; list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+"; float:right; color:var(--brand); font-weight:800}
+  details[open] summary::after{content:"–"}
+  details p{color:var(--muted); margin:12px 0 2px}
+
+  footer{padding:42px 0; border-top:1px solid var(--line); text-align:center; color:var(--muted); font-size:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="logo"><span class="dot"></span>Ten<span>ly</span></div>
+      <div class="navlinks">
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#start">Get started</a>
+      </div>
+    </nav>
+    <div class="hero">
+      <div class="pill">For independent landlords &amp; small portfolios</div>
+      <h1>Never get a <span class="hl">2am tenant call</span> again.</h1>
+      <p class="sub">Tenly is the AI property manager that answers your tenants, triages maintenance, and dispatches trusted contractors — 24/7, in your name. You stay informed; you stop being on call.</p>
+      <div class="cta-row">
+        <a class="btn" href="#start">Get my evenings back →</a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+      <div class="reassure">No app for your tenants to download • You approve anything that costs money • Cancel anytime</div>
+    </div>
+  </div>
+</header>
+
+<div class="proof">
+  <div class="stat"><div class="num">3am</div><div class="lbl">when the "toilet's leaking" text always arrives</div></div>
+  <div class="stat"><div class="num">8 hrs/wk</div><div class="lbl">small landlords spend managing tenants</div></div>
+  <div class="stat"><div class="num">£0</div><div class="lbl">to handle the routine stuff yourself — until now</div></div>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="lead">Tenants text one number. Tenly handles the rest and only pings you when it actually matters.</p>
+    <div class="steps">
+      <div class="card">
+        <div class="n">1</div>
+        <h3>Tenants text Tenly</h3>
+        <p>Your tenants message a normal phone number — no app to install. Tenly answers instantly, day or night, in a warm, professional voice.</p>
+      </div>
+      <div class="card">
+        <div class="n">2</div>
+        <h3>It triages &amp; troubleshoots</h3>
+        <p>Tenly walks them through quick fixes, decides what's urgent vs. routine, and logs every request with photos so nothing slips.</p>
+      </div>
+      <div class="card">
+        <div class="n">3</div>
+        <h3>You approve, it dispatches</h3>
+        <p>For real repairs, Tenly lines up a trusted contractor and sends you a one-tap approval. Emergencies escalate to you immediately.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" style="padding-top:0">
+  <div class="wrap">
+    <h2>What Tenly takes off your plate</h2>
+    <p class="lead">The everyday landlord grind — handled.</p>
+    <div class="features">
+      <div class="feat"><div class="ico">🌙</div><div><b>24/7 tenant line</b><p>After-hours questions and emergencies answered the moment they come in, so you sleep.</p></div></div>
+      <div class="feat"><div class="ico">🔧</div><div><b>Maintenance triage</b><p>Routine fixes guided over text; real issues routed to a vetted contractor with your okay.</p></div></div>
+      <div class="feat"><div class="ico">📸</div><div><b>Logged &amp; documented</b><p>Every request, photo, and message stored — a clean paper trail for you and your records.</p></div></div>
+      <div class="feat"><div class="ico">🚨</div><div><b>Smart escalation</b><p>Flood or no-heat? Tenly calls you. A dripping tap on a Tuesday? It just handles it.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="roi">
+      <p class="big">One avoided weekend call-out pays for <em>months</em> of Tenly.</p>
+      <p>At £9 per unit a month, Tenly costs less than one emergency plumber call-out a year — and gives you back roughly 8 hours a week of being on call.</p>
+    </div>
+  </div>
+</section>
+
+<!--
+  PROOF SECTION — swap these for REAL wins as they come in during validation.
+  Use a real first name + city, the unit count, and the specific time saved.
+-->
+<section>
+  <div class="wrap">
+    <h2>Landlords who got their evenings back</h2>
+    <p class="lead">Early users, real units, real peace of mind. (Replace with your own wins.)</p>
+    <div class="wins">
+      <div class="win">
+        <div class="tag">6 units</div>
+        <p class="quote">"A tenant's boiler died at 11pm. Tenly had a heating engineer booked before I'd even seen the message. I found out in the morning — sorted."</p>
+        <div class="who"><div class="av">JT</div><div><b>James T.</b><span>Landlord, 6 units</span></div></div>
+      </div>
+      <div class="win">
+        <div class="tag">~7 hrs/wk saved</div>
+        <p class="quote">"I used to dread my phone buzzing on weekends. Now Tenly handles the small stuff and only calls me for the things that actually need me."</p>
+        <div class="who"><div class="av">AO</div><div><b>Amara O.</b><span>Landlord, 11 units</span></div></div>
+      </div>
+      <div class="win">
+        <div class="tag">3 units</div>
+        <p class="quote">"My tenants think I hired a property manager. Honestly it's better — replies are instant and nothing falls through the cracks."</p>
+        <div class="who"><div class="av">RB</div><div><b>Rob B.</b><span>Landlord, 3 units</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" style="background:var(--bg2); border-top:1px solid var(--line); border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <h2>Simple per-unit pricing</h2>
+    <p class="lead">Pay for the doors you have. Nothing more.</p>
+    <div class="price">
+      <div class="amt">£9<small>/unit / mo</small></div>
+      <div class="plus">First unit free for 14 days</div>
+      <ul>
+        <li>24/7 AI tenant line (no tenant app)</li>
+        <li>Maintenance triage &amp; troubleshooting</li>
+        <li>Contractor dispatch with your approval</li>
+        <li>Emergency escalation to you</li>
+        <li>Full request &amp; photo log</li>
+        <li>Cancel anytime</li>
+      </ul>
+      <!-- Create a Stripe Payment Link ($9/unit/mo) and paste it here to collect real cards -->
+      <a class="btn" style="width:100%" href="#start">Start free →</a>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <div class="signup">
+      <h2>Get your evenings back — start free</h2>
+      <p class="lead" style="margin-bottom:8px">Drop your email. We'll set you up and personally cover your tenant line free for two weeks, so you can feel the difference before you pay a cent.</p>
+      <!-- Reuses your existing Formspree endpoint; create a separate Tenly form if you want clean separation -->
+      <form action="https://formspree.io/f/mgojlbnp" method="POST">
+        <input type="hidden" name="_subject" value="New Tenly signup 🏠" />
+        <input type="hidden" name="product" value="Tenly" />
+        <div class="form-row">
+          <input type="email" name="email" placeholder="you@email.com" required />
+          <button class="btn" type="submit">Start free →</button>
+        </div>
+      </form>
+      <div class="reassure">No tenant app. No card to start. Just quieter evenings.</div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:10px">
+  <div class="wrap" style="max-width:720px">
+    <h2 style="margin-bottom:26px">Questions</h2>
+    <details open>
+      <summary>Do my tenants have to download anything?</summary>
+      <p>No. They text a normal phone number like they'd text you. There's nothing for them to install or learn — it just feels like fast, friendly service.</p>
+    </details>
+    <details>
+      <summary>Will it spend my money without asking?</summary>
+      <p>Never. Tenly troubleshoots and triages on its own, but anything that costs money — a contractor call-out, a repair — needs your one-tap approval first.</p>
+    </details>
+    <details>
+      <summary>What happens in a real emergency?</summary>
+      <p>Genuine emergencies (flooding, gas, no heat in winter) escalate to you immediately by call and text, while Tenly keeps the tenant calm and informed.</p>
+    </details>
+    <details>
+      <summary>I only have a couple of units. Is this overkill?</summary>
+      <p>That's exactly who Tenly is for. Big operators have staff for this; independent landlords don't. Per-unit pricing means it's affordable even for one or two doors.</p>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo" style="justify-content:center; font-size:18px; margin-bottom:8px"><span class="dot"></span>Ten<span>ly</span></div>
+    <div>Your evenings, back. © 2026 Tenly.</div>
+  </div>
+</footer>
+
+</body>
+</html>
