@@ -10,3 +10,6 @@ leads/leads_*.md
 leads/outreach_pack_*.md
 leads/email_drafts*.json
 leads/email_drafts*.md
+
+# Polymarket bot paper-trading state (local portfolio, not code)
+polymarket_data/
