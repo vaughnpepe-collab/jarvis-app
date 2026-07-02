@@ -1,18 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HW Web Design | Professional Websites for High Wycombe Businesses</title>
-<meta name="description" content="Affordable, mobile-friendly websites for small businesses in High Wycombe, Marlow, Beaconsfield & Amersham. Sites from £399, live within a week. Free no-obligation mockup.">
+<title>HW Web Design | Websites That Win Customers for High Wycombe Businesses</title>
+<meta name="description" content="Modern, fast, mobile-friendly websites for small businesses in High Wycombe, Marlow, Beaconsfield, Amersham & across Buckinghamshire. From £399, live within a week. See a free, no-obligation mockup first.">
+<meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://hwwebdesign.co.uk/">
 <meta name="theme-color" content="#0b1220">
+<meta name="color-scheme" content="light">
+<!-- Open Graph / social -->
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="HW Web Design">
 <meta property="og:title" content="HW Web Design — Websites That Win Customers for Local Businesses">
-<meta property="og:description" content="Affordable, mobile-friendly websites for High Wycombe & Buckinghamshire businesses. From £399, live in a week. Free mockup, no obligation.">
+<meta property="og:description" content="Modern, mobile-friendly websites for High Wycombe & Buckinghamshire businesses. From £399, live in a week. Free mockup, no obligation.">
 <meta property="og:url" content="https://hwwebdesign.co.uk/">
 <meta property="og:locale" content="en_GB">
+<meta property="og:image" content="https://hwwebdesign.co.uk/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="HW Web Design — websites that win customers, from £399, live in a week.">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HW Web Design — Websites That Win Customers">
+<meta name="twitter:description" content="Modern, mobile-friendly websites for High Wycombe businesses. From £399, live in a week. Free mockup, no obligation.">
+<meta name="twitter:image" content="https://hwwebdesign.co.uk/assets/og-cover.png">
 <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
 <link rel="alternate icon" href="/assets/logo-icon-512.png">
 <link rel="apple-touch-icon" href="/assets/logo-icon-512.png">
@@ -20,558 +31,812 @@
 {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
+  "@id": "https://hwwebdesign.co.uk/#business",
   "name": "HW Web Design",
-  "description": "Web design for small businesses in High Wycombe and Buckinghamshire. Mobile-friendly websites from £399, live within a week.",
+  "description": "Web design for small businesses in High Wycombe and across Buckinghamshire. Modern, mobile-friendly websites from £399, live within a week.",
   "url": "https://hwwebdesign.co.uk/",
+  "image": "https://hwwebdesign.co.uk/assets/og-cover.png",
   "email": "hellohwwebdesign@gmail.com",
+  "telephone": "+44-7359-881818",
   "priceRange": "££",
-  "areaServed": ["High Wycombe", "Marlow", "Beaconsfield", "Amersham", "Buckinghamshire"],
+  "areaServed": ["High Wycombe", "Marlow", "Beaconsfield", "Amersham", "Aylesbury", "Buckinghamshire"],
   "address": {"@type": "PostalAddress", "addressLocality": "High Wycombe", "addressRegion": "Buckinghamshire", "addressCountry": "GB"},
   "makesOffer": {"@type": "Offer", "priceCurrency": "GBP", "price": "399", "itemOffered": {"@type": "Service", "name": "Small business website"}}
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"How much does a website cost?","acceptedAnswer":{"@type":"Answer","text":"Sites start at £399 for a clean, mobile-friendly starter site. Most local businesses choose the £699 Standard package for a full multi-page site. Everything is a fixed price agreed up front — no hidden fees."}},
+    {"@type":"Question","name":"How long does it take?","acceptedAnswer":{"@type":"Answer","text":"Most sites go live within a week of receiving your content. A simple starter site can be ready in just a few days."}},
+    {"@type":"Question","name":"Do I have to pay anything up front?","acceptedAnswer":{"@type":"Answer","text":"No. I design a free, no-obligation mockup of your new site first. You only pay once you have seen it and you are happy to go ahead."}},
+    {"@type":"Question","name":"Do I own my website?","acceptedAnswer":{"@type":"Answer","text":"Yes — 100%. The website and your domain name belong to you. You are never locked in."}},
+    {"@type":"Question","name":"I already have a website — can you improve it?","acceptedAnswer":{"@type":"Answer","text":"Absolutely. I will build a free mockup of a refreshed version so you can see the difference side by side before deciding."}},
+    {"@type":"Question","name":"Will my site show up on Google?","acceptedAnswer":{"@type":"Answer","text":"Every site is built SEO-ready and I set up your Google Business Profile so nearby customers can find, call and map you."}},
+    {"@type":"Question","name":"Do you handle hosting and updates?","acceptedAnswer":{"@type":"Answer","text":"Yes. There is an optional care plan from £39/month covering hosting, updates and changes — or you are free to host it yourself. No lock-in contracts."}}
+  ]
+}
+</script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* ============ TOKENS ============ */
 :root{
-  --blue:#2563eb;--blue-dark:#1d4ed8;--indigo:#4f46e5;--violet:#7c3aed;--cyan:#06b6d4;
-  --ink:#0b1220;--slate:#0f172a;--text:#0f172a;--grey:#64748b;--light:#f8fafc;--border:#e7ebf3;
+  /* ink / dark surfaces */
+  --ink-900:#070c17; --ink:#0b1220; --ink-700:#0f1830; --ink-600:#152244;
+  --ink-panel:#101a35;
+  /* accent */
+  --accent:#3b82f6; --accent-600:#2563eb; --accent-700:#1d4ed8;
+  --violet:#7c3aed; --violet-300:#a78bfa; --cyan:#22d3ee; --emerald:#34d399;
+  /* light surfaces + text */
+  --surface:#ffffff; --surface-2:#f5f8fd; --surface-3:#eef2fa;
+  --text:#0d1526; --muted:#525d75; --muted-2:#6a7690;
+  --line:#e6eaf2;
+  /* on-dark text */
+  --on-dark:#eef3fc; --on-dark-muted:rgba(223,230,244,.70); --on-dark-faint:rgba(223,230,244,.5);
+  /* gradients */
+  --grad:linear-gradient(120deg,#3b82f6,#6366f1,#8b5cf6);
+  --grad-text:linear-gradient(92deg,#60a5fa,#a78bfa,#38bdf8);
+  --grad-band:linear-gradient(120deg,#1d4ed8,#4f46e5,#7c3aed);
+  /* radius */
+  --r-sm:12px; --r-md:16px; --r-lg:22px; --r-xl:28px; --r-pill:999px;
+  /* shadow */
+  --sh-sm:0 1px 2px rgba(11,18,32,.05),0 3px 8px rgba(11,18,32,.05);
+  --sh-md:0 10px 30px rgba(11,18,32,.09);
+  --sh-lg:0 26px 64px rgba(11,18,32,.14);
+  --sh-glow:0 14px 36px rgba(59,130,246,.42);
+  /* type */
+  --f-display:clamp(2.55rem, 1.5rem + 4.6vw, 4.5rem);
+  --f-h2:clamp(1.85rem, 1.25rem + 2.5vw, 2.9rem);
+  --f-h3:1.18rem;
+  --f-lead:clamp(1.06rem, 1rem + 0.4vw, 1.24rem);
+  /* motion */
+  --ease:cubic-bezier(.2,.7,.2,1); --ease-out:cubic-bezier(.16,1,.3,1);
+  --container:1200px; --nav-h:72px;
 }
-html{scroll-behavior:smooth;overflow-x:hidden}
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--text);line-height:1.6;background:#fff;overflow-x:hidden;width:100%;max-width:100%;position:relative}
-a{text-decoration:none}
-::selection{background:var(--blue);color:#fff}
-img{max-width:100%}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--text);line-height:1.6;background:var(--surface);
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+a{text-decoration:none;color:inherit}
+img,svg{max-width:100%;display:block}
+::selection{background:var(--accent);color:#fff}
+h1,h2,h3,h4{text-wrap:balance}
+p{text-wrap:pretty}
 
-/* ---------- scroll progress ---------- */
-.progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:200;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));box-shadow:0 0 12px rgba(37,99,235,.6)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip{position:fixed;top:-120px;left:16px;z-index:400;background:#fff;color:var(--accent-700);padding:12px 20px;border-radius:12px;font-weight:800;box-shadow:var(--sh-lg);transition:top .22s var(--ease)}
+.skip:focus{top:16px}
+:focus-visible{outline:3px solid #93c5fd;outline-offset:3px;border-radius:8px}
 
-/* ---------- nav ---------- */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;transition:background .35s,box-shadow .35s,border-color .35s;border-bottom:1px solid transparent}
-nav.solid{background:rgba(255,255,255,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 4px 24px rgba(2,6,23,.06)}
-.nav-logo{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;font-size:19px;font-weight:800;letter-spacing:-.3px;color:#fff;transition:color .35s}
-.nav-logo span{margin-left:2px}
-.nav-logo .logo-mark{width:30px;height:30px;flex-shrink:0;transition:transform .25s cubic-bezier(.2,.7,.2,1)}
-.nav-logo:hover .logo-mark{transform:translateY(-1px) scale(1.08)}
-.logo-mark .ln{transform-box:fill-box;transform-origin:left center;animation:lnDraw .6s cubic-bezier(.2,.7,.2,1) both}
-.logo-mark .lines .ln:nth-child(1){animation-delay:.25s}
-.logo-mark .lines .ln:nth-child(2){animation-delay:.38s}
-.logo-mark .lines .ln:nth-child(3){animation-delay:.51s}
-.logo-mark .dots circle{transform-box:fill-box;transform-origin:center}
-.nav-logo:hover .dots circle{animation:dotPulse .6s ease}
-.nav-logo:hover .dots circle:nth-child(2){animation-delay:.08s}
-.nav-logo:hover .dots circle:nth-child(3){animation-delay:.16s}
-@keyframes lnDraw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-@keyframes dotPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.55)}}
-@media(max-width:980px){.nav-links{display:none}.nav-toggle{display:flex}.nav-cta{display:none}}
-nav.solid .nav-logo{color:var(--ink)}
-.nav-logo span{color:#7dd3fc}
-nav.solid .nav-logo span{color:var(--blue)}
-.nav-links{display:flex;gap:30px;list-style:none}
-.nav-links a{color:rgba(255,255,255,.82);font-size:15px;font-weight:500;transition:color .2s;position:relative}
-nav.solid .nav-links a{color:var(--grey)}
-.nav-links a::after{content:'';position:absolute;left:0;bottom:-5px;height:2px;width:0;background:var(--blue);transition:width .25s}
+.container{width:100%;max-width:var(--container);margin:0 auto;padding:0 24px}
+section{padding:clamp(64px,9vw,120px) 0;scroll-margin-top:80px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-600)}
+.eyebrow.on-dark{color:#bfdbfe}
+h2{font-size:var(--f-h2);font-weight:850;line-height:1.1;letter-spacing:-.02em;color:var(--ink);margin:14px 0 16px}
+.lead{font-size:var(--f-lead);color:var(--muted);line-height:1.65;max-width:60ch}
+.head-center{text-align:center;max-width:none}
+.head-center .lead{margin-left:auto;margin-right:auto}
+.grad-text{background:var(--grad-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.section-2{background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+
+/* icon system */
+.ic{width:24px;height:24px;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;fill:none;flex-shrink:0}
+.ic.sm{width:18px;height:18px}
+
+/* buttons */
+.btn{--pad:15px 26px;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:var(--pad);border-radius:14px;font-weight:800;font-size:1rem;line-height:1;cursor:pointer;border:1px solid transparent;transition:transform .18s var(--ease),box-shadow .25s var(--ease),background .2s,border-color .2s;will-change:transform}
+.btn .ic{width:19px;height:19px;stroke-width:2}
+.btn-primary{background:var(--accent-600);color:#fff;box-shadow:var(--sh-glow)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 18px 44px rgba(37,99,235,.55)}
+.btn-primary::after{content:"";position:absolute;inset:0;border-radius:inherit;overflow:hidden;background:linear-gradient(120deg,transparent 40%,rgba(255,255,255,.35) 50%,transparent 60%);background-size:250% 100%;background-position:150% 0;transition:none;animation:sheen 5s ease-in-out infinite;pointer-events:none}
+@keyframes sheen{0%,55%{background-position:150% 0}80%,100%{background-position:-50% 0}}
+.btn-ghost{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.2)}
+.btn-ghost:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.4);transform:translateY(-2px)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{transform:translateY(-2px);box-shadow:var(--sh-lg)}
+.btn-white{background:#fff;color:var(--accent-700)}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 20px 46px rgba(0,0,0,.25)}
+.btn-outline{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent-700);transform:translateY(-2px)}
+.btn-block{display:flex;width:100%}
+
+/* ============ PROGRESS + NAV ============ */
+.progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:300;background:linear-gradient(90deg,var(--cyan),var(--accent),var(--violet));box-shadow:0 0 12px rgba(59,130,246,.6)}
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);display:flex;align-items:center;transition:background .35s,box-shadow .35s,border-color .35s;border-bottom:1px solid transparent}
+.nav.solid{background:rgba(255,255,255,.82);backdrop-filter:blur(16px) saturate(1.4);border-bottom-color:var(--line);box-shadow:0 6px 26px rgba(2,6,23,.06)}
+.nav .container{display:flex;align-items:center;justify-content:space-between}
+.brand{display:inline-flex;align-items:center;gap:11px;font-size:1.18rem;font-weight:850;letter-spacing:-.02em;color:#fff;white-space:nowrap;transition:color .35s}
+.nav.solid .brand{color:var(--ink)}
+.brand .mark{width:32px;height:32px;flex-shrink:0;transition:transform .3s var(--ease)}
+.brand:hover .mark{transform:translateY(-2px) rotate(-3deg) scale(1.06)}
+.brand b{font-weight:850}
+.brand span{color:#7dd3fc;transition:color .35s}
+.nav.solid .brand span{color:var(--accent-600)}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+.nav-links a{position:relative;font-size:.95rem;font-weight:600;color:rgba(255,255,255,.82);transition:color .2s}
+.nav.solid .nav-links a{color:var(--muted)}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;height:2px;width:0;border-radius:2px;background:var(--accent);transition:width .25s var(--ease)}
+.nav-links a:hover{color:#fff}.nav.solid .nav-links a:hover{color:var(--accent-700)}
 .nav-links a:hover::after{width:100%}
-.nav-links a:hover{color:var(--blue)}
-.nav-cta{background:var(--blue);color:#fff;padding:10px 22px;border-radius:9px;font-weight:700;font-size:14px;transition:transform .15s,box-shadow .25s;box-shadow:0 6px 18px rgba(37,99,235,.35)}
-.nav-cta:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,99,235,.5)}
-
-/* ---------- hero ---------- */
-.hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:120px 5% 80px;background:var(--ink);overflow:hidden}
-.aurora{position:absolute;inset:0;overflow:hidden;z-index:0}
-.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;will-change:transform}
-.blob.b1{width:520px;height:520px;background:#2563eb;top:-120px;left:-80px;animation:drift1 18s ease-in-out infinite}
-.blob.b2{width:480px;height:480px;background:#7c3aed;top:10%;right:-120px;animation:drift2 22s ease-in-out infinite}
-.blob.b3{width:420px;height:420px;background:#06b6d4;bottom:-160px;left:30%;animation:drift3 20s ease-in-out infinite}
-@keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(80px,60px) scale(1.15)}}
-@keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-90px,40px) scale(1.1)}}
-@keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,-70px) scale(1.18)}}
-.grid-overlay{position:absolute;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:54px 54px;mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,#000 40%,transparent 100%)}
-.hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center;width:100%;max-width:1240px;margin:0 auto}
-.hero-copy{max-width:600px}
-.eyebrow{display:inline-flex;align-items:center;gap:9px;background:rgba(125,211,252,.1);border:1px solid rgba(125,211,252,.28);color:#bae6fd;padding:7px 15px;border-radius:30px;font-size:13px;font-weight:600;margin-bottom:26px}
-.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 0 0 rgba(52,211,153,.7);animation:pulse 2s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.6)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
-.hero h1{font-size:clamp(38px,6vw,68px);font-weight:900;line-height:1.05;letter-spacing:-1.8px;color:#fff;margin-bottom:18px}
-.rot-wrap{display:block;height:1.1em;overflow:hidden;position:relative}
-#rot{display:inline-block;background:linear-gradient(90deg,#60a5fa,#a78bfa,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:rotin .5s cubic-bezier(.2,.7,.2,1)}
-@keyframes rotin{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
-.hero .tagline{font-size:19px;color:rgba(226,232,240,.72);max-width:500px;margin-bottom:34px;line-height:1.65}
-.hero .tagline b{color:#fff;font-weight:700}
-.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:34px}
-.btn-primary{position:relative;background:var(--blue);color:#fff;padding:16px 32px;border-radius:12px;font-weight:800;font-size:16px;overflow:hidden;transition:transform .15s,box-shadow .25s;box-shadow:0 10px 30px rgba(37,99,235,.45)}
-.btn-primary:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(37,99,235,.6)}
-.btn-primary::after{content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:shine 4.5s ease-in-out infinite}
-@keyframes shine{0%,60%{left:-120%}80%,100%{left:130%}}
-.btn-ghost{background:rgba(255,255,255,.07);color:#fff;padding:16px 30px;border-radius:12px;font-weight:600;font-size:16px;border:1px solid rgba(255,255,255,.18);transition:background .2s,border-color .2s}
-.btn-ghost:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4)}
-.hero-trust{display:flex;align-items:center;gap:18px;flex-wrap:wrap;color:rgba(226,232,240,.6);font-size:14px}
-.hero-trust .stars{color:#fbbf24;letter-spacing:2px;font-size:15px}
-.hero-trust .sep{width:1px;height:26px;background:rgba(255,255,255,.16)}
-
-/* ---------- hero visual: floating browser ---------- */
-.hero-visual{position:relative;perspective:1400px}
-.browser{position:relative;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:16px;box-shadow:0 40px 90px rgba(0,0,0,.5);backdrop-filter:blur(6px);overflow:hidden;animation:float 6s ease-in-out infinite;transform:rotateY(-9deg) rotateX(4deg)}
-@keyframes float{0%,100%{transform:rotateY(-9deg) rotateX(4deg) translateY(0)}50%{transform:rotateY(-6deg) rotateX(3deg) translateY(-16px)}}
-.browser-bar{display:flex;align-items:center;gap:7px;padding:13px 16px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
-.browser-bar i{width:11px;height:11px;border-radius:50%;display:block}
-.browser-bar i:nth-child(1){background:#ff5f57}.browser-bar i:nth-child(2){background:#febc2e}.browser-bar i:nth-child(3){background:#28c840}
-.browser-url{margin-left:10px;flex:1;height:22px;border-radius:6px;background:rgba(255,255,255,.08);display:flex;align-items:center;padding:0 10px;font-size:11px;color:rgba(255,255,255,.5)}
-.browser-body{padding:22px;background:linear-gradient(160deg,#0e1630,#111c3e)}
-.bb-hero{height:96px;border-radius:10px;background:linear-gradient(120deg,var(--blue),var(--violet));position:relative;overflow:hidden;margin-bottom:16px}
-.bb-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.3),transparent);transform:translateX(-100%);animation:sweep 3.5s ease-in-out infinite}
-@keyframes sweep{0%,55%{transform:translateX(-100%)}80%,100%{transform:translateX(200%)}}
-.bb-line{height:9px;border-radius:5px;background:rgba(255,255,255,.16);margin-bottom:9px}
-.bb-line.w70{width:70%}.bb-line.w45{width:45%}
-.bb-btn{margin-top:14px;width:120px;height:30px;border-radius:7px;background:var(--blue);box-shadow:0 6px 16px rgba(37,99,235,.5)}
-.bb-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px}
-.bb-card{height:54px;border-radius:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.06)}
-.float-badge{position:absolute;background:#fff;color:var(--ink);border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;box-shadow:0 16px 40px rgba(0,0,0,.35);display:flex;align-items:center;gap:8px}
-.float-badge .ic{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:14px}
-.fb1{top:8%;left:-38px;animation:floatb 5s ease-in-out infinite}
-.fb1 .ic{background:#dcfce7}
-.fb2{bottom:12%;right:-30px;animation:floatb 5s ease-in-out infinite .8s}
-.fb2 .ic{background:#dbeafe}
-.fb3{bottom:-22px;left:14%;animation:floatb 5s ease-in-out infinite 1.6s}
-.fb3 .ic{background:#fef3c7}
-@keyframes floatb{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.hero-fade{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(transparent,#fff);z-index:1}
-
-/* ---------- marquee ---------- */
-.marquee-wrap{background:var(--ink);padding:0 0 38px;position:relative;z-index:2;overflow:hidden}
-.marquee-label{text-align:center;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:22px;font-weight:600}
-.marquee{display:flex;gap:18px;width:max-content;animation:scrollx 26s linear infinite}
-.marquee:hover{animation-play-state:paused}
-.mq-pill{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.78);padding:11px 22px;border-radius:30px;font-size:15px;font-weight:600;white-space:nowrap}
-@keyframes scrollx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-/* ---------- sections ---------- */
-section{padding:96px 5%}
-.wrap{max-width:1180px;margin:0 auto}
-.tag{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
-h2{font-size:clamp(29px,4vw,46px);font-weight:900;color:var(--ink);line-height:1.12;letter-spacing:-1px;margin-bottom:16px}
-.sub{font-size:18px;color:var(--grey);max-width:580px;margin-bottom:0;line-height:1.7}
-.center{text-align:center}.center .sub{margin:0 auto}
-.light-bg{background:var(--light)}
-
-/* reveal */
-.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
-.reveal.in{opacity:1;transform:none}
-.stagger>*{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
-.stagger.in>*{opacity:1;transform:none}
-.stagger.in>*:nth-child(2){transition-delay:.08s}
-.stagger.in>*:nth-child(3){transition-delay:.16s}
-.stagger.in>*:nth-child(4){transition-delay:.24s}
-.stagger.in>*:nth-child(5){transition-delay:.32s}
-.stagger.in>*:nth-child(6){transition-delay:.40s}
-
-/* ---------- stats band ---------- */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;background:linear-gradient(135deg,#0f1b3d,#0b1220);border-radius:22px;padding:46px 30px;box-shadow:0 30px 70px rgba(2,6,23,.18)}
-.stat{text-align:center;color:#fff;position:relative}
-.stat:not(:last-child)::after{content:'';position:absolute;right:-12px;top:15%;height:70%;width:1px;background:rgba(255,255,255,.12)}
-.stat .num{font-size:clamp(30px,4vw,44px);font-weight:900;background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
-.stat .lab{font-size:14px;color:rgba(255,255,255,.62);margin-top:8px}
-
-/* (portfolio section removed) */
-
-/* ---------- free mockup band ---------- */
-.mockup-band{position:relative;text-align:center;color:#fff;overflow:hidden;background:linear-gradient(120deg,#1d4ed8,#4f46e5,#7c3aed);background-size:200% 200%;animation:gradmove 9s ease infinite}
-@keyframes gradmove{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-.mockup-band::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.18),transparent 40%),radial-gradient(circle at 80% 80%,rgba(255,255,255,.12),transparent 40%)}
-.mockup-band .wrap{position:relative}
-.mockup-band h2{color:#fff}
-.mockup-band p{font-size:19px;color:rgba(255,255,255,.92);max-width:640px;margin:0 auto 34px;line-height:1.7}
-.btn-white{display:inline-block;background:#fff;color:var(--blue);padding:16px 34px;border-radius:12px;font-weight:800;font-size:17px;transition:transform .15s,box-shadow .25s;box-shadow:0 14px 34px rgba(0,0,0,.22)}
-.btn-white:hover{transform:translateY(-3px);box-shadow:0 20px 46px rgba(0,0,0,.3)}
-
-/* ---------- pricing ---------- */
-.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:26px;max-width:980px;margin:54px auto 0}
-.price-card{border-radius:18px;padding:38px 32px;border:1.5px solid var(--border);background:#fff;position:relative;transition:transform .3s,box-shadow .3s,border-color .3s}
-.price-card:hover{transform:translateY(-8px);box-shadow:0 28px 56px rgba(2,6,23,.12)}
-.price-card.popular{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,var(--blue),var(--violet)) border-box;border:2px solid transparent;box-shadow:0 24px 50px rgba(37,99,235,.18);transform:translateY(-10px)}
-.pop-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--blue),var(--violet));color:#fff;font-size:12px;font-weight:800;letter-spacing:1px;padding:5px 18px;border-radius:30px;white-space:nowrap;box-shadow:0 8px 20px rgba(37,99,235,.4)}
-.price-name{font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--grey);margin-bottom:16px}
-.price-amt{font-size:46px;font-weight:900;color:var(--ink);line-height:1;margin-bottom:6px}
-.price-amt sup{font-size:23px;vertical-align:top;margin-top:8px;font-weight:700;color:var(--grey)}
-.price-desc{font-size:14px;color:var(--grey);margin-bottom:26px}
-.price-feat{list-style:none;display:flex;flex-direction:column;gap:13px;margin-bottom:30px}
-.price-feat li{font-size:14.5px;color:var(--text);display:flex;gap:10px;align-items:flex-start}
-.price-feat li .ck{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#eff6ff;color:var(--blue);display:grid;place-items:center;font-size:11px;font-weight:900}
-.price-btn{display:block;text-align:center;padding:14px;border-radius:10px;font-weight:800;font-size:15px;transition:transform .15s,box-shadow .2s,background .2s}
-.price-btn.outline{border:1.5px solid var(--border);color:var(--ink)}
-.price-btn.outline:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-2px)}
-.price-btn.solid{background:var(--blue);color:#fff;box-shadow:0 10px 24px rgba(37,99,235,.35)}
-.price-btn.solid:hover{background:var(--blue-dark);transform:translateY(-2px)}
-.price-foot{text-align:center;margin-top:30px;font-size:14px;color:var(--grey)}
-
-/* ---------- process ---------- */
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px;margin-top:54px;position:relative}
-.step{position:relative}
-.step-num{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--violet));display:grid;place-items:center;color:#fff;font-weight:900;font-size:19px;margin-bottom:18px;box-shadow:0 10px 24px rgba(37,99,235,.35)}
-.step h4{font-size:17px;font-weight:800;color:var(--ink);margin-bottom:7px}
-.step p{font-size:14.5px;color:var(--grey);line-height:1.7}
-
-/* ---------- contact ---------- */
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
-.contact-left p.lead{font-size:17px;color:var(--grey);line-height:1.7;margin:6px 0 30px}
-.cpills{display:flex;flex-direction:column;gap:14px}
-.cpill{display:flex;align-items:center;gap:15px;background:#fff;border:1px solid var(--border);border-radius:13px;padding:16px 20px;transition:transform .2s,box-shadow .2s;color:inherit;text-decoration:none}
-.cpill:hover{transform:translateX(5px);box-shadow:0 10px 26px rgba(2,6,23,.08);border-color:#cbd5e1}
-.cpill .ci{width:44px;height:44px;border-radius:11px;background:#eff6ff;display:grid;place-items:center;font-size:20px;flex-shrink:0}
-.cpill .ci.wa{background:#dcfce7}
-.cpill .cv{word-break:break-word}
-.cpill .cl{font-size:12px;color:var(--grey);letter-spacing:.5px}
-.cpill .cv{font-size:15.5px;font-weight:700;color:var(--ink)}
-.cpill .cv a{color:inherit}
-form{display:flex;flex-direction:column;gap:15px;background:#fff;border:1px solid var(--border);border-radius:20px;padding:34px;box-shadow:0 20px 50px rgba(2,6,23,.07)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-input,select,textarea{padding:14px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;color:var(--text);background:#fff;width:100%;transition:border-color .2s,box-shadow .2s}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
-textarea{resize:vertical;min-height:120px}
-.form-submit{background:var(--blue);color:#fff;border:none;padding:16px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;transition:transform .15s,box-shadow .25s,background .2s;box-shadow:0 12px 28px rgba(37,99,235,.35)}
-.form-submit:hover{background:var(--blue-dark);transform:translateY(-2px);box-shadow:0 16px 36px rgba(37,99,235,.45)}
-.form-note{font-size:13px;color:var(--grey);text-align:center}
-
-/* ---------- footer ---------- */
-footer{background:var(--ink);color:rgba(255,255,255,.55);padding:40px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;font-size:14px}
-footer strong{color:#fff}
-footer .fl{display:flex;gap:24px}
-footer .fl a{color:rgba(255,255,255,.55)}
-footer .fl a:hover{color:#fff}
-
-@media(max-width:880px){
-  .nav-links{display:none}
-  .hero-inner{grid-template-columns:1fr;gap:60px}
-  .hero-visual{display:none}
-  .stats{grid-template-columns:1fr 1fr;gap:30px 16px}
-  .stat:nth-child(2)::after{display:none}
-  .contact-grid{grid-template-columns:1fr;gap:36px}
-  .form-row{grid-template-columns:1fr}
-}
-/* anchor offset so links don't hide under the fixed nav */
-section{scroll-margin-top:84px}
-/* keyboard-focus accessibility */
-a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #93c5fd;outline-offset:3px;border-radius:6px}
-
-/* what's-included features */
-.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:54px}
-.feat-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px;transition:transform .3s,box-shadow .3s}
-.feat-card:hover{transform:translateY(-6px);box-shadow:0 22px 48px rgba(2,6,23,.1)}
-.feat-ic{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;font-size:25px;background:linear-gradient(135deg,#eff6ff,#eef2ff);margin-bottom:16px}
-.feat-card h3{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px}
-.feat-card p{font-size:14.5px;color:var(--grey);line-height:1.65}
-
-/* hamburger + mobile menu */
 .nav-right{display:flex;align-items:center;gap:12px}
-.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;border:0;background:transparent;cursor:pointer}
-.nav-toggle span{display:block;width:24px;height:2.5px;border-radius:3px;background:#fff;margin:0 auto;transition:transform .3s,opacity .2s}
-nav.solid .nav-toggle span{background:var(--ink)}
+.nav-cta{padding:11px 20px;border-radius:12px;font-size:.9rem}
+.nav-toggle{display:none;flex-direction:column;gap:5px;width:46px;height:46px;align-items:center;justify-content:center;background:transparent;border:0;cursor:pointer}
+.nav-toggle span{width:24px;height:2.5px;border-radius:3px;background:#fff;transition:transform .3s var(--ease),opacity .2s}
+.nav.solid .nav-toggle span{background:var(--ink)}
 .nav-toggle.open span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
 .nav-toggle.open span:nth-child(2){opacity:0}
 .nav-toggle.open span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
-.mobile-menu{position:fixed;top:70px;left:0;right:0;z-index:99;background:rgba(11,18,32,.98);backdrop-filter:blur(12px);display:flex;flex-direction:column;padding:12px 5% 22px;transform:translateY(-135%);transition:transform .35s cubic-bezier(.2,.7,.2,1);border-bottom:1px solid rgba(255,255,255,.1)}
+.mobile-menu{position:fixed;top:var(--nav-h);left:0;right:0;z-index:190;background:rgba(11,18,32,.97);backdrop-filter:blur(14px);display:flex;flex-direction:column;padding:12px 24px 24px;transform:translateY(-140%);transition:transform .38s var(--ease);border-bottom:1px solid rgba(255,255,255,.1)}
 .mobile-menu.open{transform:translateY(0)}
-.mobile-menu a{color:rgba(255,255,255,.92);font-size:17px;font-weight:600;padding:15px 6px;border-bottom:1px solid rgba(255,255,255,.08)}
-.mobile-menu .mm-cta{background:var(--blue);color:#fff;text-align:center;border-radius:11px;margin-top:12px;padding:15px;border:0;box-shadow:0 10px 24px rgba(37,99,235,.4)}
+.mobile-menu a{color:rgba(255,255,255,.92);font-size:1.05rem;font-weight:600;padding:15px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
+.mobile-menu .mm-cta{margin-top:14px;border-radius:13px;padding:15px}
 
-@media(max-width:880px){
+/* ============ HERO ============ */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:calc(var(--nav-h) + 56px) 0 84px;background:var(--ink);overflow:hidden;isolation:isolate}
+.aurora{position:absolute;inset:0;z-index:-2;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(74px);opacity:.5;will-change:transform}
+.blob.b1{width:min(52vw,560px);aspect-ratio:1;background:#2563eb;top:-14%;left:-8%;animation:drift1 20s ease-in-out infinite}
+.blob.b2{width:min(48vw,500px);aspect-ratio:1;background:#7c3aed;top:6%;right:-12%;animation:drift2 24s ease-in-out infinite}
+.blob.b3{width:min(44vw,460px);aspect-ratio:1;background:#06b6d4;bottom:-22%;left:26%;animation:drift3 22s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(70px,54px) scale(1.14)}}
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-80px,38px) scale(1.1)}}
+@keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(54px,-64px) scale(1.16)}}
+.grid-overlay,.grain{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.grid-overlay{background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 78% 68% at 50% 42%,#000 42%,transparent 100%)}
+.grain{opacity:.4;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}
+.cursor-glow{position:absolute;z-index:-1;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(96,165,250,.22),transparent 66%);transform:translate(-50%,-50%);left:50%;top:36%;pointer-events:none;transition:opacity .4s;opacity:0}
+.hero-fade{position:absolute;left:0;right:0;bottom:-1px;height:120px;background:linear-gradient(transparent,var(--surface));z-index:1}
+.hero .container{position:relative;z-index:2;display:grid;grid-template-columns:1.06fr .94fr;gap:56px;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:9px;background:rgba(125,211,252,.1);border:1px solid rgba(125,211,252,.28);color:#bae6fd;padding:7px 15px 7px 12px;border-radius:var(--r-pill);font-size:.82rem;font-weight:700;margin-bottom:26px}
+.hero-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 0 rgba(52,211,153,.7);animation:pulse 2.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.6)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+.hero h1{font-size:var(--f-display);font-weight:875;line-height:1.03;letter-spacing:-.03em;color:#fff;margin-bottom:20px}
+.rot-wrap{display:block;height:1.08em;overflow:hidden;position:relative}
+.rot{display:inline-block;background:var(--grad-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:rotin .55s var(--ease)}
+@keyframes rotin{from{opacity:0;transform:translateY(102%)}to{opacity:1;transform:translateY(0)}}
+.hero-tagline{font-size:var(--f-lead);color:var(--on-dark-muted);max-width:33ch;margin-bottom:32px;line-height:1.6}
+.hero-tagline b{color:#fff;font-weight:700}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:30px}
+.hero-trust{display:flex;flex-wrap:wrap;gap:10px 18px}
+.trust-chip{display:inline-flex;align-items:center;gap:8px;color:var(--on-dark-muted);font-size:.9rem;font-weight:600}
+.trust-chip .ic{width:17px;height:17px;color:var(--emerald);stroke-width:2.4}
+/* hero visual */
+.hero-visual{position:relative;perspective:1500px}
+.browser{position:relative;border-radius:18px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.14);box-shadow:0 44px 100px rgba(0,0,0,.55);backdrop-filter:blur(6px);overflow:hidden;transform-style:preserve-3d;transform:rotateY(-10deg) rotateX(5deg);animation:float 7s ease-in-out infinite;will-change:transform}
+@keyframes float{0%,100%{transform:rotateY(-10deg) rotateX(5deg) translateY(0)}50%{transform:rotateY(-7deg) rotateX(4deg) translateY(-16px)}}
+.browser-bar{display:flex;align-items:center;gap:7px;padding:13px 16px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.browser-bar i{width:11px;height:11px;border-radius:50%}
+.browser-bar i:nth-child(1){background:#ff5f57}.browser-bar i:nth-child(2){background:#febc2e}.browser-bar i:nth-child(3){background:#28c840}
+.browser-url{margin-left:10px;flex:1;height:24px;border-radius:7px;background:rgba(255,255,255,.08);display:flex;align-items:center;gap:6px;padding:0 11px;font-size:.7rem;color:rgba(255,255,255,.55)}
+.browser-url .ic{width:12px;height:12px;stroke-width:2.2;color:var(--emerald)}
+.browser-body{padding:22px;background:linear-gradient(165deg,#0e1630,#111c3e)}
+.bb-hero{height:104px;border-radius:12px;background:linear-gradient(120deg,var(--accent),var(--violet));position:relative;overflow:hidden;margin-bottom:16px;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:0 18px}
+.bb-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.28),transparent);transform:translateX(-100%);animation:sweep 4s ease-in-out infinite}
+@keyframes sweep{0%,55%{transform:translateX(-100%)}82%,100%{transform:translateX(220%)}}
+.bb-hl{height:11px;width:62%;border-radius:5px;background:rgba(255,255,255,.85)}
+.bb-hl.s{width:40%;height:8px;background:rgba(255,255,255,.5)}
+.bb-line{height:9px;border-radius:5px;background:rgba(255,255,255,.14);margin-bottom:9px}
+.bb-line.w70{width:70%}.bb-line.w45{width:45%}
+.bb-btn{margin-top:14px;width:128px;height:32px;border-radius:8px;background:var(--accent);box-shadow:0 6px 16px rgba(37,99,235,.5);position:relative}
+.bb-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.bb-card{height:56px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07)}
+.bb-cursor{position:absolute;left:96px;top:150px;width:16px;height:16px;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));animation:cursorMove 4s var(--ease) infinite}
+@keyframes cursorMove{0%,100%{transform:translate(60px,40px)}45%,60%{transform:translate(0,0) scale(.9)}}
+.float-badge{position:absolute;display:flex;align-items:center;gap:9px;background:#fff;color:var(--ink);border-radius:13px;padding:10px 14px;font-size:.82rem;font-weight:750;box-shadow:0 18px 42px rgba(0,0,0,.35)}
+.float-badge .fic{width:28px;height:28px;border-radius:8px;display:grid;place-items:center}
+.float-badge .fic .ic{width:16px;height:16px;stroke-width:2.2}
+.fb1{top:6%;left:-42px;animation:floatb 5.5s ease-in-out infinite}
+.fb1 .fic{background:#dcfce7;color:#16a34a}
+.fb2{bottom:16%;right:-34px;animation:floatb 5.5s ease-in-out infinite .9s}
+.fb2 .fic{background:#dbeafe;color:#2563eb}
+.fb3{bottom:-24px;left:12%;animation:floatb 5.5s ease-in-out infinite 1.8s}
+.fb3 .fic{background:#fef3c7;color:#d97706}
+@keyframes floatb{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* ============ MARQUEE ============ */
+.marquee-wrap{background:var(--ink);padding:0 0 44px;overflow:hidden;position:relative;z-index:2}
+.marquee-label{text-align:center;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.42);margin-bottom:22px;font-weight:700}
+.marquee{display:flex;gap:16px;width:max-content;animation:scrollx 32s linear infinite}
+.marquee:hover{animation-play-state:paused}
+.mq-pill{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.8);padding:11px 20px;border-radius:var(--r-pill);font-size:.95rem;font-weight:600;white-space:nowrap}
+.mq-pill .ic{width:17px;height:17px;color:#7dd3fc;stroke-width:2}
+@keyframes scrollx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ============ STATS ============ */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;background:linear-gradient(135deg,#101d40,#0b1220);border-radius:var(--r-xl);padding:48px 32px;box-shadow:var(--sh-lg);position:relative;overflow:hidden}
+.stats::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 0,rgba(59,130,246,.16),transparent 45%)}
+.stat{text-align:center;color:#fff;position:relative;z-index:1}
+.stat+.stat::before{content:"";position:absolute;left:-11px;top:14%;height:72%;width:1px;background:rgba(255,255,255,.1)}
+.stat .num{font-size:clamp(2rem, 1.2rem + 2.6vw, 2.9rem);font-weight:875;line-height:1;background:linear-gradient(92deg,#60a5fa,#a78bfa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.stat .lab{font-size:.9rem;color:rgba(255,255,255,.62);margin-top:9px}
+
+/* ============ FEATURES ============ */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px;margin-top:56px}
+.feat-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:30px;transition:transform .3s var(--ease),box-shadow .3s,border-color .3s;overflow:hidden}
+.feat-card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:var(--grad);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s}
+.feat-card:hover{transform:translateY(-6px);box-shadow:var(--sh-lg)}
+.feat-card:hover::before{opacity:1}
+.feat-ic{width:56px;height:56px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#eff6ff,#eef2ff);color:var(--accent-600);margin-bottom:18px}
+.feat-ic .ic{width:26px;height:26px;stroke-width:1.9}
+.feat-card h3{font-size:var(--f-h3);font-weight:800;color:var(--ink);margin-bottom:8px}
+.feat-card p{font-size:.94rem;color:var(--muted);line-height:1.62}
+
+/* ============ ABOUT / FOUNDER ============ */
+.about-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+.about-card{position:relative;background:linear-gradient(150deg,#101d40,#0b1220);border-radius:var(--r-xl);padding:40px;color:#fff;box-shadow:var(--sh-lg);overflow:hidden}
+.about-card::before{content:"";position:absolute;top:-40%;right:-20%;width:70%;height:120%;background:radial-gradient(circle,rgba(124,58,237,.28),transparent 60%)}
+.about-avatar{position:relative;width:74px;height:74px;border-radius:20px;background:var(--grad);display:grid;place-items:center;font-size:1.7rem;font-weight:850;color:#fff;box-shadow:var(--sh-glow);margin-bottom:22px}
+.about-card blockquote{position:relative;font-size:1.22rem;line-height:1.6;font-weight:500;letter-spacing:-.01em}
+.about-sign{margin-top:22px;font-weight:800}
+.about-sign span{display:block;font-weight:600;color:var(--on-dark-muted);font-size:.9rem;margin-top:2px}
+.promise{list-style:none;display:grid;gap:16px}
+.promise li{display:flex;gap:14px;align-items:flex-start}
+.promise .pic{width:42px;height:42px;border-radius:12px;background:#eff6ff;color:var(--accent-600);display:grid;place-items:center;flex-shrink:0}
+.promise .pic .ic{width:21px;height:21px;stroke-width:2}
+.promise b{display:block;color:var(--ink);font-size:1.02rem;margin-bottom:2px}
+.promise p{color:var(--muted);font-size:.92rem;line-height:1.55}
+
+/* ============ MOCKUP BAND ============ */
+.band{position:relative;text-align:center;color:#fff;overflow:hidden;background:var(--grad-band);background-size:200% 200%;animation:gradmove 10s ease infinite}
+@keyframes gradmove{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+.band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 22%,rgba(255,255,255,.18),transparent 42%),radial-gradient(circle at 82% 80%,rgba(255,255,255,.12),transparent 42%)}
+.band .container{position:relative}
+.band h2{color:#fff}
+.band p{font-size:var(--f-lead);color:rgba(255,255,255,.92);max-width:60ch;margin:0 auto 32px;line-height:1.6}
+.band .btn-white{font-size:1.05rem;padding:16px 34px}
+
+/* ============ PRICING ============ */
+.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px;max-width:1000px;margin:56px auto 0;align-items:start}
+.price-card{position:relative;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:36px 32px;transition:transform .3s var(--ease),box-shadow .3s,border-color .3s}
+.price-card:hover{transform:translateY(-8px);box-shadow:var(--sh-lg)}
+.price-card.popular{border:0;background:linear-gradient(#fff,#fff) padding-box,var(--grad) border-box;border:2px solid transparent;box-shadow:0 26px 56px rgba(37,99,235,.2);transform:translateY(-12px)}
+.pop-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:.72rem;font-weight:850;letter-spacing:.08em;padding:6px 18px;border-radius:var(--r-pill);white-space:nowrap;box-shadow:0 10px 22px rgba(37,99,235,.4)}
+.price-ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:#eff6ff;color:var(--accent-600);margin-bottom:18px}
+.price-name{font-size:.78rem;font-weight:850;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.price-amt{font-size:3rem;font-weight:875;color:var(--ink);line-height:1}
+.price-amt sup{font-size:1.35rem;vertical-align:top;margin-top:10px;display:inline-block;font-weight:750;color:var(--muted)}
+.price-amt small{font-size:.9rem;font-weight:600;color:var(--muted)}
+.price-desc{font-size:.92rem;color:var(--muted);margin:8px 0 24px}
+.price-feat{list-style:none;display:flex;flex-direction:column;gap:13px;margin-bottom:30px}
+.price-feat li{font-size:.94rem;color:var(--text);display:flex;gap:11px;align-items:flex-start}
+.price-feat .ck{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#eff6ff;color:var(--accent-600);display:grid;place-items:center}
+.price-feat .ck .ic{width:12px;height:12px;stroke-width:3}
+.price-foot{text-align:center;margin-top:32px;font-size:.92rem;color:var(--muted)}
+
+/* ============ PROCESS ============ */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px;margin-top:56px;position:relative}
+.step{position:relative}
+.step-ic{position:relative;width:56px;height:56px;border-radius:16px;background:var(--grad);display:grid;place-items:center;color:#fff;margin-bottom:18px;box-shadow:var(--sh-glow)}
+.step-ic .ic{width:25px;height:25px;stroke-width:2}
+.step-ic b{position:absolute;top:-9px;right:-9px;width:24px;height:24px;border-radius:50%;background:#fff;color:var(--accent-700);font-size:.72rem;font-weight:850;display:grid;place-items:center;box-shadow:var(--sh-sm);border:1px solid var(--line)}
+.step h4{font-size:1.08rem;font-weight:800;color:var(--ink);margin-bottom:7px}
+.step p{font-size:.92rem;color:var(--muted);line-height:1.62}
+
+/* ============ FAQ ============ */
+.faq{max-width:820px;margin:52px auto 0;display:flex;flex-direction:column;gap:12px}
+.faq-item{border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden;transition:border-color .25s,box-shadow .25s}
+.faq-item.open{border-color:#c7d7f5;box-shadow:var(--sh-md)}
+.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;background:none;border:0;cursor:pointer;font-size:1.05rem;font-weight:750;color:var(--ink);text-align:left;font-family:inherit}
+.faq-q .pm{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:#eff6ff;color:var(--accent-600);display:grid;place-items:center;transition:transform .3s var(--ease),background .25s}
+.faq-item.open .pm{transform:rotate(45deg);background:var(--accent-600);color:#fff}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .34s var(--ease)}
+.faq-a p{padding:0 22px 22px;color:var(--muted);line-height:1.65;font-size:.98rem}
+
+/* ============ CONTACT ============ */
+.contact-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:52px;align-items:start}
+.contact-left .lead{margin:6px 0 28px}
+.cpills{display:flex;flex-direction:column;gap:13px}
+.cpill{display:flex;align-items:center;gap:15px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 18px;transition:transform .2s var(--ease),box-shadow .2s,border-color .2s}
+.cpill:hover{transform:translateX(5px);box-shadow:var(--sh-md);border-color:#cbd5e1}
+.cpill .ci{width:46px;height:46px;border-radius:12px;background:#eff6ff;color:var(--accent-600);display:grid;place-items:center;flex-shrink:0}
+.cpill .ci.wa{background:#dcfce7;color:#16a34a}
+.cpill .cl{font-size:.74rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:700}
+.cpill .cv{font-size:1rem;font-weight:750;color:var(--ink);word-break:break-word}
+form{display:flex;flex-direction:column;gap:15px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:34px;box-shadow:var(--sh-md)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:.82rem;font-weight:700;color:var(--text)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+input,select,textarea{padding:13px 15px;border:1.5px solid var(--line);border-radius:11px;font-size:.98rem;font-family:inherit;color:var(--text);background:var(--surface);width:100%;transition:border-color .2s,box-shadow .2s}
+input::placeholder,textarea::placeholder{color:#9aa6bd}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,99,235,.13)}
+textarea{resize:vertical;min-height:120px}
+.form-note{font-size:.84rem;color:var(--muted);text-align:center}
+.form-note a{color:var(--accent-700);font-weight:700}
+
+/* ============ FOOTER ============ */
+.footer{background:var(--ink-900);color:var(--on-dark-muted);padding:64px 0 30px}
+.footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)}
+.footer-brand .brand{color:#fff;margin-bottom:14px}
+.footer-brand p{max-width:34ch;line-height:1.6;font-size:.92rem}
+.footer-col h5{color:#fff;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;font-weight:800}
+.footer-col a,.footer-col span{display:block;color:var(--on-dark-muted);font-size:.94rem;margin-bottom:11px;transition:color .2s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;padding-top:26px;font-size:.86rem}
+.footer-bottom a{color:#93c5fd;font-weight:600}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:960px){
+  .nav-links,.nav-cta{display:none}
   .nav-toggle{display:flex}
-  .nav-cta{display:none}
-  nav.solid{backdrop-filter:none;background:#fff}
+  .nav.solid{background:#fff;backdrop-filter:none}
+  .hero .container{grid-template-columns:1fr;gap:56px}
+  .hero-visual{display:none}
+  .about-grid{grid-template-columns:1fr;gap:40px}
+  .contact-grid{grid-template-columns:1fr;gap:36px}
+  .footer-top{grid-template-columns:1fr 1fr;gap:32px}
+  .footer-brand{grid-column:1/-1}
 }
-@media(max-width:600px){
-  section{padding:74px 5%}
-  .hero{padding:108px 5% 72px}
-  .hero-btns{flex-direction:column;align-items:stretch}
-  .hero-btns a{text-align:center}
-  .blob{animation:none!important;filter:blur(55px);opacity:.42}
-  .stats{padding:34px 18px;gap:26px 14px}
-  form{padding:24px}
-  .mockup-band p{font-size:17px}
+@media(max-width:680px){
+  .stats{grid-template-columns:1fr 1fr;gap:30px 16px;padding:34px 20px}
+  .stat+.stat:nth-child(2)::before,.stat:nth-child(3)::before{display:none}
+  .form-row{grid-template-columns:1fr}
+  .hero-cta{flex-direction:column;align-items:stretch}
+  .hero-cta .btn{width:100%}
+  .footer-top{grid-template-columns:1fr}
+  .blob{filter:blur(58px);opacity:.42;animation:none!important}
 }
 @media(prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
+  *{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
   .reveal,.stagger>*{opacity:1!important;transform:none!important}
 }
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.stagger>*{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.stagger.in>*{opacity:1;transform:none}
+.stagger.in>*:nth-child(2){transition-delay:.07s}
+.stagger.in>*:nth-child(3){transition-delay:.14s}
+.stagger.in>*:nth-child(4){transition-delay:.21s}
+.stagger.in>*:nth-child(5){transition-delay:.28s}
+.stagger.in>*:nth-child(6){transition-delay:.35s}
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <div class="progress" id="progress"></div>
 
-<nav id="nav">
-  <a href="#home" class="nav-logo"><svg class="logo-mark" viewBox="0 0 60 60" aria-hidden="true"><defs><linearGradient id="nlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><rect x=".5" y=".5" width="59" height="59" rx="14" fill="#0b1220" stroke="#94a3b8" stroke-opacity=".3"/><g class="dots"><circle cx="12" cy="13" r="2.4" fill="#ff5f57"/><circle cx="21" cy="13" r="2.4" fill="#febc2e"/><circle cx="30" cy="13" r="2.4" fill="#28c840"/></g><rect x="8" y="22" width="44" height="30" rx="6" fill="url(#nlg)"/><g class="lines"><rect class="ln" x="14" y="29" width="20" height="4" rx="2" fill="#fff" opacity=".95"/><rect class="ln" x="14" y="37" width="32" height="3" rx="1.5" fill="#fff" opacity=".55"/><rect class="ln" x="14" y="43" width="14" height="6" rx="3" fill="#fff"/></g></svg>HW <span>Web Design</span></a>
-  <ul class="nav-links">
-    <li><a href="#included">What's Included</a></li>
-    <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#process">How It Works</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <div class="nav-right">
-    <a href="#mockup" class="nav-cta">Get a Free Mockup</a>
-    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+  <symbol id="i-phone-screen" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M12 18h.01"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-buoy" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="m4.9 4.9 4.2 4.2M14.9 14.9l4.2 4.2M14.9 9.1l4.2-4.2M9.1 14.9l-4.2 4.2"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10z"/><circle cx="7" cy="7" r="1.4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="i-cursor" viewBox="0 0 24 24"><path d="M3 3l7.5 18 2.6-7.9L21 10.5 3 3z" fill="#fff" stroke="#0b1220" stroke-width="1.5"/></symbol>
+</svg>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="container">
+    <a href="#home" class="brand" aria-label="HW Web Design — home">
+      <svg class="mark" viewBox="0 0 60 60" aria-hidden="true"><defs><linearGradient id="nlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><rect x=".5" y=".5" width="59" height="59" rx="14" fill="#0b1220" stroke="#94a3b8" stroke-opacity=".3"/><circle cx="12" cy="13" r="2.4" fill="#ff5f57"/><circle cx="21" cy="13" r="2.4" fill="#febc2e"/><circle cx="30" cy="13" r="2.4" fill="#28c840"/><rect x="8" y="22" width="44" height="30" rx="6" fill="url(#nlg)"/><rect x="14" y="29" width="20" height="4" rx="2" fill="#fff" opacity=".95"/><rect x="14" y="37" width="32" height="3" rx="1.5" fill="#fff" opacity=".55"/><rect x="14" y="43" width="14" height="6" rx="3" fill="#fff"/></svg>
+      <span class="brand-txt"><b>HW</b> <span>Web Design</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#included">What's Included</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#process">How It Works</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="#mockup" class="btn btn-primary nav-cta">Get a Free Mockup</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+    </div>
   </div>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
   <a href="#included">What's Included</a>
   <a href="#pricing">Pricing</a>
   <a href="#process">How It Works</a>
+  <a href="#faq">FAQ</a>
   <a href="#contact">Contact</a>
-  <a href="#mockup" class="mm-cta">Get a Free Mockup →</a>
+  <a href="#mockup" class="btn btn-primary mm-cta">Get a Free Mockup →</a>
 </div>
 
+<main id="main">
+<!-- HERO -->
 <section class="hero" id="home">
-  <div class="aurora">
-    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
-  </div>
-  <div class="grid-overlay"></div>
-  <div class="hero-inner">
+  <div class="aurora" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+  <div class="container">
     <div class="hero-copy">
-      <div class="eyebrow"><span class="dot"></span> High Wycombe · Web Design</div>
-      <h1>Websites that<br><span class="rot-wrap"><span id="rot">win customers</span></span></h1>
-      <p class="tagline">Modern, fast, mobile-friendly sites for ambitious local businesses — <b>from £399, live within a week.</b> See yours first with a free, no-obligation mockup.</p>
-      <div class="hero-btns">
-        <a href="#mockup" class="btn-primary">Get a Free Mockup →</a>
-        <a href="#included" class="btn-ghost">What's Included</a>
+      <span class="hero-badge"><span class="dot"></span> High Wycombe · Web Design</span>
+      <h1>Websites that<br><span class="rot-wrap"><span class="rot" id="rot" aria-hidden="true">win customers</span></span><span class="sr-only">win customers</span></h1>
+      <p class="hero-tagline">Modern, fast, mobile-friendly sites for ambitious local businesses — <b>from £399, live within a week.</b> See yours first with a free, no-obligation mockup.</p>
+      <div class="hero-cta">
+        <a href="#mockup" class="btn btn-primary" data-magnetic>Get a Free Mockup <svg class="ic"><use href="#i-arrow"/></svg></a>
+        <a href="#included" class="btn btn-ghost">See What's Included</a>
       </div>
       <div class="hero-trust">
-        <span class="stars">★★★★★</span>
-        <span>Friendly, local service</span>
-        <span class="sep"></span>
-        <span>No jargon · No call-out fees</span>
+        <span class="trust-chip"><svg class="ic"><use href="#i-check"/></svg> Free mockup before you pay</span>
+        <span class="trust-chip"><svg class="ic"><use href="#i-check"/></svg> You own your site &amp; domain</span>
+        <span class="trust-chip"><svg class="ic"><use href="#i-check"/></svg> No jargon, no call-out fees</span>
       </div>
     </div>
-    <div class="hero-visual">
-      <div class="browser">
-        <div class="browser-bar"><i></i><i></i><i></i><div class="browser-url">yourbusiness.co.uk</div></div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="browser" id="tiltBrowser">
+        <div class="browser-bar"><i></i><i></i><i></i><div class="browser-url"><svg class="ic"><use href="#i-shield"/></svg> yourbusiness.co.uk</div></div>
         <div class="browser-body">
-          <div class="bb-hero"></div>
+          <div class="bb-hero"><div class="bb-hl"></div><div class="bb-hl s"></div></div>
           <div class="bb-line w70"></div><div class="bb-line w45"></div>
           <div class="bb-btn"></div>
           <div class="bb-cards"><div class="bb-card"></div><div class="bb-card"></div><div class="bb-card"></div></div>
+          <svg class="bb-cursor ic"><use href="#i-cursor"/></svg>
         </div>
       </div>
-      <div class="float-badge fb1"><span class="ic">📈</span> +12 enquiries</div>
-      <div class="float-badge fb2"><span class="ic">⚡</span> Live in 7 days</div>
-      <div class="float-badge fb3"><span class="ic">⭐</span> Looks great on mobile</div>
+      <div class="float-badge fb1"><span class="fic"><svg class="ic"><use href="#i-zap"/></svg></span> Live in ~7 days</div>
+      <div class="float-badge fb2"><span class="fic"><svg class="ic"><use href="#i-phone-screen"/></svg></span> Built for mobile</div>
+      <div class="float-badge fb3"><span class="fic"><svg class="ic"><use href="#i-pen"/></svg></span> Free mockup first</div>
     </div>
   </div>
-  <div class="hero-fade"></div>
+  <div class="hero-fade" aria-hidden="true"></div>
 </section>
 
-<div class="marquee-wrap">
-  <div class="marquee-label">Industries we build for</div>
-  <div class="marquee">
-    <span class="mq-pill">🔧 Trades</span><span class="mq-pill">🍽 Restaurants</span><span class="mq-pill">💇 Beauty & Salons</span><span class="mq-pill">🏋 Fitness & Gyms</span><span class="mq-pill">🦷 Dental & Clinics</span><span class="mq-pill">🐾 Vets</span><span class="mq-pill">📊 Accountants</span><span class="mq-pill">🏠 Estate Agents</span>
-    <span class="mq-pill">🔧 Trades</span><span class="mq-pill">🍽 Restaurants</span><span class="mq-pill">💇 Beauty & Salons</span><span class="mq-pill">🏋 Fitness & Gyms</span><span class="mq-pill">🦷 Dental & Clinics</span><span class="mq-pill">🐾 Vets</span><span class="mq-pill">📊 Accountants</span><span class="mq-pill">🏠 Estate Agents</span>
+<!-- MARQUEE -->
+<div class="marquee-wrap" aria-hidden="true">
+  <div class="marquee-label">Local businesses we build for</div>
+  <div class="marquee" id="marquee">
+    <span class="mq-pill"><svg class="ic"><use href="#i-zap"/></svg> Trades</span><span class="mq-pill"><svg class="ic"><use href="#i-pin"/></svg> Restaurants</span><span class="mq-pill"><svg class="ic"><use href="#i-pen"/></svg> Beauty &amp; Salons</span><span class="mq-pill"><svg class="ic"><use href="#i-buoy"/></svg> Fitness &amp; Gyms</span><span class="mq-pill"><svg class="ic"><use href="#i-shield"/></svg> Dental &amp; Clinics</span><span class="mq-pill"><svg class="ic"><use href="#i-user"/></svg> Vets</span><span class="mq-pill"><svg class="ic"><use href="#i-tag"/></svg> Accountants</span><span class="mq-pill"><svg class="ic"><use href="#i-pin"/></svg> Estate Agents</span>
+    <span class="mq-pill"><svg class="ic"><use href="#i-zap"/></svg> Trades</span><span class="mq-pill"><svg class="ic"><use href="#i-pin"/></svg> Restaurants</span><span class="mq-pill"><svg class="ic"><use href="#i-pen"/></svg> Beauty &amp; Salons</span><span class="mq-pill"><svg class="ic"><use href="#i-buoy"/></svg> Fitness &amp; Gyms</span><span class="mq-pill"><svg class="ic"><use href="#i-shield"/></svg> Dental &amp; Clinics</span><span class="mq-pill"><svg class="ic"><use href="#i-user"/></svg> Vets</span><span class="mq-pill"><svg class="ic"><use href="#i-tag"/></svg> Accountants</span><span class="mq-pill"><svg class="ic"><use href="#i-pin"/></svg> Estate Agents</span>
   </div>
 </div>
 
-<section class="light-bg">
-  <div class="wrap reveal">
+<!-- STATS -->
+<section class="section-2" style="padding-top:clamp(48px,6vw,72px);padding-bottom:clamp(48px,6vw,72px)">
+  <div class="container reveal">
     <div class="stats stagger" id="stats">
       <div class="stat"><div class="num"><span data-count="399" data-prefix="£">£399</span></div><div class="lab">Starting price</div></div>
-      <div class="stat"><div class="num"><span data-count="7" data-suffix="">7</span> days</div><div class="lab">Average launch</div></div>
-      <div class="stat"><div class="num"><span data-count="100" data-suffix="%">100%</span></div><div class="lab">Mobile-friendly</div></div>
-      <div class="stat"><div class="num"><span data-count="0" data-zero="∞">∞</span></div><div class="lab">Revisions till you're happy</div></div>
+      <div class="stat"><div class="num">~<span data-count="7">7</span> days</div><div class="lab">Typical launch</div></div>
+      <div class="stat"><div class="num"><span data-count="100" data-suffix="%">100%</span></div><div class="lab">Built mobile-first</div></div>
+      <div class="stat"><div class="num" data-zero="∞">∞</div><div class="lab">Revisions till you're happy</div></div>
     </div>
   </div>
 </section>
 
+<!-- FEATURES -->
 <section id="included">
-  <div class="wrap">
-    <div class="reveal"><div class="tag">What's Included</div><h2>Everything Your Website Needs</h2>
-    <p class="sub">Every site comes with the essentials to look professional and get found by local customers — no upsells, no surprises.</p></div>
+  <div class="container">
+    <div class="reveal">
+      <span class="eyebrow">What's Included</span>
+      <h2>Everything your website needs</h2>
+      <p class="lead">Every site comes with the essentials to look professional and get found by local customers — no upsells, no surprises.</p>
+    </div>
     <div class="feat-grid stagger">
-      <div class="feat-card"><div class="feat-ic">🎨</div><h3>Custom Design</h3><p>Designed around your brand and your customers — never a template with the logo swapped in.</p></div>
-      <div class="feat-card"><div class="feat-ic">📱</div><h3>Flawless on Mobile</h3><p>Most people find local businesses on a phone, so your site is built mobile-first to look perfect on every screen.</p></div>
-      <div class="feat-card"><div class="feat-ic">🔍</div><h3>Google-Ready SEO</h3><p>Set up from day one to be found by local customers searching for exactly what you do.</p></div>
-      <div class="feat-card"><div class="feat-ic">⚡</div><h3>Lightning Fast</h3><p>Hand-built, lightweight pages that load in a blink — fast sites rank higher and win more enquiries.</p></div>
-      <div class="feat-card"><div class="feat-ic">📍</div><h3>Google Business Setup</h3><p>We get you onto Google Maps and local search so nearby customers can find and call you.</p></div>
-      <div class="feat-card"><div class="feat-ic">🛟</div><h3>Local, Ongoing Support</h3><p>30 days of free aftercare and a real local person to call whenever you need a change.</p></div>
+      <div class="feat-card"><div class="feat-ic"><svg class="ic"><use href="#i-pen"/></svg></div><h3>Custom Design</h3><p>Designed around your brand and your customers — never a template with the logo swapped in.</p></div>
+      <div class="feat-card"><div class="feat-ic"><svg class="ic"><use href="#i-phone-screen"/></svg></div><h3>Flawless on Mobile</h3><p>Most people find local businesses on a phone, so your site is built mobile-first to look perfect on every screen.</p></div>
+      <div class="feat-card"><div class="feat-ic"><svg class="ic"><use href="#i-search"/></svg></div><h3>Google-Ready SEO</h3><p>Set up from day one to be found by local customers searching for exactly what you do.</p></div>
+      <div class="feat-card"><div class="feat-ic"><svg class="ic"><use href="#i-zap"/></svg></div><h3>Lightning Fast</h3><p>Hand-built, lightweight pages that load in a blink — fast sites rank higher and win more enquiries.</p></div>
+      <div class="feat-card"><div class="feat-ic"><svg class="ic"><use href="#i-pin"/></svg></div><h3>Google Business Setup</h3><p>We get you onto Google Maps and local search so nearby customers can find and call you.</p></div>
+      <div class="feat-card"><div class="feat-ic"><svg class="ic"><use href="#i-buoy"/></svg></div><h3>Local, Ongoing Support</h3><p>30 days of free aftercare and a real local person to call whenever you need a change.</p></div>
     </div>
   </div>
 </section>
 
-<section id="mockup" class="mockup-band">
-  <div class="wrap reveal">
-    <div class="tag" style="color:#bfdbfe">See It Before You Buy</div>
-    <h2>Get a Free Mockup of Your New Website</h2>
-    <p>No commitment, no catch. Tell us about your business and we'll design a <b>free, no-obligation mockup</b> of what your new site could look like — usually within a couple of days. Love it? We build it. Not for you? No problem at all.</p>
-    <a href="#contact" class="btn-white">Get My Free Mockup →</a>
+<!-- ABOUT / FOUNDER -->
+<section id="about" class="section-2">
+  <div class="container about-grid">
+    <div class="about-card reveal">
+      <div class="about-avatar" aria-hidden="true">V</div>
+      <blockquote>"You're not hiring a faceless agency — you're hiring a neighbour. I build every site by hand, keep it jargon-free, and won't ask for a penny until you've seen a mockup you love."</blockquote>
+      <div class="about-sign">Vaughn<span>Founder &amp; designer · HW Web Design</span></div>
+    </div>
+    <div class="reveal">
+      <span class="eyebrow">Why work with me</span>
+      <h2>A local designer, not a call centre</h2>
+      <p class="lead" style="margin-bottom:28px">Based right here in High Wycombe, I work directly with business owners across Buckinghamshire — no account managers, no outsourcing, no runaround.</p>
+      <ul class="promise">
+        <li><span class="pic"><svg class="ic"><use href="#i-user"/></svg></span><div><b>You deal with me directly</b><p>The person designing your site is the person you talk to. One point of contact, start to finish.</p></div></li>
+        <li><span class="pic"><svg class="ic"><use href="#i-pen"/></svg></span><div><b>See it before you commit</b><p>I design a free mockup of your actual site first. No upfront fee, no obligation to go ahead.</p></div></li>
+        <li><span class="pic"><svg class="ic"><use href="#i-shield"/></svg></span><div><b>You own everything</b><p>Your website and domain are yours to keep. No lock-in contracts, ever.</p></div></li>
+      </ul>
+    </div>
   </div>
 </section>
 
-<section id="pricing" class="light-bg">
-  <div class="wrap">
-    <div class="center reveal"><div class="tag">Pricing</div><h2>Simple, Transparent Pricing</h2>
-    <p class="sub">No hidden fees. No ongoing contracts unless you want them. Just a fair price for a great website.</p></div>
+<!-- MOCKUP BAND -->
+<section id="mockup" class="band">
+  <div class="container reveal">
+    <span class="eyebrow on-dark">See it before you buy</span>
+    <h2>Get a free mockup of your new website</h2>
+    <p>No commitment, no catch. Tell me about your business and I'll design a <b>free, no-obligation mockup</b> of what your new site could look like — usually within a couple of days. Love it? We build it. Not for you? No problem at all.</p>
+    <a href="#contact" class="btn btn-white" data-magnetic>Get My Free Mockup <svg class="ic"><use href="#i-arrow"/></svg></a>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="head-center reveal">
+      <span class="eyebrow">Pricing</span>
+      <h2>Simple, transparent pricing</h2>
+      <p class="lead">No hidden fees. No ongoing contracts unless you want them. Just a fair fixed price for a great website.</p>
+    </div>
     <div class="price-grid stagger">
       <div class="price-card">
+        <div class="price-ic"><svg class="ic"><use href="#i-zap"/></svg></div>
         <div class="price-name">Starter</div>
         <div class="price-amt"><sup>£</sup>399</div>
         <div class="price-desc">Perfect for getting online fast</div>
         <ul class="price-feat">
-          <li><span class="ck">✓</span>Up to 5 pages</li>
-          <li><span class="ck">✓</span>Mobile responsive design</li>
-          <li><span class="ck">✓</span>Contact form</li>
-          <li><span class="ck">✓</span>Google Maps embed</li>
-          <li><span class="ck">✓</span>Basic SEO setup</li>
-          <li><span class="ck">✓</span>Delivered in 5–7 days</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Up to 5 pages</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Mobile-responsive design</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Contact form &amp; Google Maps</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Basic SEO setup</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Delivered in 5–7 days</li>
         </ul>
-        <a href="#contact" class="price-btn outline">Get Started</a>
+        <a href="#contact" class="btn btn-outline btn-block">Get Started</a>
       </div>
       <div class="price-card popular">
         <div class="pop-badge">MOST POPULAR</div>
+        <div class="price-ic"><svg class="ic"><use href="#i-rocket"/></svg></div>
         <div class="price-name">Standard</div>
         <div class="price-amt"><sup>£</sup>699</div>
         <div class="price-desc">The complete business website</div>
         <ul class="price-feat">
-          <li><span class="ck">✓</span>Up to 8 pages</li>
-          <li><span class="ck">✓</span>Custom design (your brand)</li>
-          <li><span class="ck">✓</span>Full SEO optimisation</li>
-          <li><span class="ck">✓</span>Photo gallery</li>
-          <li><span class="ck">✓</span>Google Business setup</li>
-          <li><span class="ck">✓</span>Delivered in 7–10 days</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Up to 8 pages</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Custom design in your brand</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Full SEO optimisation</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Photo gallery &amp; Google Business</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Delivered in 7–10 days</li>
         </ul>
-        <a href="#contact" class="price-btn solid">Get Started</a>
+        <a href="#contact" class="btn btn-primary btn-block">Get Started</a>
       </div>
       <div class="price-card">
+        <div class="price-ic"><svg class="ic"><use href="#i-tag"/></svg></div>
         <div class="price-name">Premium</div>
         <div class="price-amt"><sup>£</sup>1,199</div>
         <div class="price-desc">For businesses ready to grow</div>
         <ul class="price-feat">
-          <li><span class="ck">✓</span>Up to 15 pages</li>
-          <li><span class="ck">✓</span>Booking / enquiry system</li>
-          <li><span class="ck">✓</span>Blog or news section</li>
-          <li><span class="ck">✓</span>Copywriting included</li>
-          <li><span class="ck">✓</span>Advanced SEO</li>
-          <li><span class="ck">✓</span>Delivered in 10–14 days</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Up to 15 pages</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Booking / enquiry system</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Blog or news section</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Copywriting included</li>
+          <li><span class="ck"><svg class="ic"><use href="#i-check"/></svg></span>Delivered in 10–14 days</li>
         </ul>
-        <a href="#contact" class="price-btn outline">Get Started</a>
+        <a href="#contact" class="btn btn-outline btn-block">Get Started</a>
       </div>
     </div>
-    <p class="price-foot reveal">All packages include 30 days of free aftercare. Monthly maintenance from £39/month.</p>
+    <p class="price-foot reveal">Every package includes 30 days of free aftercare. Optional care plan (hosting + updates) from £39/month — cancel anytime.</p>
   </div>
 </section>
 
-<section id="process">
-  <div class="wrap">
-    <div class="reveal"><div class="tag">How It Works</div><h2>From Idea to Live in Days</h2>
-    <p class="sub">We keep it simple. No jargon, no months of back-and-forth. Just a clean, fast process.</p></div>
+<!-- PROCESS -->
+<section id="process" class="section-2">
+  <div class="container">
+    <div class="reveal">
+      <span class="eyebrow">How It Works</span>
+      <h2>From idea to live in days</h2>
+      <p class="lead">No jargon, no months of back-and-forth. Just a clean, fast, four-step process.</p>
+    </div>
     <div class="steps stagger">
-      <div class="step"><div class="step-num">1</div><h4>Free Chat</h4><p>Tell us about your business and what you need. We'll advise on the best approach — no pressure.</p></div>
-      <div class="step"><div class="step-num">2</div><h4>We Design</h4><p>We build a first draft for your review, usually within 48 hours of getting your content.</p></div>
-      <div class="step"><div class="step-num">3</div><h4>You Approve</h4><p>Review the design, request any changes, and sign it off. Unlimited revisions until it's right.</p></div>
-      <div class="step"><div class="step-num">4</div><h4>Go Live</h4><p>We handle all hosting and launch. Your site is live and ready to bring in customers.</p></div>
+      <div class="step"><div class="step-ic"><svg class="ic"><use href="#i-chat"/></svg><b>1</b></div><h4>Free chat</h4><p>Tell me about your business and what you need. I'll advise on the best approach — no pressure.</p></div>
+      <div class="step"><div class="step-ic"><svg class="ic"><use href="#i-pen"/></svg><b>2</b></div><h4>I design</h4><p>I build a first draft for your review, usually within 48 hours of getting your content.</p></div>
+      <div class="step"><div class="step-ic"><svg class="ic"><use href="#i-check"/></svg><b>3</b></div><h4>You approve</h4><p>Review the design, request any changes, and sign it off. Revisions until it's exactly right.</p></div>
+      <div class="step"><div class="step-ic"><svg class="ic"><use href="#i-rocket"/></svg><b>4</b></div><h4>Go live</h4><p>I handle all the hosting and launch. Your site is live and ready to bring in customers.</p></div>
     </div>
   </div>
 </section>
 
-<section id="contact" class="light-bg">
-  <div class="wrap contact-grid">
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <div class="head-center reveal">
+      <span class="eyebrow">FAQ</span>
+      <h2>Questions, answered</h2>
+      <p class="lead">Everything you might be wondering before you get in touch.</p>
+    </div>
+    <div class="faq reveal" id="faqList">
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">How much does a website cost?<span class="pm"><svg class="ic sm"><use href="#i-plus"/></svg></span></button><div class="faq-a"><p>Sites start at <b>£399</b> for a clean, mobile-friendly starter site. Most local businesses choose the <b>£699 Standard</b> package for a full multi-page site. Everything is a fixed price agreed up front — no hidden fees or surprise invoices.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">How long does it take?<span class="pm"><svg class="ic sm"><use href="#i-plus"/></svg></span></button><div class="faq-a"><p>Most sites go live <b>within a week</b> of receiving your content. A simple starter site can be ready in just a few days.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Do I have to pay anything up front?<span class="pm"><svg class="ic sm"><use href="#i-plus"/></svg></span></button><div class="faq-a"><p>No. I design a <b>free, no-obligation mockup</b> of your new site first. You only pay once you've seen it and you're happy to go ahead.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Do I own my website?<span class="pm"><svg class="ic sm"><use href="#i-plus"/></svg></span></button><div class="faq-a"><p>Yes — <b>100%</b>. The website and your domain name belong to you. You're never locked in and can take them elsewhere at any time.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">I already have a website — can you improve it?<span class="pm"><svg class="ic sm"><use href="#i-plus"/></svg></span></button><div class="faq-a"><p>Absolutely. I'll build a <b>free mockup</b> of a refreshed version so you can see the difference side by side before deciding anything.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Will my site show up on Google?<span class="pm"><svg class="ic sm"><use href="#i-plus"/></svg></span></button><div class="faq-a"><p>Every site is built SEO-ready and I set up your <b>Google Business Profile</b> so nearby customers can find, call and map you.</p></div></div>
+      <div class="faq-item"><button class="faq-q" aria-expanded="false">Do you handle hosting and updates?<span class="pm"><svg class="ic sm"><use href="#i-plus"/></svg></span></button><div class="faq-a"><p>Yes. There's an optional <b>care plan from £39/month</b> covering hosting, updates and changes — or you're free to host it yourself. No lock-in contracts.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="section-2">
+  <div class="container contact-grid">
     <div class="contact-left reveal">
-      <div class="tag">Get In Touch</div><h2>Let's Talk About Your Website</h2>
-      <p class="lead">Based in High Wycombe, working with businesses across Buckinghamshire. Get in touch for a free, no-obligation quote — we'll get back to you the same day.</p>
+      <span class="eyebrow">Get In Touch</span>
+      <h2>Let's talk about your website</h2>
+      <p class="lead">Based in High Wycombe, working with businesses across Buckinghamshire. Get in touch for a free, no-obligation quote — I'll get back to you the same day.</p>
       <div class="cpills">
-        <a class="cpill" href="tel:+447359881818"><div class="ci">📞</div><div><div class="cl">Call</div><div class="cv">07359 881818</div></div></a>
-        <a class="cpill" href="https://wa.me/447359881818" target="_blank" rel="noopener"><div class="ci wa">💬</div><div><div class="cl">WhatsApp</div><div class="cv">Message us</div></div></a>
-        <a class="cpill" href="mailto:hellohwwebdesign@gmail.com"><div class="ci">📧</div><div><div class="cl">Email</div><div class="cv">hellohwwebdesign@gmail.com</div></div></a>
-        <div class="cpill"><div class="ci">📍</div><div><div class="cl">Based In</div><div class="cv">High Wycombe, Bucks</div></div></div>
+        <a class="cpill" href="tel:+447359881818"><span class="ci"><svg class="ic"><use href="#i-phone"/></svg></span><span><span class="cl">Call</span><span class="cv">07359 881818</span></span></a>
+        <a class="cpill" href="https://wa.me/447359881818" target="_blank" rel="noopener"><span class="ci wa"><svg class="ic"><use href="#i-msg"/></svg></span><span><span class="cl">WhatsApp</span><span class="cv">Message me</span></span></a>
+        <a class="cpill" href="mailto:hellohwwebdesign@gmail.com"><span class="ci"><svg class="ic"><use href="#i-mail"/></svg></span><span><span class="cl">Email</span><span class="cv">hellohwwebdesign@gmail.com</span></span></a>
+        <div class="cpill"><span class="ci"><svg class="ic"><use href="#i-pin"/></svg></span><span><span class="cl">Based in</span><span class="cv">High Wycombe, Bucks</span></span></div>
       </div>
     </div>
     <!-- Zero-backend: submits via the visitor's email client. Swap for a free
          Formspree/Web3Forms endpoint (form action + method="POST") to auto-collect. -->
-    <form id="enquiry" class="reveal" onsubmit="return sendEnquiry(event)">
+    <form id="enquiry" class="reveal" onsubmit="return sendEnquiry(event)" novalidate>
       <div class="form-row">
-        <input id="f-name" type="text" placeholder="Your Name" required>
-        <input id="f-phone" type="tel" placeholder="Phone Number">
+        <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" type="text" placeholder="Jane Smith" autocomplete="name" required></div>
+        <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" placeholder="07…" autocomplete="tel"></div>
       </div>
-      <input id="f-email" type="email" placeholder="Email Address" required>
-      <input id="f-biz" type="text" placeholder="Business Name">
-      <select id="f-type">
-        <option value="">What type of business are you?</option>
-        <option>Trades (Plumber, Electrician, Builder etc.)</option>
-        <option>Restaurant / Café / Takeaway</option>
-        <option>Beauty / Hair / Wellness</option>
-        <option>Retail / Shop</option>
-        <option>Healthcare / Dental</option>
-        <option>Fitness / Gym</option>
-        <option>Other</option>
-      </select>
-      <textarea id="f-msg" placeholder="Tell us a bit about what you need — do you have a website already?"></textarea>
-      <button type="submit" class="form-submit">Send My Enquiry →</button>
-      <p class="form-note">Prefer to talk? Call or WhatsApp <strong><a href="tel:+447359881818" style="color:inherit">07359 881818</a></strong>.</p>
+      <div class="field"><label for="f-email">Email address</label><input id="f-email" name="email" type="email" placeholder="you@business.co.uk" autocomplete="email" required></div>
+      <div class="field"><label for="f-biz">Business name</label><input id="f-biz" name="business" type="text" placeholder="Your business" autocomplete="organization"></div>
+      <div class="field"><label for="f-type">What type of business are you?</label>
+        <select id="f-type" name="type">
+          <option value="">Please choose…</option>
+          <option>Trades (plumber, electrician, builder…)</option>
+          <option>Restaurant / café / takeaway</option>
+          <option>Beauty / hair / wellness</option>
+          <option>Retail / shop</option>
+          <option>Healthcare / dental</option>
+          <option>Fitness / gym</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label for="f-msg">Tell me a bit about what you need</label><textarea id="f-msg" name="message" placeholder="Do you have a website already? What are you hoping for?"></textarea></div>
+      <button type="submit" class="btn btn-primary btn-block">Send My Enquiry <svg class="ic"><use href="#i-arrow"/></svg></button>
+      <p class="form-note">Prefer to talk? Call or WhatsApp <a href="tel:+447359881818">07359 881818</a>.</p>
     </form>
   </div>
 </section>
+</main>
 
-<footer>
-  <div><strong>HW Web Design</strong> · High Wycombe, Buckinghamshire</div>
-  <div class="fl"><a href="#included">What's Included</a><a href="#pricing">Pricing</a><a href="#contact">Contact</a></div>
-  <div>© 2025 HW Web Design. All rights reserved.</div>
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#home" class="brand"><svg class="mark" viewBox="0 0 60 60" aria-hidden="true"><defs><linearGradient id="flg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><rect x=".5" y=".5" width="59" height="59" rx="14" fill="#0b1220" stroke="#94a3b8" stroke-opacity=".3"/><circle cx="12" cy="13" r="2.4" fill="#ff5f57"/><circle cx="21" cy="13" r="2.4" fill="#febc2e"/><circle cx="30" cy="13" r="2.4" fill="#28c840"/><rect x="8" y="22" width="44" height="30" rx="6" fill="url(#flg)"/><rect x="14" y="29" width="20" height="4" rx="2" fill="#fff" opacity=".95"/><rect x="14" y="37" width="32" height="3" rx="1.5" fill="#fff" opacity=".55"/><rect x="14" y="43" width="14" height="6" rx="3" fill="#fff"/></svg><span class="brand-txt" style="color:#fff"><b>HW</b> <span style="color:#93c5fd">Web Design</span></span></a>
+        <p>Modern, mobile-friendly websites for small businesses in High Wycombe and across Buckinghamshire. From £399, live within a week.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Explore</h5>
+        <a href="#included">What's Included</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#process">How It Works</a>
+        <a href="#faq">FAQ</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h5>Get in touch</h5>
+        <a href="tel:+447359881818">07359 881818</a>
+        <a href="https://wa.me/447359881818" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="mailto:hellohwwebdesign@gmail.com">hellohwwebdesign@gmail.com</a>
+        <span>High Wycombe · Marlow · Amersham · Aylesbury</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© <span id="yr">2026</span> HW Web Design. All rights reserved.</div>
+      <div>Built (of course) by <a href="#home">HW Web Design</a>.</div>
+    </div>
+  </div>
 </footer>
 
 <script>
-/* nav solidify + scroll progress */
-var nav=document.getElementById('nav'),prog=document.getElementById('progress');
-function onScroll(){
-  var y=window.scrollY||document.documentElement.scrollTop;
-  nav.classList.toggle('solid',y>40);
-  var h=document.documentElement.scrollHeight-window.innerHeight;
-  prog.style.width=(h>0?(y/h*100):0)+'%';
-}
-addEventListener('scroll',onScroll,{passive:true});onScroll();
+(function(){
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var finePointer = window.matchMedia("(pointer: fine)").matches;
 
-/* mobile menu */
-var tgl=document.getElementById('navToggle'),mm=document.getElementById('mobileMenu');
-if(tgl&&mm){
-  tgl.addEventListener('click',function(){
-    var open=mm.classList.toggle('open');tgl.classList.toggle('open',open);
-    tgl.setAttribute('aria-expanded',open);tgl.setAttribute('aria-label',open?'Close menu':'Open menu');
+  /* nav solidify + scroll progress */
+  var nav=document.getElementById('nav'),prog=document.getElementById('progress');
+  function onScroll(){
+    var y=window.scrollY||document.documentElement.scrollTop;
+    nav.classList.toggle('solid',y>40);
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    prog.style.width=(h>0?(y/h*100):0)+'%';
+  }
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  /* mobile menu */
+  var tgl=document.getElementById('navToggle'),mm=document.getElementById('mobileMenu');
+  if(tgl&&mm){
+    tgl.addEventListener('click',function(){
+      var open=mm.classList.toggle('open');tgl.classList.toggle('open',open);
+      tgl.setAttribute('aria-expanded',open);tgl.setAttribute('aria-label',open?'Close menu':'Open menu');
+    });
+    mm.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){
+      mm.classList.remove('open');tgl.classList.remove('open');tgl.setAttribute('aria-expanded','false');
+    });});
+  }
+
+  /* rotating headline (skipped when reduced-motion) */
+  var words=['win customers','get you found','turn clicks into calls','make you look the part'],i=0,rot=document.getElementById('rot');
+  if(rot&&!reduce){
+    setInterval(function(){
+      i=(i+1)%words.length;
+      rot.style.animation='none';void rot.offsetHeight;rot.textContent=words[i];rot.style.animation='';
+    },2600);
+  }
+
+  /* reveal on scroll + count-up */
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in');if(e.target.id==='stats')runCounts();io.unobserve(e.target);}
+    });
+  },{threshold:.16});
+  document.querySelectorAll('.reveal,.stagger').forEach(function(el){io.observe(el);});
+
+  var counted=false;
+  function runCounts(){
+    if(counted)return;counted=true;
+    document.querySelectorAll('[data-count]').forEach(function(el){
+      var target=+el.dataset.count,pre=el.dataset.prefix||'',suf=el.dataset.suffix||'';
+      if(reduce){el.textContent=pre+target+suf;return;}
+      var t0=null;
+      function step(ts){
+        if(!t0)t0=ts;var p=Math.min((ts-t0)/1100,1),val=Math.round(target*(1-Math.pow(1-p,3)));
+        el.textContent=pre+val+suf;if(p<1)requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  /* FAQ accordion */
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn=item.querySelector('.faq-q'),panel=item.querySelector('.faq-a');
+    btn.addEventListener('click',function(){
+      var open=item.classList.toggle('open');
+      btn.setAttribute('aria-expanded',open);
+      panel.style.maxHeight=open?(panel.scrollHeight+'px'):'0';
+    });
   });
-  mm.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){
-    mm.classList.remove('open');tgl.classList.remove('open');tgl.setAttribute('aria-expanded','false');
-  });});
-}
 
-/* rotating headline word */
-var words=['win customers','get you found','turn clicks into calls','make you look the part'],i=0,rot=document.getElementById('rot');
-setInterval(function(){
-  i=(i+1)%words.length;
-  rot.style.animation='none';rot.offsetHeight;rot.textContent=words[i];rot.style.animation='';
-},2600);
-
-/* reveal on scroll + count-up */
-var io=new IntersectionObserver(function(entries){
-  entries.forEach(function(e){
-    if(e.isIntersecting){e.target.classList.add('in');if(e.target.id==='stats')runCounts();io.unobserve(e.target);}
-  });
-},{threshold:.18});
-document.querySelectorAll('.reveal,.stagger').forEach(function(el){io.observe(el);});
-
-var counted=false;
-function runCounts(){
-  if(counted)return;counted=true;
-  document.querySelectorAll('[data-count]').forEach(function(el){
-    if(el.dataset.zero){el.textContent=el.dataset.zero;return;}
-    var target=+el.dataset.count,pre=el.dataset.prefix||'',suf=el.dataset.suffix||'',t0=null;
-    function step(ts){
-      if(!t0)t0=ts;var p=Math.min((ts-t0)/1100,1),val=Math.round(target*(1-Math.pow(1-p,3)));
-      el.textContent=pre+val+suf;if(p<1)requestAnimationFrame(step);
+  /* magnetic buttons + hero cursor glow + browser tilt (fine pointers, motion on) */
+  if(finePointer&&!reduce){
+    document.querySelectorAll('[data-magnetic]').forEach(function(btn){
+      btn.addEventListener('mousemove',function(e){
+        var r=btn.getBoundingClientRect();
+        btn.style.transform='translate('+((e.clientX-r.left-r.width/2)*.25)+'px,'+((e.clientY-r.top-r.height/2)*.35-2)+'px)';
+      });
+      btn.addEventListener('mouseleave',function(){btn.style.transform='';});
+    });
+    var hero=document.getElementById('home'),glow=document.getElementById('cursorGlow'),tilt=document.getElementById('tiltBrowser');
+    if(hero&&glow){
+      hero.addEventListener('mousemove',function(e){
+        var r=hero.getBoundingClientRect();
+        glow.style.opacity='1';glow.style.left=(e.clientX-r.left)+'px';glow.style.top=(e.clientY-r.top)+'px';
+        if(tilt){var cx=(e.clientX-r.left)/r.width-.5,cy=(e.clientY-r.top)/r.height-.5;
+          tilt.style.transform='rotateY('+(-10+cx*8)+'deg) rotateX('+(5-cy*8)+'deg)';}
+      });
+      hero.addEventListener('mouseleave',function(){glow.style.opacity='0';if(tilt)tilt.style.transform='';});
     }
-    requestAnimationFrame(step);
-  });
-}
+  }
 
-/* contact form -> email (no backend needed) */
-function sendEnquiry(e){
-  e.preventDefault();
-  var v=function(id){var el=document.getElementById(id);return el?(el.value||'').trim():'';};
-  var name=v('f-name'),phone=v('f-phone'),email=v('f-email'),biz=v('f-biz'),type=v('f-type'),msg=v('f-msg');
-  var subject='Website enquiry'+(biz?(' — '+biz):'');
-  var body=['Name: '+name,'Business: '+biz,'Phone: '+phone,'Email: '+email,'Type: '+type,'','Message:',msg].join('\n');
-  window.location.href='mailto:hellohwwebdesign@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
-  return false;
-}
+  /* footer year */
+  var yr=document.getElementById('yr');if(yr)yr.textContent=new Date().getFullYear();
+
+  /* contact form -> email (no backend needed) */
+  window.sendEnquiry=function(e){
+    e.preventDefault();
+    var v=function(id){var el=document.getElementById(id);return el?(el.value||'').trim():'';};
+    var name=v('f-name'),phone=v('f-phone'),email=v('f-email'),biz=v('f-biz'),type=v('f-type'),msg=v('f-msg');
+    if(!name||!email){var f=document.getElementById(name?'f-email':'f-name');if(f)f.focus();return false;}
+    var subject='Website enquiry'+(biz?(' — '+biz):'');
+    var body=['Name: '+name,'Business: '+biz,'Phone: '+phone,'Email: '+email,'Type: '+type,'','Message:',msg].join('\n');
+    window.location.href='mailto:hellohwwebdesign@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+    return false;
+  };
+})();
 </script>
 </body>
 </html>

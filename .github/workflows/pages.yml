@@ -27,7 +27,7 @@ jobs:
           mkdir -p _site
           # Default-deny: publish ONLY these public assets. The prospect list,
           # scraped contacts, outreach copy and tooling are never published.
-          for item in index.html overrun.html ui.html .nojekyll CNAME assets portfolio demos mockups; do
+          for item in index.html overrun.html ui.html robots.txt sitemap.xml .nojekyll CNAME assets portfolio demos mockups; do
             [ -e "$item" ] && cp -r "$item" _site/ || true
           done
           echo "Published:" && ls -A _site

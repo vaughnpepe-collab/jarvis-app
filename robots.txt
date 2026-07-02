@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+# Personalised prospect mockups and legacy experiments — reachable by direct
+# link, but kept out of search so only the homepage ranks.
+Disallow: /mockups/
+Disallow: /demos/
+Disallow: /portfolio/
+Disallow: /overrun.html
+Disallow: /ui.html
+
+Sitemap: https://hwwebdesign.co.uk/sitemap.xml
