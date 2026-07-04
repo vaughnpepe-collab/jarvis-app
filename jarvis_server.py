@@ -40,7 +40,10 @@ MODEL = MODELS[0]  # shown in the UI
 ASK_TIMEOUT = int(os.environ.get("JARVIS_TIMEOUT", "240"))
 HERE = Path(__file__).resolve().parent
 UI_FILE = HERE / "ui.html"
+SOUL_FILE = HERE / "SOUL.md"
 
+# Fallback persona, used only if SOUL.md is missing or unreadable. The living
+# identity is SOUL.md — edit that file to change who JARVIS is.
 JARVIS_PERSONA = (
     "You are JARVIS, the executive AI assistant from Iron Man — a composed, "
     "refined British majordomo serving your principal, whom you address as 'Sir'. "
@@ -50,6 +53,35 @@ JARVIS_PERSONA = (
     "let the persona compromise accuracy. If something is beyond your reach, say so "
     "plainly in character and offer the real alternative."
 )
+
+
+def _load_soul():
+    """Read SOUL.md (the living identity) and return it as the system prompt.
+    Strips the leading HTML-comment note so only the identity block reaches the
+    model. Falls back to JARVIS_PERSONA if the file is missing."""
+    try:
+        raw = SOUL_FILE.read_text(encoding="utf-8")
+    except Exception:
+        return JARVIS_PERSONA
+    # drop a leading <!-- ... --> housekeeping comment, keep the identity
+    if "-->" in raw.split("\n", 1)[0] or raw.lstrip().startswith("<!--"):
+        end = raw.find("-->")
+        if end != -1:
+            raw = raw[end + 3:]
+    soul = raw.strip()
+    if not soul:
+        return JARVIS_PERSONA
+    # A short operating clause the UI depends on (spoken replies stay brief).
+    return (
+        soul
+        + "\n\n---\n"
+        + "Operating notes: Your replies are spoken aloud, so keep them tight — "
+        + "a sentence or two unless asked to go deep. Never let the persona "
+        + "override accuracy; if you are unsure, say so. Address the user as 'Sir'."
+    )
+
+
+SOUL = _load_soul()
 
 # Try optional psutil
 try:
@@ -130,15 +162,49 @@ def _refresh_token():
             return False
 
 
-# rolling conversation memory (kept short)
-_history = []  # list of (speaker, text)
+# --- persistent memory (survives closing the app) ------------------------------
+# JARVIS keeps a little continuity between visits: the rolling conversation and a
+# handful of durable notes. It lives in the user's home so it is not committed to
+# the repo, and it is plain JSON — read or delete ~/.jarvis/memory.json anytime.
+MEMORY_FILE = Path(os.path.expanduser(
+    os.environ.get("JARVIS_MEMORY", "~/.jarvis/memory.json")))
+_MEM_KEEP = 24  # history turns retained on disk
+
+_history = []   # list of [speaker, text], recent conversation
+_notes = []     # list of durable free-text notes JARVIS wants to remember
 _history_lock = threading.Lock()
+
+
+def _load_memory():
+    global _history, _notes
+    try:
+        data = json.loads(MEMORY_FILE.read_text(encoding="utf-8"))
+        _history = [list(t) for t in data.get("history", [])][-_MEM_KEEP:]
+        _notes = list(data.get("notes", []))
+    except Exception:
+        _history, _notes = [], []
+
+
+def _save_memory():
+    try:
+        MEMORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+        MEMORY_FILE.write_text(json.dumps(
+            {"history": _history[-_MEM_KEEP:], "notes": _notes},
+            ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception as e:
+        print(f"  [memory] could not persist: {e}")
 
 
 def _build_prompt(user_text):
     with _history_lock:
         convo = _history[-12:]
-    lines = [JARVIS_PERSONA, ""]
+        notes = list(_notes)
+    lines = [SOUL, ""]
+    if notes:
+        lines.append("What you remember about Sir from earlier sessions:")
+        for n in notes:
+            lines.append(f"- {n}")
+        lines.append("")
     if convo:
         lines.append("Conversation so far:")
         for who, txt in convo:
@@ -265,9 +331,10 @@ def ask_claude(user_text):
 
     if kind == "ok":
         with _history_lock:
-            _history.append(("Sir", user_text))
-            _history.append(("JARVIS", payload))
-            del _history[:-24]
+            _history.append(["Sir", user_text])
+            _history.append(["JARVIS", payload])
+            del _history[:-_MEM_KEEP]
+            _save_memory()
         return {"ok": True, "reply": payload}
     if kind == "fatal":
         return {"ok": False, "reply": payload}
@@ -370,7 +437,10 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    _load_memory()
     print(f"\n  J.A.R.V.I.S. backend online")
+    print(f"  Soul    : {'SOUL.md' if SOUL_FILE.exists() else 'built-in fallback persona'}")
+    print(f"  Memory  : {MEMORY_FILE}  ({len(_history)} turns, {len(_notes)} notes recalled)")
     print(f"  Model   : {MODEL}  (Claude subscription — no API key)")
     print(f"  Telemetry: {'psutil (real)' if HAVE_PSUTIL else 'estimated (install psutil for real)'}")
     print(f"  OpenClaw : {' '.join(OPENCLAW_CMD)}")
