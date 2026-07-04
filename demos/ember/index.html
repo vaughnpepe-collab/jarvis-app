@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMBER — Fire Kitchen · High Wycombe (Demo by HW Web Design)</title>
+<meta name="description" content="Concept demo: a cinematic landing page for a modern fire-kitchen restaurant. Designed & built by HW Web Design, High Wycombe.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b0705">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230b0705'/%3E%3Cpath d='M32 12c4 8-6 10-3 18 2 6 10 6 12 1 5 8 1 21-9 21S17 42 22 33c2-4 5-5 5-9 0-4-1-7 5-12z' fill='%23ff7a3d'/%3E%3C/svg%3E">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#0b0705; --bg-2:#120b07; --panel:#171009; --panel-2:#1d1409;
+  --line:rgba(255,190,120,.12); --line-2:rgba(255,190,120,.22);
+  --text:#f7ede2; --muted:rgba(247,237,226,.62); --faint:rgba(247,237,226,.38);
+  --ember:#ff7a3d; --ember-2:#ff5a1f; --gold:#f5b942; --deep:#b3341f;
+  --grad:linear-gradient(100deg,#ff5a1f,#ff7a3d 45%,#f5b942);
+  --glass:rgba(23,16,9,.55);
+  --ease:cubic-bezier(.16,1,.3,1);            /* premium decel */
+  --ease-soft:cubic-bezier(.22,.61,.21,.98);
+  --r-md:16px; --r-lg:24px; --r-pill:999px;
+  --nav-h:76px; --container:1180px;
+  --f-hero:clamp(3.4rem, 1.6rem + 9vw, 8.6rem);
+  --f-h2:clamp(2rem, 1.2rem + 3.4vw, 3.6rem);
+  --f-lead:clamp(1.02rem, .96rem + .5vw, 1.25rem);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:"Avenir Next","Futura",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+img,svg{display:block;max-width:100%}
+::selection{background:var(--ember);color:#160a04}
+h1,h2,h3{text-wrap:balance;font-weight:800;letter-spacing:-.03em}
+.container{width:100%;max-width:var(--container);margin:0 auto;padding:0 28px}
+section{position:relative;padding:clamp(84px,11vw,150px) 0}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.74rem;font-weight:800;letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--grad)}
+h2{font-size:var(--f-h2);line-height:1.05;margin:18px 0 16px}
+.lead{font-size:var(--f-lead);color:var(--muted);max-width:56ch}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:6px}
+.skip{position:fixed;top:-120px;left:16px;z-index:400;background:var(--gold);color:#160a04;padding:12px 20px;border-radius:12px;font-weight:800;transition:top .25s var(--ease)}
+.skip:focus{top:16px}
+
+/* ============ ATMOSPHERE ============ */
+.atmo{position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden;background:
+  radial-gradient(58% 44% at 78% -6%, rgba(255,90,31,.15), transparent 60%),
+  radial-gradient(50% 40% at 8% 16%, rgba(245,185,66,.08), transparent 60%),
+  radial-gradient(70% 60% at 50% 118%, rgba(179,52,31,.14), transparent 60%),
+  var(--bg)}
+.grain{position:fixed;inset:-60px;z-index:-1;pointer-events:none;opacity:.5;mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E")}
+.embers{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.embers i{position:absolute;bottom:-3vh;width:5px;height:5px;border-radius:50%;
+  background:radial-gradient(circle,#ffd9a0 0%,var(--ember) 55%,transparent 75%);
+  filter:blur(.4px);opacity:0;animation:rise linear infinite}
+@keyframes rise{
+  0%{transform:translate(0,0) scale(1);opacity:0}
+  8%{opacity:.85}
+  60%{opacity:.5}
+  100%{transform:translate(var(--dx,40px),-108vh) scale(.25);opacity:0}
+}
+
+/* ============ NAV (glass) ============ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);display:flex;align-items:center;
+  transition:background .4s var(--ease),border-color .4s,box-shadow .4s;border-bottom:1px solid transparent}
+.nav.solid{background:var(--glass);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border-bottom-color:var(--line);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.nav .container{display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.3rem;letter-spacing:.34em;text-transform:uppercase}
+.brand .flame{width:30px;height:30px;flex-shrink:0}
+.brand .flame path{transform-origin:50% 90%;animation:flick 2.6s ease-in-out infinite}
+@keyframes flick{0%,100%{transform:scaleY(1) skewX(0)}30%{transform:scaleY(1.06) skewX(-2deg)}60%{transform:scaleY(.96) skewX(2deg)}}
+.nav-links{display:flex;gap:38px;list-style:none}
+.nav-links a{position:relative;font-size:.82rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
+  transition:color .35s var(--ease-soft)}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-7px;height:1.5px;width:0;background:var(--grad);transition:width .35s var(--ease)}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:hover::after{width:100%}
+
+/* buttons — magnetic w/ text fade */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 32px;
+  border-radius:var(--r-pill);font-weight:800;font-size:.92rem;letter-spacing:.14em;text-transform:uppercase;
+  cursor:pointer;border:1px solid transparent;overflow:hidden;
+  transition:transform .3s var(--ease),box-shadow .35s var(--ease),border-color .3s,color .35s var(--ease-soft);will-change:transform}
+.btn-fire{background:var(--grad);color:#1c0c04;box-shadow:0 12px 42px rgba(255,105,45,.35)}
+.btn-fire:hover{box-shadow:0 20px 60px rgba(255,105,45,.55);color:#000}
+.btn-fire::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 42%,rgba(255,255,255,.5) 50%,transparent 58%);
+  background-size:240% 100%;background-position:140% 0;animation:sheen 5.5s var(--ease-soft) infinite;pointer-events:none}
+@keyframes sheen{0%,60%{background-position:140% 0}88%,100%{background-position:-60% 0}}
+.btn-glass{background:rgba(247,237,226,.05);color:var(--text);border-color:rgba(247,237,226,.2);backdrop-filter:blur(8px)}
+.btn-glass:hover{border-color:var(--gold);color:var(--gold)}
+.nav .btn{padding:12px 24px;font-size:.78rem}
+
+/* ============ HERO ============ */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:calc(var(--nav-h) + 40px) 0 120px;overflow:hidden}
+.hero-glow{position:absolute;z-index:0;width:min(58vw,720px);aspect-ratio:1;border-radius:50%;pointer-events:none;
+  right:-12%;top:4%;filter:blur(90px);opacity:.5;
+  background:radial-gradient(circle at 40% 40%, rgba(255,122,61,.55), rgba(179,52,31,.28) 50%, transparent 72%);
+  animation:breathe 9s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.hero .container{position:relative;z-index:2}
+.hero-badge{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line-2);border-radius:var(--r-pill);
+  padding:9px 20px;font-size:.74rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);
+  background:rgba(23,16,9,.5);backdrop-filter:blur(8px);margin-bottom:34px}
+.hero-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--ember);box-shadow:0 0 12px var(--ember);animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero h1{font-size:var(--f-hero);line-height:.95;letter-spacing:-.04em;text-transform:uppercase;margin-bottom:34px}
+.hl{display:block;overflow:hidden}
+.hl span{display:block;transform:translateY(112%);animation:hlUp 1.1s var(--ease) forwards}
+.hl:nth-child(1) span{animation-delay:.15s}
+.hl:nth-child(2) span{animation-delay:.32s}
+.hl:nth-child(3) span{animation-delay:.49s}
+@keyframes hlUp{to{transform:translateY(0)}}
+.hero-sub{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap;
+  opacity:0;animation:fadeUp 1.1s var(--ease) .85s forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.hero-sub .lead{max-width:44ch}
+.hero-cta{display:flex;gap:16px;flex-wrap:wrap}
+.scroll-cue{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;
+  color:var(--faint);font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;opacity:0;animation:fadeUp 1s var(--ease) 1.5s forwards}
+.scroll-cue i{width:1px;height:44px;background:linear-gradient(var(--gold),transparent);display:block;animation:cue 2s var(--ease) infinite}
+@keyframes cue{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ============ MARQUEE ============ */
+.mq-band{padding:26px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;background:rgba(18,11,7,.6)}
+.mq{display:flex;gap:64px;width:max-content;animation:mqx var(--mq-t,34s) linear infinite}
+.mq.rev{animation-direction:reverse}
+.mq:hover{animation-play-state:paused}
+.mq span{display:inline-flex;align-items:center;gap:14px;white-space:nowrap;font-size:.95rem;font-weight:600;color:var(--muted)}
+.mq .st{color:var(--gold);letter-spacing:3px}
+.mq em{font-style:normal;color:var(--faint);font-size:.8rem;letter-spacing:.18em;text-transform:uppercase}
+@keyframes mqx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ============ REVEALS ============ */
+.reveal{opacity:0;transform:translateY(44px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.stagger>*{opacity:0;transform:translateY(38px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.stagger.in>*{opacity:1;transform:none}
+.stagger.in>*:nth-child(2){transition-delay:.1s}
+.stagger.in>*:nth-child(3){transition-delay:.2s}
+.stagger.in>*:nth-child(4){transition-delay:.3s}
+
+/* ============ EXPERIENCE ============ */
+.exp-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+.exp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:44px;border-radius:var(--r-md);overflow:hidden}
+.exp-stat{background:var(--panel);padding:26px 20px;text-align:center}
+.exp-stat b{display:block;font-size:clamp(1.7rem, 1.2rem + 1.8vw, 2.5rem);font-weight:800;background:var(--grad);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.exp-stat small{color:var(--faint);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase}
+.fire-panel{position:relative;border-radius:var(--r-lg);overflow:hidden;aspect-ratio:4/4.6;
+  transform:scale(.94);border:1px solid var(--line);transition:transform 1.2s var(--ease),border-radius 1.2s var(--ease);
+  background:
+    radial-gradient(70% 46% at 50% 104%, rgba(255,122,61,.8), rgba(255,90,31,.35) 42%, transparent 70%),
+    radial-gradient(46% 34% at 50% 102%, rgba(255,217,160,.9), transparent 60%),
+    linear-gradient(180deg,#191009 0%, #221306 68%, #33170a 100%)}
+.fire-panel.in{transform:scale(1)}
+.fire-panel::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(38% 26% at 50% 100%, rgba(255,236,200,.75), transparent 65%);
+  filter:blur(14px);animation:flick 3.2s ease-in-out infinite}
+.fire-panel .fp-tag{position:absolute;top:22px;left:22px;border:1px solid rgba(247,237,226,.25);border-radius:var(--r-pill);
+  padding:8px 18px;font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--text);
+  background:rgba(11,7,5,.4);backdrop-filter:blur(6px)}
+.fire-panel .fp-quote{position:absolute;left:22px;right:22px;bottom:22px;background:var(--glass);backdrop-filter:blur(14px);
+  border:1px solid var(--line);border-radius:var(--r-md);padding:20px 22px;font-size:.95rem;color:var(--text)}
+.fire-panel .fp-quote small{display:block;margin-top:8px;color:var(--gold);font-size:.7rem;letter-spacing:.24em;text-transform:uppercase}
+
+/* ============ MENU (tilt cards) ============ */
+.menu-head{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap;margin-bottom:56px}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:22px}
+.dish{--mx:50%;--my:50%;position:relative;border-radius:var(--r-lg);padding:28px;min-height:340px;display:flex;flex-direction:column;justify-content:flex-end;
+  background:var(--panel);border:1px solid var(--line);overflow:hidden;
+  transform:perspective(900px) rotateX(var(--rx,0)) rotateY(var(--ry,0));
+  transition:transform .5s var(--ease),border-color .4s,box-shadow .5s var(--ease);will-change:transform}
+.dish:hover{border-color:var(--line-2);box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.dish::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .5s var(--ease);pointer-events:none;
+  background:radial-gradient(420px circle at var(--mx) var(--my), rgba(255,140,70,.16), transparent 45%)}
+.dish:hover::before{opacity:1}
+.dish .plate{position:absolute;top:-46px;right:-46px;width:190px;height:190px;border-radius:50%;filter:blur(2px);opacity:.9;
+  transition:transform .6s var(--ease)}
+.dish:hover .plate{transform:scale(1.12) rotate(10deg)}
+.dish .plate.p1{background:radial-gradient(circle at 36% 34%, #ffb36b, #b3341f 62%, #431105 92%)}
+.dish .plate.p2{background:radial-gradient(circle at 36% 34%, #ffe19e, #d98324 60%, #4a2405 92%)}
+.dish .plate.p3{background:radial-gradient(circle at 36% 34%, #ff9d76, #8c1f12 62%, #350b03 92%)}
+.dish .plate.p4{background:radial-gradient(circle at 36% 34%, #f7ceab, #a34a12 62%, #38180a 92%)}
+.dish>*:not(.plate){position:relative;z-index:1}
+.dish .no{font-size:.72rem;letter-spacing:.3em;color:var(--faint);margin-bottom:12px}
+.dish h3{font-size:1.35rem;margin-bottom:8px}
+.dish p{font-size:.9rem;color:var(--muted);line-height:1.55;margin-bottom:16px}
+.dish .price{font-weight:800;color:var(--gold);letter-spacing:.06em}
+
+/* ============ CHEF QUOTE BAND ============ */
+.quote-band{padding:clamp(90px,12vw,160px) 0;text-align:center;position:relative;overflow:hidden}
+.quote-band blockquote{font-size:clamp(1.5rem, 1rem + 2.6vw, 2.7rem);font-weight:700;line-height:1.28;letter-spacing:-.02em;max-width:22ch;margin:0 auto 26px}
+.quote-band cite{font-style:normal;color:var(--gold);font-size:.78rem;letter-spacing:.3em;text-transform:uppercase}
+
+/* ============ BOOK ============ */
+.book{border-top:1px solid var(--line)}
+.book-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.book-form{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:var(--r-lg);padding:38px;display:flex;flex-direction:column;gap:16px}
+.bf-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:.7rem;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--faint)}
+input,select{background:rgba(11,7,5,.55);border:1px solid var(--line);border-radius:12px;color:var(--text);
+  padding:14px 16px;font-size:.98rem;font-family:inherit;transition:border-color .3s,box-shadow .3s;width:100%}
+input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(245,185,66,.14)}
+.form-ok{display:none;text-align:center;padding:14px;border:1px solid rgba(245,185,66,.4);border-radius:12px;color:var(--gold);font-weight:700}
+.demo-note{font-size:.78rem;color:var(--faint);text-align:center}
+
+/* ============ FOOTER ============ */
+footer{border-top:1px solid var(--line);padding:44px 0;background:rgba(11,7,5,.8)}
+footer .container{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;color:var(--faint);font-size:.86rem}
+footer .credit a{color:var(--gold);font-weight:700;border-bottom:1px solid rgba(245,185,66,.35);transition:border-color .3s}
+footer .credit a:hover{border-color:var(--gold)}
+
+/* demo ribbon */
+.ribbon{position:fixed;z-index:300;bottom:18px;right:18px;background:var(--glass);backdrop-filter:blur(12px);
+  border:1px solid var(--line-2);border-radius:var(--r-pill);padding:10px 18px;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted)}
+.ribbon a{color:var(--gold);font-weight:800}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:960px){
+  .nav-links{display:none}
+  .exp-grid,.book-grid{grid-template-columns:1fr;gap:44px}
+  .hero-sub{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:640px){
+  :root{--f-hero:clamp(2.1rem, 10vw, 2.8rem)}
+  .nav .btn{padding:10px 16px;font-size:.66rem;letter-spacing:.08em}
+  .hero-badge{font-size:.62rem;letter-spacing:.18em}
+  .bf-row{grid-template-columns:1fr}
+  .exp-stats{grid-template-columns:1fr 1fr 1fr;gap:1px}
+  .embers{display:none}
+  .ribbon{display:none}
+  .hero-cta .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .hl span{transform:none!important}
+  .hero-sub,.scroll-cue{opacity:1!important}
+  .reveal,.stagger>*{opacity:1!important;transform:none!important}
+  .fire-panel{transform:none!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="atmo" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav" id="nav" aria-label="Main">
+  <div class="container">
+    <a href="#top" class="brand">
+      <svg class="flame" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8c5 10-8 13-4 23 2.5 7 12 7 15 1 6 10 1 26-11 26S15 46 21 35c2.6-5 6.5-6 6.5-11S26 15 32 8z" fill="url(#fg)"/><defs><linearGradient id="fg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ff5a1f"/><stop offset=".55" stop-color="#ff7a3d"/><stop offset="1" stop-color="#f5b942"/></linearGradient></defs></svg>
+      Ember
+    </a>
+    <ul class="nav-links">
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#book">Reservations</a></li>
+    </ul>
+    <a href="#book" class="btn btn-fire" data-magnetic>Book a Table</a>
+  </div>
+</nav>
+
+<main id="main">
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="embers" aria-hidden="true" id="embers"></div>
+  <div class="container" id="heroInner">
+    <span class="hero-badge"><span class="dot"></span> High Wycombe · Open Wed–Sun</span>
+    <h1>
+      <span class="hl"><span>Cooked</span></span>
+      <span class="hl"><span>over <span class="grad-text">fire.</span></span></span>
+      <span class="hl"><span>Nothing else.</span></span>
+    </h1>
+    <div class="hero-sub">
+      <p class="lead">An open-flame kitchen in the heart of Buckinghamshire. Twelve seats at the counter, one 800°C grill, and a menu that changes with the smoke.</p>
+      <div class="hero-cta">
+        <a href="#book" class="btn btn-fire" data-magnetic>Reserve Your Seat</a>
+        <a href="#menu" class="btn btn-glass" data-magnetic>View the Menu</a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
+</header>
+
+<!-- ============ PRESS MARQUEE ============ -->
+<div class="mq-band" aria-hidden="true">
+  <div class="mq" style="--mq-t:36s">
+    <span><b class="st">★★★★★</b> "The most exciting table in the county" <em>— Food &amp; Flame</em></span>
+    <span><b class="st">★★★★★</b> "Theatre, smoke and precision" <em>— The Weekend Table</em></span>
+    <span><b class="st">★★★★★</b> "Book weeks ahead. Worth every ember" <em>— Local Larder</em></span>
+    <span><b class="st">★★★★★</b> "A masterclass in restraint" <em>— The Counter Review</em></span>
+    <span><b class="st">★★★★★</b> "The most exciting table in the county" <em>— Food &amp; Flame</em></span>
+    <span><b class="st">★★★★★</b> "Theatre, smoke and precision" <em>— The Weekend Table</em></span>
+    <span><b class="st">★★★★★</b> "Book weeks ahead. Worth every ember" <em>— Local Larder</em></span>
+    <span><b class="st">★★★★★</b> "A masterclass in restraint" <em>— The Counter Review</em></span>
+  </div>
+</div>
+
+<!-- ============ EXPERIENCE ============ -->
+<section id="experience">
+  <div class="container exp-grid">
+    <div class="reveal">
+      <span class="eyebrow">The Experience</span>
+      <h2>Twelve seats.<br>One <span class="grad-text">living flame.</span></h2>
+      <p class="lead">No gas, no electricity in the kitchen — just oak, birch and time. Every dish passes through the fire, from the first charred sourdough to the smoked-cream dessert. You sit at the counter; the kitchen is the show.</p>
+      <div class="exp-stats stagger">
+        <div class="exp-stat"><b data-count="12">0</b><small>Counter seats</small></div>
+        <div class="exp-stat"><b data-count="800">0</b><small>°C at the grill</small></div>
+        <div class="exp-stat"><b data-count="9">0</b><small>Course tasting</small></div>
+      </div>
+    </div>
+    <div class="fire-panel reveal" id="firePanel">
+      <span class="fp-tag">The Counter</span>
+      <div class="fp-quote">"You smell the oak before you taste it. By the third course you understand — this isn't cooking, it's choreography."<small>Guest review · Tasting menu</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MENU ============ -->
+<section id="menu">
+  <div class="container">
+    <div class="menu-head reveal">
+      <div>
+        <span class="eyebrow">Signatures</span>
+        <h2>From the fire, tonight</h2>
+      </div>
+      <p class="lead" style="max-width:34ch">A cut of the current menu. It changes with the seasons — and with the wood we're burning.</p>
+    </div>
+    <div class="menu-grid stagger">
+      <article class="dish" data-tilt>
+        <span class="plate p1" aria-hidden="true"></span>
+        <span class="no">01 — To Begin</span>
+        <h3>Ember-Cracked Sourdough</h3>
+        <p>Charred crust, whipped bone-marrow butter, fireplace salt.</p>
+        <span class="price">£9</span>
+      </article>
+      <article class="dish" data-tilt>
+        <span class="plate p2" aria-hidden="true"></span>
+        <span class="no">02 — The Sea</span>
+        <h3>Coal-Roast Scallop</h3>
+        <p>Cooked in the shell over white embers, seaweed butter, burnt lemon.</p>
+        <span class="price">£16</span>
+      </article>
+      <article class="dish" data-tilt>
+        <span class="plate p3" aria-hidden="true"></span>
+        <span class="no">03 — The Fire</span>
+        <h3>45-Day Rib, Oak &amp; Ash</h3>
+        <p>Dry-aged over the open grill, smoked shallot, drippings jus.</p>
+        <span class="price">£38</span>
+      </article>
+      <article class="dish" data-tilt>
+        <span class="plate p4" aria-hidden="true"></span>
+        <span class="no">04 — To Finish</span>
+        <h3>Burnt Honey &amp; Smoke Cream</h3>
+        <p>Torched meringue, embered figs, birch-syrup caramel.</p>
+        <span class="price">£11</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUOTE ============ -->
+<section class="quote-band">
+  <div class="embers" aria-hidden="true" id="embers2"></div>
+  <div class="container reveal">
+    <blockquote>"Fire is the oldest recipe there is. We just listen to it."</blockquote>
+    <cite>— Head Chef &amp; Founder</cite>
+  </div>
+</section>
+
+<!-- ============ REVIEWS MARQUEE (reverse) ============ -->
+<div class="mq-band" aria-hidden="true">
+  <div class="mq rev" style="--mq-t:42s">
+    <span><b class="st">★★★★★</b> "Best meal of my year — not close" <em>— Guest, March</em></span>
+    <span><b class="st">★★★★★</b> "The counter seats are pure theatre" <em>— Guest, April</em></span>
+    <span><b class="st">★★★★★</b> "That scallop lives in my head rent-free" <em>— Guest, May</em></span>
+    <span><b class="st">★★★★★</b> "Worth the three-week wait" <em>— Guest, June</em></span>
+    <span><b class="st">★★★★★</b> "Best meal of my year — not close" <em>— Guest, March</em></span>
+    <span><b class="st">★★★★★</b> "The counter seats are pure theatre" <em>— Guest, April</em></span>
+    <span><b class="st">★★★★★</b> "That scallop lives in my head rent-free" <em>— Guest, May</em></span>
+    <span><b class="st">★★★★★</b> "Worth the three-week wait" <em>— Guest, June</em></span>
+  </div>
+</div>
+
+<!-- ============ BOOK ============ -->
+<section id="book" class="book">
+  <div class="container book-grid">
+    <div class="reveal">
+      <span class="eyebrow">Reservations</span>
+      <h2>Take a seat<br>at the <span class="grad-text">fire.</span></h2>
+      <p class="lead">Counter seatings at 6pm and 8:45pm, Wednesday to Sunday. Parties of one to four — the flame doesn't do big tables.</p>
+    </div>
+    <form class="book-form reveal" id="bookForm" novalidate>
+      <div class="bf-row">
+        <div class="field"><label for="b-name">Name</label><input id="b-name" type="text" placeholder="Your name" required></div>
+        <div class="field"><label for="b-party">Party</label>
+          <select id="b-party"><option>2 guests</option><option>1 guest</option><option>3 guests</option><option>4 guests</option></select>
+        </div>
+      </div>
+      <div class="bf-row">
+        <div class="field"><label for="b-date">Date</label><input id="b-date" type="date"></div>
+        <div class="field"><label for="b-time">Seating</label>
+          <select id="b-time"><option>6:00 pm</option><option>8:45 pm</option></select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-fire" data-magnetic>Request Reservation</button>
+      <p class="form-ok" id="formOk">🔥 Request received — we'll confirm by email. (Demo)</p>
+      <p class="demo-note">Concept demo — in a live build this connects to your booking system.</p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <div><b style="color:var(--text);letter-spacing:.3em;text-transform:uppercase">Ember</b> · Fire Kitchen — a fictional concept restaurant</div>
+    <div class="credit">Designed &amp; built by <a href="https://hwwebdesign.co.uk/" target="_blank" rel="noopener">HW Web Design</a></div>
+  </div>
+</footer>
+
+<div class="ribbon">Concept demo by <a href="https://hwwebdesign.co.uk/" target="_blank" rel="noopener">HW Web Design</a></div>
+
+<script>
+(function(){
+  "use strict";
+  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fine=window.matchMedia("(pointer: fine)").matches;
+
+  /* nav glass on scroll + hero parallax scrub (rAF-throttled) */
+  var nav=document.getElementById('nav'),heroInner=document.getElementById('heroInner'),ticking=false;
+  function onScroll(){
+    if(ticking)return;ticking=true;
+    requestAnimationFrame(function(){
+      var y=window.scrollY||0;
+      nav.classList.toggle('solid',y>50);
+      if(!reduce&&heroInner){
+        var p=Math.min(y/window.innerHeight,1);
+        heroInner.style.transform='translateY('+(p*70)+'px)';
+        heroInner.style.opacity=String(1-p*.9);
+      }
+      ticking=false;
+    });
+  }
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  /* reveals + counters + fire panel scale */
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting)return;
+      e.target.classList.add('in');
+      e.target.querySelectorAll('[data-count]').forEach(count);
+      io.unobserve(e.target);
+    });
+  },{threshold:.22});
+  document.querySelectorAll('.reveal,.stagger,.fire-panel').forEach(function(el){io.observe(el);});
+
+  function count(el){
+    if(el.dataset.done)return;el.dataset.done=1;
+    var t=+el.dataset.count;
+    if(reduce){el.textContent=t;return;}
+    var t0=null;
+    function step(ts){
+      if(!t0)t0=ts;
+      var p=Math.min((ts-t0)/1300,1);
+      el.textContent=Math.round(t*(1-Math.pow(1-p,4)));
+      if(p<1)requestAnimationFrame(step);else el.textContent=t;
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* magnetic buttons */
+  if(fine&&!reduce){
+    document.querySelectorAll('[data-magnetic]').forEach(function(b){
+      b.addEventListener('mousemove',function(e){
+        var r=b.getBoundingClientRect();
+        b.style.transform='translate('+((e.clientX-r.left-r.width/2)*.28)+'px,'+((e.clientY-r.top-r.height/2)*.4)+'px)';
+      });
+      b.addEventListener('mouseleave',function(){b.style.transform='';});
+    });
+    /* 3D tilt + cursor glow on dish cards */
+    document.querySelectorAll('[data-tilt]').forEach(function(c){
+      c.addEventListener('mousemove',function(e){
+        var r=c.getBoundingClientRect(),
+            px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+        c.style.setProperty('--ry',((px-.5)*10)+'deg');
+        c.style.setProperty('--rx',((.5-py)*8)+'deg');
+        c.style.setProperty('--mx',(px*100)+'%');
+        c.style.setProperty('--my',(py*100)+'%');
+      });
+      c.addEventListener('mouseleave',function(){
+        c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg');
+      });
+    });
+  }
+
+  /* ember particles */
+  function embers(host,n){
+    if(!host||reduce)return;
+    for(var i=0;i<n;i++){
+      var s=document.createElement('i'),
+          d=9+Math.random()*9, delay=Math.random()*d, size=3+Math.random()*4;
+      s.style.left=(Math.random()*100)+'%';
+      s.style.width=s.style.height=size+'px';
+      s.style.setProperty('--dx',((Math.random()-.5)*160)+'px');
+      s.style.animationDuration=d+'s';
+      s.style.animationDelay='-'+delay+'s';
+      host.appendChild(s);
+    }
+  }
+  embers(document.getElementById('embers'),16);
+  embers(document.getElementById('embers2'),10);
+
+  /* demo booking form */
+  var f=document.getElementById('bookForm'),ok=document.getElementById('formOk');
+  if(f){f.addEventListener('submit',function(e){
+    e.preventDefault();ok.style.display='block';
+    f.querySelector('button[type=submit]').disabled=true;
+  });}
+})();
+</script>
+</body>
+</html>
