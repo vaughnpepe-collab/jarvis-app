@@ -45,6 +45,7 @@ h2 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 :focus-visible{outline:2px solid var(--rose);outline-offset:4px;border-radius:6px}
 .skip{position:fixed;top:-120px;left:16px;z-index:400;background:var(--rose);color:#22100a;padding:12px 20px;border-radius:12px;font-weight:800;transition:top .25s var(--ease)}
 .skip:focus{top:16px}
+.progress{position:fixed;top:0;left:0;height:2.5px;width:0;z-index:310;background:var(--grad);box-shadow:0 0 10px rgba(233,184,166,.55)}
 
 /* ============ ATMOSPHERE ============ */
 .atmo{position:fixed;inset:0;z-index:-2;pointer-events:none;background:
@@ -88,6 +89,17 @@ h2 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 .btn-glass{background:rgba(249,239,233,.05);color:var(--text);border-color:rgba(249,239,233,.2);backdrop-filter:blur(8px)}
 .btn-glass:hover{border-color:var(--rose);color:var(--rose)}
 .nav .btn{padding:12px 22px;font-size:.74rem}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-toggle{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:46px;height:46px;background:transparent;border:0;cursor:pointer}
+.nav-toggle span{width:23px;height:2px;border-radius:2px;background:var(--rose);transition:transform .32s var(--ease),opacity .2s}
+.nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{position:fixed;top:var(--nav-h);left:0;right:0;z-index:190;background:rgba(13,7,9,.96);backdrop-filter:blur(16px);
+  display:flex;flex-direction:column;padding:10px 28px 24px;transform:translateY(-140%);transition:transform .4s var(--ease);border-bottom:1px solid var(--line)}
+.mobile-menu.open{transform:translateY(0)}
+.mobile-menu a{color:var(--text);font-size:1rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:16px 2px;border-bottom:1px solid var(--line)}
+.mobile-menu a:last-child{border-bottom:0;margin-top:12px}
 
 /* ============ HERO ============ */
 .hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:calc(var(--nav-h) + 30px) 0 110px;overflow:hidden}
@@ -103,7 +115,12 @@ h2 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 .hero-badge .hrt{color:var(--blush);animation:beat 1.8s ease-in-out infinite;display:inline-block}
 @keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.25)}24%{transform:scale(1)}}
 .hero h1{font-size:var(--f-hero);line-height:1.02;margin-bottom:28px}
-.hero h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero h1 em{font-style:italic;background:linear-gradient(95deg,#f3c5c9,#e9b8a6 30%,#cf8f77 55%,#f3c5c9 80%,#e9b8a6);background-size:220% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 7s ease-in-out infinite}
+@keyframes shimmer{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
+.cursor-glow{position:absolute;z-index:1;width:380px;height:380px;border-radius:50%;pointer-events:none;left:50%;top:40%;
+  transform:translate(-50%,-50%);opacity:0;transition:opacity .5s;
+  background:radial-gradient(circle,rgba(233,184,166,.14),transparent 66%)}
 .hl{display:block;overflow:hidden}
 .hl span{display:block;transform:translateY(112%);animation:hlUp 1.1s var(--ease) forwards}
 .hl:nth-child(1) span{animation-delay:.15s}
@@ -115,7 +132,8 @@ h2 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 .hero-sub .lead{max-width:44ch;margin-bottom:30px}
 .hero-cta{display:flex;gap:16px;flex-wrap:wrap}
 /* hero candle scene (echoes their logo: lit candle + snap bar + sprig + hearts) */
-.scene{position:relative;display:grid;place-items:center;opacity:0;animation:fadeUp 1.3s var(--ease) 1.05s forwards}
+.scene{position:relative;display:grid;place-items:center;opacity:0;animation:fadeUp 1.3s var(--ease) 1.05s forwards;will-change:transform}
+.scene.settled{opacity:1;animation:none}
 .scene svg{width:min(430px,80%);overflow:visible}
 .halo{transform-origin:center;animation:halo 4.5s ease-in-out infinite}
 @keyframes halo{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:.85;transform:scale(1.12)}}
@@ -123,6 +141,9 @@ h2 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 @keyframes flick{0%,100%{transform:rotate(0) scaleY(1)}25%{transform:rotate(-2.4deg) scaleY(1.06)}55%{transform:rotate(2deg) scaleY(.95)}80%{transform:rotate(-1.2deg) scaleY(1.04)}}
 .heart-f{transform-box:fill-box;transform-origin:center;animation:beat 2.6s ease-in-out infinite}
 .heart-f.h2{animation-delay:.5s}
+.smoke{opacity:0;animation:smokeRise 6.5s ease-in-out infinite}
+.smoke.s2{animation-delay:3.2s}
+@keyframes smokeRise{0%{opacity:0;transform:translateY(6px)}25%{opacity:.4}60%{opacity:.18}100%{opacity:0;transform:translateY(-26px)}}
 
 /* ============ MARQUEE ============ */
 .mq-band{padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;background:rgba(19,10,14,.7)}
@@ -130,7 +151,7 @@ h2 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 .mq.rev{animation-direction:reverse}
 .mq:hover{animation-play-state:paused}
 .mq span{display:inline-flex;align-items:center;gap:12px;white-space:nowrap;font-size:.92rem;font-weight:600;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
-.mq .hh{color:var(--rose)}
+.mq .hh{color:var(--rose);display:inline-block;animation:beat 2.8s ease-in-out infinite}
 .mq .st{color:var(--rose);letter-spacing:3px}
 .mq em{font-style:normal;color:var(--faint);font-size:.76rem;letter-spacing:.14em}
 @keyframes mqx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -138,6 +159,8 @@ h2 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 /* ============ REVEALS ============ */
 .reveal{opacity:0;transform:translateY(42px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
 .reveal.in{opacity:1;transform:none}
+.reveal-scale{opacity:0;transform:scale(.94) translateY(24px);transition:opacity 1.1s var(--ease),transform 1.1s var(--ease)}
+.reveal-scale.in{opacity:1;transform:none}
 .stagger>*{opacity:0;transform:translateY(36px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .stagger.in>*{opacity:1;transform:none}
 .stagger.in>*:nth-child(2){transition-delay:.09s}
@@ -175,8 +198,14 @@ h2 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 .prod p{font-size:.9rem;color:var(--muted);line-height:1.55;margin-bottom:18px}
 .prod .row{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .prod .price{font-family:var(--serif);font-size:1.3rem;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.prod .row a{font-size:.72rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:color .3s}
-.prod .row a:hover{color:var(--rose)}
+.prod .row a{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:color .3s,transform .3s var(--ease)}
+.prod .row a:hover{color:var(--rose);transform:translateX(4px)}
+/* touch devices can't hover — candles arrive lit */
+@media(hover:none){
+  .prod .lite{opacity:1}
+  .prod .stage .warm{opacity:.7}
+  .hover-hint{display:none}
+}
 .hover-hint{text-align:center;margin-top:26px;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
 
 /* ============ MEL / STORY ============ */
@@ -239,6 +268,7 @@ footer .credit a:hover{border-color:var(--rose)}
 /* ============ RESPONSIVE ============ */
 @media(max-width:960px){
   .nav-links{display:none}
+  .nav-toggle{display:flex}
   .hero .container{grid-template-columns:1fr;gap:40px}
   .scene svg{width:min(340px,74%)}
   .mel-grid,.contact-grid{grid-template-columns:1fr;gap:44px}
@@ -258,13 +288,14 @@ footer .credit a:hover{border-color:var(--rose)}
   *{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
   .hl span{transform:none!important}
   .hero-sub,.scene{opacity:1!important}
-  .reveal,.stagger>*{opacity:1!important;transform:none!important}
+  .reveal,.reveal-scale,.stagger>*{opacity:1!important;transform:none!important}
   .prod .lite{opacity:1!important}
 }
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+<div class="progress" id="progress" aria-hidden="true"></div>
 <div class="atmo" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
@@ -280,14 +311,25 @@ footer .credit a:hover{border-color:var(--rose)}
       <li><a href="#custom">Custom Orders</a></li>
       <li><a href="#order">Get in Touch</a></li>
     </ul>
-    <a href="#order" class="btn btn-rose" data-magnetic>Order Now</a>
+    <div class="nav-right">
+      <a href="#order" class="btn btn-rose" data-magnetic>Order Now</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+    </div>
   </div>
 </nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#shop">Shop</a>
+  <a href="#mel">Meet Mel</a>
+  <a href="#custom">Custom Orders</a>
+  <a href="#order">Get in Touch</a>
+  <a href="#order" class="btn btn-rose">Order Now ♥</a>
+</div>
 
 <main id="main">
 <!-- ============ HERO ============ -->
 <header class="hero" id="top">
   <div class="hero-glow" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
   <div class="sparks" aria-hidden="true" id="sparks"></div>
   <div class="container" id="heroInner">
     <div>
@@ -314,6 +356,11 @@ footer .credit a:hover{border-color:var(--rose)}
         </defs>
         <!-- halo -->
         <circle class="halo" cx="210" cy="110" r="86" fill="url(#halog)"/>
+        <!-- smoke wisps -->
+        <g fill="none" stroke="#f3c5c9" stroke-width="1.6" stroke-linecap="round">
+          <path class="smoke" d="M206 60 C200 48 216 42 210 30 C206 22 212 14 210 6"/>
+          <path class="smoke s2" d="M216 56 C222 44 208 38 216 26 C220 18 214 12 218 2"/>
+        </g>
         <!-- flame -->
         <g class="flame-g">
           <path d="M210 66 C222 84 224 96 210 108 C196 96 198 84 210 66z" fill="#ffd9a0"/>
@@ -506,7 +553,7 @@ footer .credit a:hover{border-color:var(--rose)}
 <!-- ============ MEET MEL ============ -->
 <section id="mel" style="padding-top:0">
   <div class="container mel-grid">
-    <div class="mel-card reveal">
+    <div class="mel-card reveal-scale">
       <div class="mel-ava">M</div>
       <blockquote>"Every single candle and melt is made by me, in my kitchen, in small batches — poured, labelled and tied by hand. If you've got a request, I genuinely love those the most."</blockquote>
       <div class="mel-sign">Mel<span>Founder &amp; chief pourer · MeltsByMels</span></div>
@@ -526,7 +573,7 @@ footer .credit a:hover{border-color:var(--rose)}
 
 <!-- ============ CUSTOM BAND ============ -->
 <section id="custom" class="custom">
-  <div class="container reveal">
+  <div class="container reveal-scale">
     <span class="eyebrow" style="color:#ffe3d6">Custom Orders</span>
     <h2>Dream up a scent. <em style="-webkit-text-fill-color:#fff8f4;background:none;font-style:italic">I'll pour it.</em></h2>
     <p>Weddings, birthdays, thank-yous, "just because" — custom scents and personalised labels are what I love most. Tell me the vibe and leave the wax to me.</p>
@@ -592,22 +639,53 @@ footer .credit a:hover{border-color:var(--rose)}
   var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var fine=window.matchMedia("(pointer: fine)").matches;
 
-  /* nav + hero parallax */
-  var nav=document.getElementById('nav'),heroInner=document.getElementById('heroInner'),ticking=false;
+  /* nav + scroll progress + hero parallax (copy and candle scene at different depths) */
+  var nav=document.getElementById('nav'),heroInner=document.getElementById('heroInner'),
+      prog=document.getElementById('progress'),scene=document.querySelector('.scene'),ticking=false;
   function onScroll(){
     if(ticking)return;ticking=true;
     requestAnimationFrame(function(){
       var y=window.scrollY||0;
       nav.classList.toggle('solid',y>50);
+      if(prog){var h=document.documentElement.scrollHeight-window.innerHeight;
+        prog.style.width=(h>0?(y/h*100):0)+'%';}
       if(!reduce&&heroInner){
         var p=Math.min(y/window.innerHeight,1);
         heroInner.style.transform='translateY('+(p*66)+'px)';
         heroInner.style.opacity=String(1-p*.9);
+        if(scene&&scene.classList.contains('settled'))
+          scene.style.transform='translateY('+(p*-34)+'px) scale('+(1-p*.05)+')';
       }
       ticking=false;
     });
   }
   addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  /* mobile menu */
+  var tgl=document.getElementById('navToggle'),mm=document.getElementById('mobileMenu');
+  if(tgl&&mm){
+    tgl.addEventListener('click',function(){
+      var open=mm.classList.toggle('open');tgl.classList.toggle('open',open);
+      tgl.setAttribute('aria-expanded',open);tgl.setAttribute('aria-label',open?'Close menu':'Open menu');
+    });
+    mm.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){
+      mm.classList.remove('open');tgl.classList.remove('open');tgl.setAttribute('aria-expanded','false');
+    });});
+  }
+
+  /* release scene entrance animation so scroll parallax can take over */
+  if(scene){scene.addEventListener('animationend',function(){scene.classList.add('settled');});}
+
+  /* hero cursor glow (fine pointers) */
+  var hero=document.getElementById('top'),glow=document.getElementById('cursorGlow');
+  if(hero&&glow&&fine&&!reduce){
+    hero.addEventListener('mousemove',function(e){
+      var r=hero.getBoundingClientRect();
+      glow.style.opacity='1';
+      glow.style.left=(e.clientX-r.left)+'px';glow.style.top=(e.clientY-r.top)+'px';
+    });
+    hero.addEventListener('mouseleave',function(){glow.style.opacity='0';});
+  }
 
   /* sparkles */
   var sp=document.getElementById('sparks');
@@ -630,8 +708,8 @@ footer .credit a:hover{border-color:var(--rose)}
       e.target.classList.add('in');
       io.unobserve(e.target);
     });
-  },{threshold:.2});
-  document.querySelectorAll('.reveal,.stagger').forEach(function(el){io.observe(el);});
+  },{threshold:.1,rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.reveal,.reveal-scale,.stagger').forEach(function(el){io.observe(el);});
 
   /* magnetic + tilt */
   if(fine&&!reduce){
