@@ -46,6 +46,16 @@ python jarvis_server.py      # then open http://127.0.0.1:8765
 - **🔊 Speaker** — mute / restore JARVIS's spoken replies.
 - Live telemetry, arc-reactor core (pulses faster while thinking), activity log.
 
+## His soul & memory
+
+- **`SOUL.md`** is JARVIS's living identity. The backend reads it on startup and
+  folds it into every reply's system prompt. It's plain Markdown — edit it and
+  you change who he is. If the file is missing he falls back to a built-in persona.
+- **Persistent memory** lives at `~/.jarvis/memory.json` (override with the
+  `JARVIS_MEMORY` env var). He keeps the recent conversation and a few durable
+  notes across restarts, so closing the app no longer wipes him. It's your file —
+  read or delete it anytime. It is **not** committed to the repo.
+
 ## Notes & limits
 
 - **Voice needs Chrome or Edge** (Web Speech API). The mic also needs microphone
