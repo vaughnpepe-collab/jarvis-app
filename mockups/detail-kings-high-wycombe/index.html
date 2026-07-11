@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Detail Kings — Paint Protection & Detailing Studio · High Wycombe</title>
-<meta name="description" content="Detail Kings — High Wycombe's paint protection & detailing studio. Precision paint protection film, expert paint correction, ceramic coatings, wrapping & more. Revive · Customise · Protect.">
+<title>Detail King's — Paint Protection & Detailing Studio · High Wycombe</title>
+<meta name="description" content="Detail King&#39;s — High Wycombe's paint protection & detailing studio. Precision paint protection film, expert paint correction, ceramic coatings, wrapping & more. Revive · Customise · Protect.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#08090c">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2308090c'/%3E%3Cpath d='M20 44 32 14l12 30' fill='none' stroke='%23d8b46b' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M26 34h12' stroke='%23d8b46b' stroke-width='4'/%3E%3C/svg%3E">
@@ -67,6 +67,7 @@ h2{font-size:var(--f-h2);text-transform:uppercase}
 .brand .mk{width:34px;height:34px;flex-shrink:0}
 .brand b{font-size:1.18rem;font-weight:800;letter-spacing:.02em;line-height:1}
 .brand b span{color:var(--gold)}
+.brand .ks{font-family:"Segoe Script","Snell Roundhand","Brush Script MT",cursive;font-weight:600;color:var(--gold);letter-spacing:0;font-size:1.05em}
 .brand small{display:block;font-size:.56rem;letter-spacing:.34em;color:var(--faint);text-transform:uppercase;margin-top:3px}
 .nlinks{display:flex;gap:34px;list-style:none}
 .nlinks a{position:relative;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:color .3s}
@@ -115,47 +116,30 @@ h2{font-size:var(--f-h2);text-transform:uppercase}
 .trust-item .stars{color:var(--gold);letter-spacing:2px}
 .trust-item b{color:var(--ink);font-weight:700}
 /* hero car paint gloss visual */
-/* --- animated car-wrap turntable --- */
-.stage{position:absolute;right:-3%;top:50%;transform:translateY(-50%);width:min(60vw,780px);aspect-ratio:1/1;z-index:1;
-  pointer-events:none;perspective:1400px;perspective-origin:50% 42%}
-.stage .scene{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(64deg);display:flex;align-items:center;justify-content:center}
-/* spinning podium */
-.podium{position:absolute;top:50%;left:50%;width:72%;height:72%;transform:translate(-50%,-50%);border-radius:50%;
-  transform-style:preserve-3d}
-.podium .disc{position:absolute;inset:0;border-radius:50%;
-  background:radial-gradient(circle,rgba(216,180,107,.12),rgba(216,180,107,.03) 60%,transparent 72%);
-  border:1px solid var(--line);box-shadow:0 0 60px rgba(216,180,107,.14) inset}
-.podium .spokes{position:absolute;inset:6%;border-radius:50%;animation:spin 8s linear infinite;
-  background:
-    conic-gradient(from 0deg,transparent 0 8deg,rgba(216,180,107,.22) 8deg 9deg,transparent 9deg 45deg,
-    rgba(216,180,107,.14) 45deg 46deg,transparent 46deg 90deg,rgba(216,180,107,.22) 90deg 91deg,transparent 91deg);
-  -webkit-mask:radial-gradient(circle,transparent 40%,#000 41%,#000 98%,transparent);mask:radial-gradient(circle,transparent 40%,#000 41%,#000 98%,transparent)}
-.podium .ring{position:absolute;inset:-3%;border-radius:50%;border:1px dashed var(--line-2);animation:spin 26s linear infinite reverse}
-.podium .ring.r2{inset:14%;border-style:solid;border-color:rgba(216,180,107,.14);animation-duration:14s;animation-direction:normal}
-/* orbiting spotlight around the car */
-.orbit{position:absolute;top:50%;left:50%;width:96%;height:96%;transform:translate(-50%,-50%);animation:spin 6s linear infinite}
-.orbit .flare{position:absolute;top:-4%;left:50%;width:26%;height:26%;transform:translate(-50%,-50%);border-radius:50%;
-  background:radial-gradient(circle,rgba(255,246,224,.6),rgba(216,180,107,.2) 40%,transparent 70%);filter:blur(6px)}
-@keyframes spin{to{transform:rotate(360deg)}}
-/* the car — stands upright out of the tilted podium */
-.car{position:absolute;top:50%;left:50%;width:92%;transform:translate(-50%,-58%) rotateX(-64deg) translateZ(2px);
-  filter:drop-shadow(0 26px 30px rgba(0,0,0,.55));animation:carBob 6s var(--ease-soft) infinite}
-@keyframes carBob{0%,100%{transform:translate(-50%,-58%) rotateX(-64deg) rotateY(-7deg) translateZ(2px)}
-  50%{transform:translate(-50%,-60%) rotateX(-64deg) rotateY(7deg) translateZ(2px)}}
-.car svg{width:100%;height:auto;overflow:visible}
-/* colour-changing wrap + squeegee handled inside the SVG via CSS */
-.car .wrapbody{animation:hueShift 18s linear infinite}
-@keyframes hueShift{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
-.car .squeegee{animation:squeeze 4.5s var(--ease-soft) infinite}
-@keyframes squeeze{0%{transform:translateX(-360px)}60%,100%{transform:translateX(360px)}}
-.car .rimspin{transform-box:fill-box;transform-origin:center;animation:spin 2.2s linear infinite}
-.car .rimspin.rear{animation-duration:2.2s}
-/* floor reflection of the car */
-.car .reflection{opacity:.16}
-.stage .caption{position:absolute;left:50%;bottom:2%;transform:translateX(-50%);z-index:3;font-size:.62rem;font-weight:800;
-  letter-spacing:.28em;text-transform:uppercase;color:var(--gold-2);white-space:nowrap;
-  background:rgba(8,9,12,.5);border:1px solid var(--line);padding:6px 14px;border-radius:var(--pill);backdrop-filter:blur(6px)}
-@media(prefers-reduced-motion:reduce){.podium .spokes,.podium .ring,.orbit,.car,.car .wrapbody,.car .squeegee,.car .rimspin{animation:none!important}}
+/* --- hero two-column layout + real photo --- */
+.hero-wrap{display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(32px,4vw,64px);align-items:center}
+.hero-media{position:relative;justify-self:end;width:100%;max-width:520px;opacity:0;animation:fadeUp 1s .5s forwards}
+.photo{position:relative;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 1px rgba(216,180,107,.06)}
+.photo img{width:100%;height:auto;display:block;animation:kenburns 22s var(--ease-soft) infinite alternate}
+@keyframes kenburns{from{transform:scale(1.02)}to{transform:scale(1.11)}}
+/* moving specular light sweep across the paint */
+.photo .shine{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.16) 47%,rgba(190,214,255,.28) 50%,rgba(255,255,255,.16) 53%,transparent 62%);
+  background-size:280% 100%;background-position:150% 0;animation:paintSweep 6.5s var(--ease-soft) infinite}
+@keyframes paintSweep{0%,100%{background-position:150% 0}55%,72%{background-position:-70% 0}}
+.photo::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent 55%,rgba(6,7,10,.5))}
+.ph-tag{position:absolute;left:16px;bottom:14px;z-index:2;display:flex;flex-direction:column;gap:1px;
+  background:rgba(8,9,12,.6);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.ph-tag b{font-size:.9rem;font-weight:800;color:var(--ink)}
+.ph-tag span{font-size:.7rem;letter-spacing:.06em;color:var(--gold-2)}
+.float-badge{position:absolute;top:-14px;right:-14px;z-index:3;display:flex;align-items:center;gap:8px;
+  background:var(--grad-gold);color:#0a0a0a;font-size:.7rem;font-weight:800;letter-spacing:.08em;padding:9px 15px;
+  border-radius:var(--pill);box-shadow:0 14px 34px rgba(216,180,107,.3);animation:badgeBob 5s var(--ease-soft) infinite}
+.float-badge .stars{color:#0a0a0a;letter-spacing:1px}
+@keyframes badgeBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media(prefers-reduced-motion:reduce){.photo img,.photo .shine,.float-badge{animation:none!important}}
 .scroll-hint{position:absolute;left:26px;bottom:26px;z-index:2;display:flex;align-items:center;gap:10px;font-size:.68rem;
   letter-spacing:.28em;text-transform:uppercase;color:var(--faint)}
 .scroll-hint .bar{width:1px;height:40px;background:linear-gradient(var(--gold),transparent);position:relative;overflow:hidden}
@@ -225,6 +209,21 @@ h2{font-size:var(--f-h2);text-transform:uppercase}
 .ba-copy li .tick{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:rgba(216,180,107,.12);border:1px solid var(--line);
   color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;margin-top:2px}
 .ba-copy li b{color:var(--ink);font-weight:700}
+
+/* ============================== GALLERY ============================== */
+.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.gitem{position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line-2);
+  aspect-ratio:4/3;transition:transform .45s var(--ease),border-color .45s,box-shadow .45s}
+.gitem.big{grid-row:span 2;aspect-ratio:auto}
+.gitem img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--ease)}
+.gitem:hover{transform:translateY(-5px);border-color:var(--line);box-shadow:0 26px 60px rgba(0,0,0,.5)}
+.gitem:hover img{transform:scale(1.06)}
+.gitem::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(6,7,10,.72));pointer-events:none}
+.gitem figcaption{position:absolute;left:16px;bottom:14px;z-index:2}
+.gitem figcaption b{display:block;font-size:1rem;font-weight:800;color:var(--ink)}
+.gitem figcaption span{font-size:.76rem;color:var(--gold-2)}
+.work-cta{margin-top:30px;text-align:center}
+@media(max-width:640px){.gallery{grid-template-columns:1fr}.gitem.big{grid-row:auto}}
 
 /* ============================== PROCESS ============================== */
 .proc{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:step}
@@ -378,8 +377,10 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
   .studio .map{max-width:420px}
 }
 @media(max-width:860px){
-  .stage{width:min(104vw,600px);right:50%;top:46%;transform:translate(50%,-50%);opacity:.3;filter:blur(.5px)}
-  .stage .caption{display:none}
+  .hero{min-height:auto;padding-bottom:40px}
+  .hero-wrap{grid-template-columns:1fr;gap:34px}
+  .hero-media{order:-1;justify-self:center;max-width:440px}
+  .hero h1{font-size:clamp(2.6rem,8vw,4rem)}
 }
 @media(max-width:640px){
   .nlinks,.nav-cta .btn-ghost{display:none}
@@ -401,14 +402,14 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
 <!-- ============ NAV ============ -->
 <nav class="nav" id="nav">
   <div class="wrap">
-    <a href="#top" class="brand" aria-label="Detail Kings home">
+    <a href="#top" class="brand" aria-label="Detail King&#39;s home">
       <svg class="mk" viewBox="0 0 64 64" fill="none" aria-hidden="true">
         <rect width="64" height="64" rx="14" fill="#0e1118" stroke="#d8b46b" stroke-opacity=".4"/>
         <path d="M18 46 32 14l14 32" stroke="#d8b46b" stroke-width="3.4" stroke-linejoin="round"/>
         <path d="M25 34h14" stroke="#d8b46b" stroke-width="3.4"/>
         <path d="M32 14l3.4 6-3.4 3-3.4-3z" fill="#f0d9a8"/>
       </svg>
-      <div><b>Detail <span>Kings</span></b><small>High Wycombe</small></div>
+      <div><b>Detail <span class="ks">King's</span></b><small>High Wycombe · Bucks</small></div>
     </a>
     <ul class="nlinks">
       <li><a href="#services">Services</a></li>
@@ -426,76 +427,7 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
 
 <!-- ============ HERO ============ -->
 <header class="hero" id="top">
-  <div class="stage" aria-hidden="true">
-    <div class="scene">
-      <div class="podium">
-        <div class="disc"></div>
-        <div class="ring"></div>
-        <div class="ring r2"></div>
-        <div class="spokes"></div>
-      </div>
-      <div class="orbit"><div class="flare"></div></div>
-      <div class="car">
-        <svg viewBox="0 0 680 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="wrapG" x1="0" y1="0" x2="0.35" y2="1">
-              <stop offset="0" stop-color="#ffe9b8"/>
-              <stop offset=".35" stop-color="#d8b46b"/>
-              <stop offset=".7" stop-color="#a5813e"/>
-              <stop offset="1" stop-color="#6b501f"/>
-            </linearGradient>
-            <linearGradient id="glassG" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#cfe0ef" stop-opacity=".55"/>
-              <stop offset="1" stop-color="#0b0f18" stop-opacity=".9"/>
-            </linearGradient>
-            <radialGradient id="tyreG"><stop offset="0" stop-color="#20242c"/><stop offset="1" stop-color="#05070b"/></radialGradient>
-            <clipPath id="bodyClip"><path d="M40 205 C46 181 92 175 120 175 C168 171 208 169 232 167 C246 121 288 105 300 103 L420 103 C470 107 486 139 505 157 L610 171 C634 175 640 186 640 205 L544 205 A44 44 0 0 0 456 205 L209 205 A44 44 0 0 0 121 205 Z"/></clipPath>
-          </defs>
-          <!-- ground reflection -->
-          <g class="reflection" transform="translate(0,410) scale(1,-1)">
-            <path d="M40 205 C46 181 92 175 120 175 C168 171 208 169 232 167 C246 121 288 105 300 103 L420 103 C470 107 486 139 505 157 L610 171 C634 175 640 186 640 205 Z" fill="url(#wrapG)"/>
-          </g>
-          <!-- tyres -->
-          <circle cx="165" cy="205" r="47" fill="url(#tyreG)"/>
-          <circle cx="500" cy="205" r="47" fill="url(#tyreG)"/>
-          <!-- colour-changing wrapped body -->
-          <g class="wrapbody">
-            <path d="M40 205 C46 181 92 175 120 175 C168 171 208 169 232 167 C246 121 288 105 300 103 L420 103 C470 107 486 139 505 157 L610 171 C634 175 640 186 640 205 L544 205 A44 44 0 0 0 456 205 L209 205 A44 44 0 0 0 121 205 Z" fill="url(#wrapG)"/>
-            <!-- body character line -->
-            <path d="M120 178 C220 172 430 172 610 176" stroke="#fff" stroke-opacity=".22" stroke-width="2"/>
-            <!-- glasshouse -->
-            <path d="M246 165 C258 128 290 112 312 108 L416 108 C452 112 474 138 492 158 Z" fill="url(#glassG)"/>
-            <path d="M356 110 L356 160" stroke="#0b0f18" stroke-opacity=".5" stroke-width="3"/>
-            <!-- squeegee shine sweeping across (clipped to body) -->
-            <g clip-path="url(#bodyClip)">
-              <rect class="squeegee" x="300" y="90" width="46" height="130" transform="translate(-360,0)" fill="#fff" fill-opacity=".5" rx="6" style="filter:blur(3px)" transform-origin="323 155"/>
-            </g>
-          </g>
-          <!-- wheels/rims on top -->
-          <g>
-            <circle cx="165" cy="205" r="47" fill="none" stroke="#0b0f18" stroke-width="2"/>
-            <g class="rimspin"><circle cx="165" cy="205" r="26" fill="#12151d" stroke="#d8b46b" stroke-opacity=".5" stroke-width="1.5"/>
-              <g stroke="#d8b46b" stroke-opacity=".7" stroke-width="3" stroke-linecap="round">
-                <path d="M165 183 L165 227"/><path d="M143 205 L187 205"/><path d="M150 190 L180 220"/><path d="M180 190 L150 220"/></g>
-              <circle cx="165" cy="205" r="5" fill="#d8b46b"/></g>
-          </g>
-          <g>
-            <circle cx="500" cy="205" r="47" fill="none" stroke="#0b0f18" stroke-width="2"/>
-            <g class="rimspin rear"><circle cx="500" cy="205" r="26" fill="#12151d" stroke="#d8b46b" stroke-opacity=".5" stroke-width="1.5"/>
-              <g stroke="#d8b46b" stroke-opacity=".7" stroke-width="3" stroke-linecap="round">
-                <path d="M500 183 L500 227"/><path d="M478 205 L522 205"/><path d="M485 190 L515 220"/><path d="M515 190 L485 220"/></g>
-              <circle cx="500" cy="205" r="5" fill="#d8b46b"/></g>
-          </g>
-          <!-- headlight / taillight -->
-          <path d="M44 190 L70 186 L70 196 L46 199 Z" fill="#fff" fill-opacity=".85"/>
-          <path d="M636 188 L616 186 L616 196 L634 197 Z" fill="#ff4d4d" fill-opacity=".8"/>
-        </svg>
-      </div>
-      <div class="orbit" style="animation-duration:9s;animation-direction:reverse"><div class="flare" style="opacity:.5;width:18%;height:18%"></div></div>
-    </div>
-    <div class="caption">● Live wrap preview · colour-change</div>
-  </div>
-  <div class="wrap">
+  <div class="wrap hero-wrap">
     <div class="hero-inner">
       <span class="kicker"><span class="dot"></span> Paintwork Specialists · Aesthetic Enhancements</span>
       <h1>
@@ -509,13 +441,21 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
         keeping it that way for years.</p>
       <div class="cta-row">
         <a href="#contact" class="btn btn-gold">Get Your Free Quote →</a>
-        <a href="#correction" class="btn btn-ghost">See the Transformation</a>
+        <a href="#work" class="btn btn-ghost">See Our Work</a>
       </div>
       <div class="hero-trust">
         <div class="trust-item"><span class="stars">★★★★★</span> <b>5.0</b> on Google</div>
         <div class="trust-item">✦ Free collection within 15 miles</div>
         <div class="trust-item">✦ Studio-based · not mobile</div>
       </div>
+    </div>
+    <div class="hero-media">
+      <figure class="photo">
+        <img src="img/m8-front.jpg" alt="Blue BMW M8 Competition finished in custom Satin PPF, in the Detail King's High Wycombe studio" width="1200" height="1354" loading="eager">
+        <span class="shine" aria-hidden="true"></span>
+        <figcaption class="ph-tag"><b>BMW M8 Competition</b><span>Custom Satin PPF · our studio</span></figcaption>
+      </figure>
+      <div class="float-badge" aria-hidden="true"><span class="stars">★★★★★</span> Real work, real cars</div>
     </div>
   </div>
   <div class="scroll-hint" aria-hidden="true"><span class="bar"></span> Scroll</div>
@@ -536,7 +476,7 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
   <div class="wrap">
     <div class="sec-head reveal">
       <div class="eyebrow">What We Do</div>
-      <h2>The Full <span class="gold-text">Detail Kings</span> Menu</h2>
+      <h2>The Full <span class="gold-text">Detail King's</span> Menu</h2>
       <p class="lead">From invisible armour for your paintwork to a finish that turns heads on the driveway —
         every service delivered to a genuinely obsessive standard.</p>
     </div>
@@ -617,6 +557,35 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
         </span></div>
         <input type="range" min="0" max="100" value="50" id="baRange" aria-label="Reveal before and after paint correction">
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WORK / GALLERY ============ -->
+<section id="work">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Recent Work</div>
+      <h2>Straight From <span class="gold-text">Our Studio</span></h2>
+      <p class="lead">A BMW M8 Competition finished in custom Satin PPF, ceramic-coated and tinted in our High
+        Wycombe studio. Real cars, real results — not stock photos.</p>
+    </div>
+    <div class="gallery stagger">
+      <figure class="gitem big">
+        <img src="img/m8-front.jpg" alt="Front three-quarter of the blue BMW M8 in Detail King's studio" width="1200" height="1354" loading="lazy">
+        <figcaption><b>BMW M8 Competition</b><span>Custom Satin PPF · full front</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/m8-rear.jpg" alt="Rear of the blue BMW M8 Competition showing the wing and diffuser" width="1200" height="1354" loading="lazy">
+        <figcaption><b>Satin finish &amp; tint</b><span>Flawless reflection</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/m8-interior.jpg" alt="Detailed interior of the BMW M8 Competition" width="1200" height="1354" loading="lazy">
+        <figcaption><b>Interior detail</b><span>As-new finish</span></figcaption>
+      </figure>
+    </div>
+    <div class="work-cta reveal">
+      <a href="https://www.instagram.com/detailkings_hw/" target="_blank" rel="noopener" class="btn btn-ghost">See more on Instagram · @detailkings_hw</a>
     </div>
   </div>
 </section>
@@ -840,7 +809,7 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
         </div>
         <div class="field"><label for="msg">Details</label><textarea id="msg" rows="3" placeholder="Tell us what you're after…"></textarea></div>
         <button class="btn btn-gold" type="submit">Send Enquiry →</button>
-        <p class="fp fmsg" style="display:none;color:var(--gold-2)">✓ Thanks — this is a concept demo, so nothing is actually sent. On the live site this would reach the Detail Kings inbox.</p>
+        <p class="fp fmsg" style="display:none;color:var(--gold-2)">✓ Thanks — this is a concept demo, so nothing is actually sent. On the live site this would reach the Detail King's inbox.</p>
       </form>
     </div>
   </div>
@@ -853,7 +822,7 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
       <div class="foot-brand">
         <a href="#top" class="brand">
           <svg class="mk" viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0e1118" stroke="#d8b46b" stroke-opacity=".4"/><path d="M18 46 32 14l14 32" stroke="#d8b46b" stroke-width="3.4" stroke-linejoin="round"/><path d="M25 34h14" stroke="#d8b46b" stroke-width="3.4"/></svg>
-          <div><b>Detail <span>Kings</span></b><small>High Wycombe</small></div>
+          <div><b>Detail <span class="ks">King's</span></b><small>High Wycombe · Bucks</small></div>
         </a>
         <p>Paintwork specialists &amp; aesthetic enhancements. Revive · Customise · Protect.</p>
       </div>
@@ -872,6 +841,7 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
           <span>High Wycombe, HP11 2LU</span>
           <a href="tel:+441494211802">01494 211802</a>
           <a href="mailto:enq@detailkings.uk">enq@detailkings.uk</a>
+          <a href="https://www.instagram.com/detailkings_hw/" target="_blank" rel="noopener">@detailkings_hw</a>
         </div>
         <div class="foot-col">
           <h5>Hours</h5>
@@ -882,10 +852,10 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
       </div>
     </div>
     <div class="foot-bottom">
-      <div>© 2026 Detail Kings · High Wycombe</div>
+      <div>© 2026 Detail King's · High Wycombe, Buckinghamshire</div>
       <div>Revive · Customise · Protect</div>
     </div>
-    <p class="concept">This is a free design concept created by <b>HW Web Design</b> to show Detail Kings what a
+    <p class="concept">This is a free design concept created by <b>HW Web Design</b> to show Detail King's what a
       modern, high-end website could look like. Sample package details and reviews are illustrative; all business
       facts, services and contact details are real. Like it? Let's make it yours — hwwebdesign.co.uk</p>
   </div>
