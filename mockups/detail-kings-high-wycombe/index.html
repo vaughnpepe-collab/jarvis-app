@@ -118,11 +118,25 @@ h2{font-size:var(--f-h2);text-transform:uppercase}
 /* hero car paint gloss visual */
 /* --- hero two-column layout + real photo --- */
 .hero-wrap{display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(32px,4vw,64px);align-items:center}
-.hero-media{position:relative;justify-self:end;width:100%;max-width:520px;opacity:0;animation:fadeUp 1s .5s forwards}
-.photo{position:relative;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--line);
-  box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 1px rgba(216,180,107,.06)}
-.photo img{width:100%;height:auto;display:block;animation:kenburns 22s var(--ease-soft) infinite alternate}
-@keyframes kenburns{from{transform:scale(1.02)}to{transform:scale(1.11)}}
+.hero-media{position:relative;justify-self:end;width:100%;max-width:520px;opacity:0;animation:fadeUp 1s .5s forwards;
+  perspective:1200px}
+.photo{position:relative;aspect-ratio:1200/1354;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 1px rgba(216,180,107,.06);
+  transform-style:preserve-3d;transition:transform .3s var(--ease-soft);will-change:transform}
+/* crossfading cinematic reel of real photos */
+.reel{position:absolute;inset:0}
+.slide{position:absolute;inset:-2%;background-size:cover;background-position:center;opacity:0;
+  transition:opacity 1.5s var(--ease-soft);will-change:transform,opacity}
+.slide.is-active{opacity:1;animation:kenburns 7.5s linear forwards}
+.slide:nth-child(2).is-active{animation-name:kenburns2}
+.slide:nth-child(3).is-active{animation-name:kenburns3}
+@keyframes kenburns{0%{transform:scale(1.02) translate(0,0)}100%{transform:scale(1.14) translate(-1.5%,-1%)}}
+@keyframes kenburns2{0%{transform:scale(1.14) translate(1.5%,0)}100%{transform:scale(1.02) translate(0,-1%)}}
+@keyframes kenburns3{0%{transform:scale(1.02) translate(0,1%)}100%{transform:scale(1.12) translate(1%,-1%)}}
+.vig{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 120px 20px rgba(6,7,10,.6)}
+.reel-dots{position:absolute;top:14px;left:16px;z-index:3;display:flex;gap:7px}
+.reel-dots i{width:20px;height:3px;border-radius:3px;background:rgba(255,255,255,.3);transition:background .4s,width .4s}
+.reel-dots i.on{background:var(--gold);width:30px}
 /* moving specular light sweep across the paint */
 .photo .shine{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
   background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.16) 47%,rgba(190,214,255,.28) 50%,rgba(255,255,255,.16) 53%,transparent 62%);
@@ -139,7 +153,7 @@ h2{font-size:var(--f-h2);text-transform:uppercase}
   border-radius:var(--pill);box-shadow:0 14px 34px rgba(216,180,107,.3);animation:badgeBob 5s var(--ease-soft) infinite}
 .float-badge .stars{color:#0a0a0a;letter-spacing:1px}
 @keyframes badgeBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@media(prefers-reduced-motion:reduce){.photo img,.photo .shine,.float-badge{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.slide,.photo .shine,.float-badge{animation:none!important}.slide.is-active{opacity:1}}
 .scroll-hint{position:absolute;left:26px;bottom:26px;z-index:2;display:flex;align-items:center;gap:10px;font-size:.68rem;
   letter-spacing:.28em;text-transform:uppercase;color:var(--faint)}
 .scroll-hint .bar{width:1px;height:40px;background:linear-gradient(var(--gold),transparent);position:relative;overflow:hidden}
@@ -155,6 +169,21 @@ h2{font-size:var(--f-h2);text-transform:uppercase}
 .mq-track span::after{content:"◆";color:var(--gold);font-size:.7em}
 .marquee:hover .mq-track{animation-play-state:paused}
 @keyframes scrollx{to{transform:translateX(-50%)}}
+
+/* ============================== SCROLL PROGRESS ============================== */
+.scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:400;background:var(--grad-gold);
+  box-shadow:0 0 14px rgba(216,180,107,.6);transition:width .1s linear}
+
+/* ============================== STATS BAND ============================== */
+.stats-band{padding:clamp(40px,6vw,72px) 0;border-bottom:1px solid var(--line-2);
+  background:radial-gradient(120% 100% at 50% 0,rgba(216,180,107,.06),transparent 60%)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center}
+.stat b{display:block;font-size:clamp(2.4rem,1.4rem+3vw,3.8rem);font-weight:800;letter-spacing:-.03em;line-height:1;
+  background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{display:block;margin-top:10px;font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.stat{position:relative}
+.stat:not(:last-child)::after{content:"";position:absolute;right:-10px;top:12%;height:76%;width:1px;background:var(--line-2)}
+@media(max-width:640px){.stats{grid-template-columns:1fr 1fr;gap:32px 20px}.stat:not(:last-child)::after{display:none}}
 
 /* ============================== SERVICES ============================== */
 .sec-head{max-width:640px;margin-bottom:56px}
@@ -396,6 +425,7 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
 </head>
 <body>
 <a href="#services" class="skip">Skip to content</a>
+<div class="scroll-progress" id="prog" aria-hidden="true"></div>
 <div class="atmo"></div>
 <div class="grain"></div>
 
@@ -450,10 +480,17 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
       </div>
     </div>
     <div class="hero-media">
-      <figure class="photo">
-        <img src="img/m8-front.jpg" alt="Blue BMW M8 Competition finished in custom Satin PPF, in the Detail King's High Wycombe studio" width="1200" height="1354" loading="eager">
+      <figure class="photo tilt" id="reel">
+        <div class="reel">
+          <div class="slide is-active" style="background-image:url(img/m8-front.jpg)"></div>
+          <div class="slide" style="background-image:url(img/m8-rear.jpg)"></div>
+          <div class="slide" style="background-image:url(img/m8-interior.jpg)"></div>
+        </div>
         <span class="shine" aria-hidden="true"></span>
-        <figcaption class="ph-tag"><b>BMW M8 Competition</b><span>Custom Satin PPF · our studio</span></figcaption>
+        <span class="vig" aria-hidden="true"></span>
+        <img src="img/m8-front.jpg" alt="Blue BMW M8 Competition finished in custom Satin PPF in the Detail King's High Wycombe studio" width="1200" height="1354" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" aria-hidden="true">
+        <figcaption class="ph-tag" id="reelCap"><b>BMW M8 Competition</b><span>Custom Satin PPF · our studio</span></figcaption>
+        <div class="reel-dots" id="reelDots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
       </figure>
       <div class="float-badge" aria-hidden="true"><span class="stars">★★★★★</span> Real work, real cars</div>
     </div>
@@ -470,6 +507,18 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
     <span>Window Tinting</span><span>Starlight Headliners</span><span>Alloy Refurbishment</span><span>Interior Detailing</span>
   </div>
 </div>
+
+<!-- ============ STATS ============ -->
+<section class="stats-band">
+  <div class="wrap">
+    <div class="stats stagger">
+      <div class="stat"><b class="count" data-to="5" data-dec="1" data-suffix="">0</b><span>Google rating</span></div>
+      <div class="stat"><b class="count" data-to="15" data-suffix="mi">0</b><span>Free collection radius</span></div>
+      <div class="stat"><b class="count" data-to="9" data-suffix="">0</b><span>Signature services</span></div>
+      <div class="stat"><b class="count" data-to="100" data-suffix="%">0</b><span>Studio-based work</span></div>
+    </div>
+  </div>
+</section>
 
 <!-- ============ SERVICES ============ -->
 <section id="services">
@@ -880,6 +929,63 @@ document.querySelectorAll('.reveal,.stagger').forEach(function(el){io.observe(el
   function set(v){before.style.clipPath='inset(0 '+(100-v)+'% 0 0)';handle.style.left=v+'%';}
   range.addEventListener('input',function(){set(this.value)});
   set(50);
+})();
+
+var reduceMotion=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+// scroll progress bar
+(function(){
+  var bar=document.getElementById('prog');if(!bar)return;
+  function upd(){var h=document.documentElement,max=h.scrollHeight-h.clientHeight;
+    bar.style.width=(max>0?(scrollY/max*100):0)+'%';}
+  addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);upd();
+})();
+
+// cinematic hero reel — crossfade real photos + sync caption/dots
+(function(){
+  var reel=document.getElementById('reel');if(!reel||reduceMotion)return;
+  var slides=reel.querySelectorAll('.slide'),dots=document.querySelectorAll('#reelDots i'),cap=document.getElementById('reelCap');
+  var caps=[['BMW M8 Competition','Custom Satin PPF · our studio'],
+            ['Satin finish & tint','Flawless studio reflection'],
+            ['Interior detail','Finished to as-new']];
+  var i=0;
+  setInterval(function(){
+    slides[i].classList.remove('is-active');dots[i].classList.remove('on');
+    i=(i+1)%slides.length;
+    var s=slides[i];s.classList.remove('is-active');void s.offsetWidth;s.classList.add('is-active');
+    dots[i].classList.add('on');
+    cap.innerHTML='<b>'+caps[i][0]+'</b><span>'+caps[i][1]+'</span>';
+  },5000);
+})();
+
+// 3D pointer parallax tilt (hero reel + gallery items)
+(function(){
+  if(reduceMotion||matchMedia('(pointer:coarse)').matches)return;
+  function bind(el,max){
+    var raf;
+    el.addEventListener('mousemove',function(e){
+      var r=el.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;
+      cancelAnimationFrame(raf);raf=requestAnimationFrame(function(){
+        el.style.transform='perspective(1200px) rotateY('+(px*max)+'deg) rotateX('+(-py*max)+'deg)';});
+    });
+    el.addEventListener('mouseleave',function(){el.style.transform='';});
+  }
+  var hero=document.getElementById('reel');if(hero)bind(hero,7);
+  document.querySelectorAll('.gitem').forEach(function(g){bind(g,5)});
+})();
+
+// count-up stats
+(function(){
+  var els=document.querySelectorAll('.count');if(!els.length)return;
+  function run(el){
+    var to=parseFloat(el.dataset.to),dec=parseInt(el.dataset.dec||'0'),suf=el.dataset.suffix||'',t0=null,dur=1400;
+    if(reduceMotion){el.textContent=to.toFixed(dec)+suf;return;}
+    function step(t){t0=t0||t;var p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,3);
+      el.textContent=(to*e).toFixed(dec)+suf;if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  }
+  var so=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){run(e.target);so.unobserve(e.target)}})},{threshold:.6});
+  els.forEach(function(el){so.observe(el)});
 })();
 </script>
 </body>
