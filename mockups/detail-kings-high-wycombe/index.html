@@ -182,6 +182,47 @@ h2{font-size:var(--f-h2);text-transform:uppercase}
 .marquee:hover .mq-track{animation-play-state:paused}
 @keyframes scrollx{to{transform:translateX(-50%)}}
 
+/* ============================== INTRO LANDING SCREEN ============================== */
+#intro{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 38%,rgba(216,180,107,.10),transparent 58%),#06070a;will-change:clip-path,opacity}
+#intro::before{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cpath d='M30 2 60 2 75 28 60 54 30 54 15 28Z M90 50 120 50 135 76 120 102 90 102 75 76Z M-30 50 0 50 15 76 0 102 -30 102 -45 76Z' fill='none' stroke='%23d8b46b' stroke-opacity='.10' stroke-width='1'/%3E%3C/svg%3E")}
+#intro::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 40%,transparent 40%,rgba(6,7,10,.7) 100%)}
+.intro-inner{position:relative;z-index:2;text-align:center;padding:20px}
+.intro-emblem{width:92px;height:92px;margin:0 auto 26px;filter:drop-shadow(0 6px 22px rgba(216,180,107,.3))}
+.intro-emblem path{fill:none;stroke:var(--gold);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:1;stroke-dashoffset:1}
+.intro-emblem .p1{animation:draw 1s var(--ease) .1s forwards}
+.intro-emblem .p2{animation:draw .7s var(--ease) .55s forwards}
+.intro-emblem .p3{animation:draw .5s var(--ease) .85s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.intro-word{font-size:clamp(2rem,1.1rem+4.5vw,3.4rem);font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:#f4f1ea;line-height:1;display:flex;align-items:baseline;justify-content:center;gap:.24em}
+.intro-word .dt{display:inline-flex}
+.intro-word .dt span{display:inline-block;opacity:0;transform:translateY(20px);animation:iRise .6s var(--ease) forwards}
+.intro-word .ks{font-family:"Segoe Script","Snell Roundhand","Brush Script MT",cursive;font-weight:600;
+  letter-spacing:0;text-transform:none;font-size:1.15em;background:var(--grad-gold);-webkit-background-clip:text;
+  background-clip:text;color:transparent;opacity:0;transform:scale(.9) rotate(-3deg);
+  animation:iKs .8s var(--ease) .95s forwards}
+@keyframes iRise{to{opacity:1;transform:none}}
+@keyframes iKs{to{opacity:1;transform:none}}
+.intro-tag{margin-top:16px;font-size:clamp(.6rem,.5rem+.3vw,.72rem);font-weight:800;letter-spacing:.34em;
+  text-transform:uppercase;color:var(--faint);opacity:0;animation:iFade .7s 1.25s forwards}
+.intro-tag i{font-style:normal;color:var(--gold)}
+.intro-bar{margin:30px auto 0;width:170px;height:2px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden}
+.intro-bar i{display:block;height:100%;width:0;background:var(--grad-gold);box-shadow:0 0 12px rgba(216,180,107,.6);
+  animation:iLoad 2.1s var(--ease-soft) .2s forwards}
+@keyframes iFade{to{opacity:1}}
+@keyframes iLoad{to{width:100%}}
+.intro-skip{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:3;font-size:.62rem;font-weight:700;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--faint);cursor:pointer;opacity:0;animation:iFade .6s 1.6s forwards;
+  background:none;border:0;padding:8px}
+.intro-skip:hover{color:var(--gold-2)}
+#intro.done{animation:introOut .85s var(--ease) forwards;pointer-events:none}
+@keyframes introOut{0%{clip-path:polygon(0 0,100% 0,100% 100%,0 100%);opacity:1}
+  100%{clip-path:polygon(0 -30%,100% 0,100% 0,0 -30%);opacity:0}}
+@media(prefers-reduced-motion:reduce){#intro{display:none}}
+
 /* ============================== SCROLL PROGRESS ============================== */
 .scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:400;background:var(--grad-gold);
   box-shadow:0 0 14px rgba(216,180,107,.6);transition:width .1s linear}
@@ -491,6 +532,39 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
 </head>
 <body>
 <a href="#services" class="skip">Skip to content</a>
+
+<!-- ============ INTRO LANDING SCREEN ============ -->
+<div id="intro" role="presentation">
+  <div class="intro-inner">
+    <svg class="intro-emblem" viewBox="0 0 100 100" aria-hidden="true">
+      <path class="p1" pathLength="1" d="M50 6 L88 28 L88 72 L50 94 L12 72 L12 28 Z"/>
+      <path class="p2" pathLength="1" d="M32 70 L50 30 L68 70"/>
+      <path class="p3" pathLength="1" d="M40 55 L60 55"/>
+    </svg>
+    <div class="intro-word">
+      <span class="dt"><span style="animation-delay:.35s">D</span><span style="animation-delay:.41s">E</span><span style="animation-delay:.47s">T</span><span style="animation-delay:.53s">A</span><span style="animation-delay:.59s">I</span><span style="animation-delay:.65s">L</span></span>
+      <span class="ks">King's</span>
+    </div>
+    <div class="intro-tag"><i>Revive</i> · <i>Customise</i> · <i>Protect</i></div>
+    <div class="intro-bar"><i></i></div>
+  </div>
+  <button class="intro-skip" type="button" id="introSkip">Skip intro</button>
+</div>
+<script>
+(function(){
+  var intro=document.getElementById('intro');if(!intro)return;
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches){intro.remove();return;}
+  var html=document.documentElement;html.style.overflow='hidden';
+  var done=false;
+  function finish(){if(done)return;done=true;intro.classList.add('done');
+    setTimeout(function(){if(intro.parentNode)intro.remove();html.style.overflow='';},850);}
+  var t=setTimeout(finish,2650);
+  function skip(){clearTimeout(t);finish();}
+  intro.addEventListener('click',skip);
+  addEventListener('keydown',function(e){if(e.key==='Escape'||e.key===' '||e.key==='Enter')skip();});
+})();
+</script>
+
 <div class="scroll-progress" id="prog" aria-hidden="true"></div>
 <div class="atmo"></div>
 <div class="grain"></div>
