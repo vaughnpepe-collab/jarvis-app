@@ -1,222 +1,1141 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Detail Kings — Garage & MOT Centre in High Wycombe. MOTs, servicing and repairs in High Wycombe — honest prices, straight answers and work done right the first time.">
-<title>Detail Kings | Garage & MOT Centre in High Wycombe</title>
+<title>Detail King's — Paint Protection & Detailing Studio · High Wycombe</title>
+<meta name="description" content="Detail King&#39;s — High Wycombe's paint protection & detailing studio. Precision paint protection film, expert paint correction, ceramic coatings, wrapping & more. Revive · Customise · Protect.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#08090c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2308090c'/%3E%3Cpath d='M20 44 32 14l12 30' fill='none' stroke='%23d8b46b' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M26 34h12' stroke='%23d8b46b' stroke-width='4'/%3E%3C/svg%3E">
 <style>
+/* ============================== TOKENS ============================== */
+:root{
+  --bg:#08090c; --bg-2:#0b0d12; --panel:#0e1118; --panel-2:#12151d;
+  --ink:#f4f1ea; --muted:rgba(244,241,234,.62); --faint:rgba(244,241,234,.36);
+  --line:rgba(216,180,107,.16); --line-2:rgba(255,255,255,.08);
+  --gold:#d8b46b; --gold-2:#f0d9a8; --gold-deep:#a5813e;
+  --chrome:#cfe0ef; --steel:#7d93a8;
+  --grad-gold:linear-gradient(105deg,#f0d9a8,#d8b46b 45%,#a5813e);
+  --grad-chrome:linear-gradient(120deg,#eef5fb,#9fb6cc 55%,#5f7387);
+  --glass:rgba(14,17,24,.62);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --ease-soft:cubic-bezier(.22,.61,.21,.98);
+  --r:14px; --r-lg:22px; --r-xl:30px; --pill:999px;
+  --nav-h:74px; --wrap:1180px;
+  --f-hero:clamp(3rem,1.1rem+8vw,7.4rem);
+  --f-h2:clamp(2rem,1.2rem+3vw,3.5rem);
+  --f-lead:clamp(1.02rem,.96rem+.4vw,1.22rem);
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1f2937;line-height:1.6;background:#fff}
-:root{--p:#1e3a5f;--pd:#142b47;--a:#f97316;--a2:#fdba74;--g:#64748b;--bd:#dbe3ec;--cr:#f4f7fb}
-a{text-decoration:none}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,15,20,.55);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:66px;transition:background .3s}
-nav.solid{background:var(--pd)}
-.logo{color:#fff;font-size:21px;font-weight:800;letter-spacing:-.3px}
-.logo span{color:var(--a)}
-.nlinks{display:flex;gap:30px;list-style:none}
-.nlinks a{color:rgba(255,255,255,.82);font-size:15px;font-weight:500;transition:color .2s}
-.nlinks a:hover{color:var(--a)}
-.ncta{background:var(--a);color:#11151c;padding:10px 22px;border-radius:8px;font-weight:700;font-size:14px;transition:transform .15s,filter .2s}
-.ncta:hover{transform:translateY(-1px);filter:brightness(1.07)}
-.hero{min-height:100vh;display:flex;align-items:center;padding:120px 5% 70px;background:linear-gradient(135deg,#0f1f33 0%,#1e3a5f 50%,#16293f 100%);position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-180px;right:-160px;width:560px;height:560px;background:radial-gradient(circle,#f9731622 0%,transparent 65%);pointer-events:none}
-.hwrap{position:relative;max-width:660px}
-.badge{display:inline-flex;align-items:center;gap:8px;background:#f973161f;border:1px solid #f9731655;color:var(--a2);padding:7px 16px;border-radius:30px;font-size:13px;font-weight:600;margin-bottom:26px}
-.hero h1{font-size:clamp(36px,6vw,66px);font-weight:900;color:#fff;line-height:1.08;letter-spacing:-1.5px;margin-bottom:22px}
-.hero h1 span{color:var(--a)}
-.hero p{font-size:19px;color:rgba(255,255,255,.74);max-width:540px;margin-bottom:36px}
-.btns{display:flex;gap:14px;flex-wrap:wrap}
-.bp{background:var(--a);color:#11151c;padding:15px 32px;border-radius:10px;font-weight:800;font-size:16px;transition:transform .15s,filter .2s}
-.bp:hover{transform:translateY(-2px);filter:brightness(1.07)}
-.bs{background:rgba(255,255,255,.1);color:#fff;padding:15px 30px;border-radius:10px;font-weight:600;font-size:16px;border:1px solid rgba(255,255,255,.25)}
-.bs:hover{background:rgba(255,255,255,.18)}
-.statbar{background:var(--p);display:flex;justify-content:center;gap:clamp(28px,7vw,80px);flex-wrap:wrap;padding:26px 5%}
-.stat{text-align:center;color:#fff}
-.stat .num{font-size:26px;font-weight:900;color:var(--a2)}
-.stat .lab{font-size:13px;color:rgba(255,255,255,.7);letter-spacing:.5px}
-section{padding:86px 5%}
-.tag{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--a);margin-bottom:12px}
-h2{font-size:clamp(28px,4vw,44px);font-weight:900;color:var(--p);line-height:1.15;letter-spacing:-.5px;margin-bottom:14px}
-.sub{font-size:18px;color:var(--g);max-width:580px;margin-bottom:50px}
-.cream{background:var(--cr)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px}
-.card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:28px;transition:transform .2s,box-shadow .2s;position:relative}
-.card:hover{transform:translateY(-5px);box-shadow:0 16px 38px rgba(0,0,0,.09)}
-.ico{font-size:36px;margin-bottom:14px}
-.card h3{font-size:19px;font-weight:800;color:var(--text);margin-bottom:8px}
-.card p{font-size:15px;color:var(--g)}
-.price{margin-top:14px;display:inline-block;background:var(--cr);color:var(--p);font-weight:800;font-size:14px;padding:5px 14px;border-radius:20px}
-.why-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center}
-.whys{list-style:none;display:flex;flex-direction:column;gap:22px;margin-top:8px}
-.why{display:flex;gap:16px}
-.chk{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--a);color:#11151c;display:flex;align-items:center;justify-content:center;font-weight:900}
-.why h4{font-size:17px;font-weight:800;color:var(--text);margin-bottom:3px}
-.why p{font-size:15px;color:var(--g)}
-.visual{background:linear-gradient(135deg,var(--p),var(--pd));border-radius:20px;min-height:380px;display:flex;align-items:center;justify-content:center;font-size:130px}
-.revs{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px}
-.rev{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:28px}
-.stars{color:var(--a);font-size:18px;margin-bottom:12px}
-.rev p{font-size:15px;color:#374151;font-style:italic;margin-bottom:18px}
-.auth{display:flex;align-items:center;gap:12px}
-.ava{width:42px;height:42px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
-.an{font-weight:700;font-size:14px;color:var(--text)}
-.al{font-size:12px;color:var(--g)}
-.contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px}
-.cinfo{display:flex;flex-direction:column;gap:18px;margin-top:10px}
-.crow{display:flex;gap:16px;align-items:flex-start;background:var(--cr);border:1px solid var(--bd);border-radius:12px;padding:18px 20px}
-.crow .ci{font-size:22px}
-.cl{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--g);margin-bottom:3px}
-.cv{font-size:17px;font-weight:800;color:var(--text)}
-form{display:flex;flex-direction:column;gap:14px;background:var(--cr);border:1px solid var(--bd);border-radius:16px;padding:30px}
-input,textarea{padding:13px 16px;border:1px solid var(--bd);border-radius:9px;font-size:15px;font-family:inherit;background:#fff}
-input:focus,textarea:focus{outline:2px solid var(--a)}
-.fsub{background:var(--p);color:#fff;border:none;padding:15px;border-radius:9px;font-weight:800;font-size:16px;cursor:pointer}
-.fsub:hover{background:var(--pd)}
-footer{background:var(--pd);color:rgba(255,255,255,.6);padding:40px 5% 70px;text-align:center}
-footer .fn{color:#fff;font-size:20px;font-weight:800;margin-bottom:8px}
-footer .fn span{color:var(--a)}
-.concept{margin-top:22px;font-size:12.5px;color:rgba(255,255,255,.45);max-width:620px;margin-left:auto;margin-right:auto;line-height:1.6}
-.flag{position:fixed;right:16px;bottom:16px;z-index:200;background:#0f172a;color:#fff;font-size:12.5px;font-weight:600;padding:9px 15px;border-radius:30px;box-shadow:0 8px 26px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12)}
-.flag span{color:#7dd3fc}
-.flag b{color:var(--a)}
-/* animation + polish */
-@keyframes mkUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
-@keyframes mkGlow{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-45px,35px) scale(1.18)}}
-@keyframes mkShine{0%,55%{left:-130%}80%,100%{left:140%}}
-.hero .badge{animation:mkUp .6s .05s both cubic-bezier(.2,.7,.2,1)}
-.hero h1{animation:mkUp .7s .16s both cubic-bezier(.2,.7,.2,1)}
-.hero p{animation:mkUp .7s .3s both cubic-bezier(.2,.7,.2,1)}
-.hero .btns{animation:mkUp .7s .42s both cubic-bezier(.2,.7,.2,1)}
-.hero::after{content:'';position:absolute;left:-120px;bottom:-170px;width:430px;height:430px;border-radius:50%;background:radial-gradient(circle,var(--a) 0%,transparent 60%);opacity:.16;pointer-events:none;animation:mkGlow 17s ease-in-out infinite}
-.bp{position:relative;overflow:hidden}
-.bp::after{content:'';position:absolute;top:0;left:-130%;width:55%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:mkShine 4.8s ease-in-out infinite}
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{background:var(--bg);color:var(--ink);line-height:1.65;overflow-x:clip;-webkit-font-smoothing:antialiased;
+  font-family:"Helvetica Neue",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:inherit;text-decoration:none}
+img,svg{display:block;max-width:100%}
+::selection{background:var(--gold);color:#0a0a0a}
+h1,h2,h3,h4{font-weight:800;letter-spacing:-.02em;text-wrap:balance;line-height:1.05}
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto;padding:0 26px}
+section{position:relative;padding:clamp(78px,10vw,140px) 0}
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font-size:.7rem;font-weight:800;letter-spacing:.36em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.eyebrow::before{content:"";width:30px;height:1px;background:var(--grad-gold)}
+h2{font-size:var(--f-h2);text-transform:uppercase}
+.lead{font-size:var(--f-lead);color:var(--muted);max-width:56ch}
+.gold-text{background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.chrome-text{background:var(--grad-chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:6px}
+.skip{position:fixed;top:-100px;left:16px;z-index:500;background:var(--gold);color:#0a0a0a;padding:12px 20px;
+  border-radius:10px;font-weight:800;transition:top .25s var(--ease)}
+.skip:focus{top:16px}
+
+/* ============================== ATMOSPHERE ============================== */
+.atmo{position:fixed;inset:0;z-index:-3;pointer-events:none;background:
+  radial-gradient(52% 40% at 78% -6%,rgba(216,180,107,.16),transparent 60%),
+  radial-gradient(48% 40% at 6% 12%,rgba(159,182,204,.08),transparent 60%),
+  radial-gradient(70% 60% at 50% 116%,rgba(216,180,107,.06),transparent 62%),var(--bg)}
+.grain{position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.4;mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}
+
+/* ============================== NAV ============================== */
+.nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);display:flex;align-items:center;
+  border-bottom:1px solid transparent;transition:background .4s var(--ease),border-color .4s,box-shadow .4s}
+.nav.solid{background:var(--glass);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border-bottom-color:var(--line);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .mk{width:34px;height:34px;flex-shrink:0}
+.brand b{font-size:1.18rem;font-weight:800;letter-spacing:.02em;line-height:1}
+.brand b span{color:var(--gold)}
+.brand .ks{font-family:"Segoe Script","Snell Roundhand","Brush Script MT",cursive;font-weight:600;color:var(--gold);letter-spacing:0;font-size:1.05em}
+.brand small{display:block;font-size:.56rem;letter-spacing:.34em;color:var(--faint);text-transform:uppercase;margin-top:3px}
+.nlinks{display:flex;gap:34px;list-style:none}
+.nlinks a{position:relative;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:color .3s}
+.nlinks a::after{content:"";position:absolute;left:0;bottom:-7px;height:1.5px;width:0;background:var(--grad-gold);transition:width .35s var(--ease)}
+.nlinks a:hover{color:var(--ink)}.nlinks a:hover::after{width:100%}
+.nav-cta{display:flex;align-items:center;gap:14px}
+
+/* ============================== BUTTONS ============================== */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 30px;
+  border-radius:var(--pill);font-weight:800;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;
+  cursor:pointer;border:1px solid transparent;overflow:hidden;white-space:nowrap;
+  transition:transform .3s var(--ease),box-shadow .35s var(--ease),border-color .3s,color .3s,background .3s;will-change:transform}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:var(--grad-gold);color:#0a0a0a;box-shadow:0 12px 40px rgba(216,180,107,.28)}
+.btn-gold:hover{box-shadow:0 20px 56px rgba(216,180,107,.42)}
+.btn-gold::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 40%,rgba(255,255,255,.6) 50%,transparent 60%);
+  background-size:250% 100%;background-position:150% 0;animation:sheen 5s var(--ease-soft) infinite;pointer-events:none}
+@keyframes sheen{0%,100%{background-position:150% 0}50%,70%{background-position:-90% 0}}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--ink);border-color:var(--line-2)}
+.btn-ghost:hover{border-color:var(--gold);background:rgba(216,180,107,.08)}
+.btn-sm{padding:11px 20px;font-size:.72rem}
+
+/* ============================== HERO ============================== */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:calc(var(--nav-h) + 40px) 0 60px;overflow:hidden}
+.hero-inner{position:relative;z-index:2;max-width:820px}
+.hero .kicker{display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border-radius:var(--pill);
+  border:1px solid var(--line);background:rgba(216,180,107,.06);color:var(--gold-2);font-size:.72rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;margin-bottom:28px}
+.hero .kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 0 rgba(216,180,107,.6);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(216,180,107,.5)}70%{box-shadow:0 0 0 10px rgba(216,180,107,0)}100%{box-shadow:0 0 0 0 rgba(216,180,107,0)}}
+.hero h1{font-size:var(--f-hero);text-transform:uppercase;letter-spacing:-.03em}
+.hero h1 .line{display:block;overflow:hidden}
+.hero h1 .line>span{display:block;transform:translateY(105%);animation:riseIn 1s var(--ease) forwards}
+.hero h1 .line:nth-child(2)>span{animation-delay:.12s}
+.hero h1 .line:nth-child(3)>span{animation-delay:.24s}
+@keyframes riseIn{to{transform:none}}
+.hero .slogan{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:26px 0 20px;font-size:clamp(.8rem,.7rem+.5vw,1rem);
+  font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:var(--faint);opacity:0;animation:fadeUp .8s .5s forwards}
+.hero .slogan i{font-style:normal;color:var(--gold)}
+.hero .slogan em{width:5px;height:5px;border-radius:50%;background:var(--gold-deep);display:inline-block}
+.hero p.lead{opacity:0;animation:fadeUp .8s .6s forwards;margin-bottom:34px}
+.hero .cta-row{display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:fadeUp .8s .72s forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.hero-trust{margin-top:44px;display:flex;gap:28px;flex-wrap:wrap;align-items:center;opacity:0;animation:fadeUp .8s .86s forwards}
+.trust-item{display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--muted)}
+.trust-item .stars{color:var(--gold);letter-spacing:2px}
+.trust-item b{color:var(--ink);font-weight:700}
+/* --- full-bleed cinematic hero + PPF-laying reel --- */
+.hero-wrap{position:relative;z-index:2}
+.hero-inner{max-width:660px}
+.hero-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
+.reel{position:absolute;inset:0}
+.slide{position:absolute;inset:0;background-size:cover;background-position:center 56%;z-index:0;
+  clip-path:inset(0);will-change:transform,clip-path}
+.slide:nth-child(1){background-position:center 64%}
+.slide:nth-child(2){background-position:center 50%}
+.slide:nth-child(3){background-position:center 48%}
+.slide.is-active{z-index:2;animation:kenburns 8s linear both}
+/* diagonal "PPF laying" wipe for incoming slide + its Ken Burns */
+.slide.is-active.wipe{animation:ppfWipe 1.35s var(--ease) both,kenburns 8s linear .1s both}
+.slide:nth-child(2).is-active.wipe{animation:ppfWipe 1.35s var(--ease) both,kenburns2 8s linear .1s both}
+.slide:nth-child(3).is-active.wipe{animation:ppfWipe 1.35s var(--ease) both,kenburns3 8s linear .1s both}
+.slide.prev{z-index:1}
+@keyframes ppfWipe{from{clip-path:polygon(0 0,0 0,-25% 100%,-25% 100%)}to{clip-path:polygon(0 0,125% 0,100% 100%,0 100%)}}
+@keyframes kenburns{0%{transform:scale(1.05)}100%{transform:scale(1.16)}}
+@keyframes kenburns2{0%{transform:scale(1.16) translateX(1.5%)}100%{transform:scale(1.05)}}
+@keyframes kenburns3{0%{transform:scale(1.05)}100%{transform:scale(1.14) translateX(-1.5%)}}
+/* squeegee light edge travelling with the wipe */
+.slide.is-active.wipe::after{content:"";position:absolute;top:-6%;bottom:-6%;width:13vw;z-index:5;left:-16vw;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.32),rgba(200,225,255,.9),rgba(255,255,255,.32),transparent);
+  transform:skewX(-9deg);mix-blend-mode:screen;filter:blur(1px);animation:squeegee 1.35s var(--ease) both}
+@keyframes squeegee{from{left:-16vw}to{left:112%}}
+.hero-bg .shine{position:absolute;inset:0;z-index:3;pointer-events:none;mix-blend-mode:screen;
+  background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.12) 48%,rgba(190,214,255,.22) 50%,rgba(255,255,255,.12) 52%,transparent 60%);
+  background-size:300% 100%;background-position:150% 0;animation:paintSweep 7s var(--ease-soft) infinite}
+@keyframes paintSweep{0%,100%{background-position:150% 0}55%,72%{background-position:-80% 0}}
+.hero-scrim{position:absolute;inset:0;z-index:4;pointer-events:none;background:
+  linear-gradient(96deg,rgba(6,7,10,.96),rgba(6,7,10,.82) 28%,rgba(6,7,10,.5) 52%,rgba(6,7,10,.26) 74%,rgba(6,7,10,.52) 100%),
+  linear-gradient(0deg,rgba(6,7,10,.86),transparent 42%),
+  linear-gradient(180deg,rgba(6,7,10,.72),transparent 26%)}
+/* bottom meta bar: scroll hint + live caption/dots */
+.hero-meta{position:absolute;left:0;right:0;bottom:22px;z-index:6;display:flex;justify-content:space-between;
+  align-items:flex-end;gap:20px}
+.hero-meta .wrap{display:flex;justify-content:flex-start;align-items:flex-end;gap:20px;width:100%}
+.hero-caption{display:flex;align-items:center;gap:16px}
+.ph-tag{display:flex;flex-direction:column;gap:1px;background:rgba(8,9,12,.55);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:12px;padding:10px 16px}
+.ph-tag b{font-size:.9rem;font-weight:800;color:var(--ink)}
+.ph-tag span{font-size:.7rem;letter-spacing:.06em;color:var(--gold-2)}
+.reel-dots{display:flex;gap:7px}
+.reel-dots i{width:22px;height:3px;border-radius:3px;background:rgba(255,255,255,.32);transition:background .4s,width .4s}
+.reel-dots i.on{background:var(--gold);width:34px}
+.float-badge{position:absolute;top:calc(var(--nav-h) + 22px);right:26px;z-index:6;display:flex;align-items:center;gap:8px;
+  background:var(--grad-gold);color:#0a0a0a;font-size:.7rem;font-weight:800;letter-spacing:.08em;padding:9px 15px;
+  border-radius:var(--pill);box-shadow:0 14px 34px rgba(216,180,107,.3);animation:badgeBob 5s var(--ease-soft) infinite}
+.float-badge .stars{color:#0a0a0a;letter-spacing:1px}
+@keyframes badgeBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media(prefers-reduced-motion:reduce){.slide,.hero-bg .shine,.float-badge{animation:none!important}.slide.is-active{z-index:2}}
+.scroll-hint{display:flex;align-items:center;gap:10px;font-size:.68rem;
+  letter-spacing:.28em;text-transform:uppercase;color:var(--faint)}
+.scroll-hint .bar{width:1px;height:40px;background:linear-gradient(var(--gold),transparent);position:relative;overflow:hidden}
+.scroll-hint .bar::after{content:"";position:absolute;top:-40px;left:0;width:1px;height:40px;background:var(--gold);animation:drop 2.2s var(--ease) infinite}
+@keyframes drop{to{top:40px}}
+
+/* ============================== MARQUEE ============================== */
+.marquee{border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);padding:22px 0;overflow:hidden;
+  background:linear-gradient(90deg,var(--bg-2),var(--panel),var(--bg-2))}
+.mq-track{display:flex;gap:0;white-space:nowrap;width:max-content;animation:scrollx 34s linear infinite}
+.mq-track span{font-size:clamp(1.1rem,.9rem+1vw,1.7rem);font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--faint);display:inline-flex;align-items:center;gap:26px;padding:0 26px}
+.mq-track span::after{content:"◆";color:var(--gold);font-size:.7em}
+.marquee:hover .mq-track{animation-play-state:paused}
+@keyframes scrollx{to{transform:translateX(-50%)}}
+
+/* ============================== SCROLL PROGRESS ============================== */
+.scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:400;background:var(--grad-gold);
+  box-shadow:0 0 14px rgba(216,180,107,.6);transition:width .1s linear}
+
+/* ============================== STATS BAND ============================== */
+.stats-band{padding:clamp(40px,6vw,72px) 0;border-bottom:1px solid var(--line-2);
+  background:radial-gradient(120% 100% at 50% 0,rgba(216,180,107,.06),transparent 60%)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center}
+.stat b{display:block;font-size:clamp(2.4rem,1.4rem+3vw,3.8rem);font-weight:800;letter-spacing:-.03em;line-height:1;
+  background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{display:block;margin-top:10px;font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.stat{position:relative}
+.stat:not(:last-child)::after{content:"";position:absolute;right:-10px;top:12%;height:76%;width:1px;background:var(--line-2)}
+@media(max-width:640px){.stats{grid-template-columns:1fr 1fr;gap:32px 20px}.stat:not(:last-child)::after{display:none}}
+
+/* ============================== SERVICES ============================== */
+.sec-head{max-width:640px;margin-bottom:56px}
+.sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
+.sec-head.center .eyebrow::after{content:"";width:30px;height:1px;background:var(--grad-gold)}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.svc{position:relative;padding:32px 28px;border-radius:var(--r-lg);background:linear-gradient(160deg,var(--panel),var(--bg-2));
+  border:1px solid var(--line-2);overflow:hidden;transition:transform .4s var(--ease),border-color .4s,box-shadow .4s}
+.svc::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 100% 0,rgba(216,180,107,.14),transparent 55%);
+  opacity:0;transition:opacity .4s}
+.svc:hover{transform:translateY(-6px);border-color:var(--line);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.svc:hover::before{opacity:1}
+.svc.feat{grid-column:span 2;background:linear-gradient(135deg,#141110,#0d0f14);border-color:var(--line)}
+.svc .ic{width:46px;height:46px;margin-bottom:20px;color:var(--gold);position:relative;z-index:1}
+.svc h3{font-size:1.22rem;margin-bottom:8px;position:relative;z-index:1;letter-spacing:-.01em;text-transform:none;font-weight:800}
+.svc p{font-size:.95rem;color:var(--muted);position:relative;z-index:1}
+.svc .tagpill{display:inline-block;margin-top:16px;font-size:.66rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold-2);border:1px solid var(--line);border-radius:var(--pill);padding:5px 12px;position:relative;z-index:1}
+.svc.feat h3{font-size:1.5rem}
+
+/* ============================== BEFORE / AFTER ============================== */
+.ba-sec{background:linear-gradient(180deg,transparent,rgba(11,13,18,.6))}
+.ba-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:56px;align-items:center}
+.ba{position:relative;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 30px 80px rgba(0,0,0,.55);aspect-ratio:4/3;user-select:none;touch-action:none}
+.ba .panel-img{position:absolute;inset:0}
+.ba .after{background:
+  radial-gradient(60% 90% at 30% 18%,rgba(255,255,255,.5),transparent 42%),
+  radial-gradient(90% 120% at 80% 90%,rgba(216,180,107,.24),transparent 55%),
+  linear-gradient(135deg,#1a2130,#0b0f18 55%,#05070c)}
+.ba .after::after{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(115deg,transparent 0 60px,rgba(255,255,255,.03) 60px 61px)}
+.ba .before{background:
+  linear-gradient(135deg,#20242c,#15181e 60%,#0d0f13);
+  clip-path:inset(0 50% 0 0)}
+.ba .before::before{content:"";position:absolute;inset:0;opacity:.5;
+  background-image:radial-gradient(circle at 20% 30%,rgba(255,255,255,.06) 0 1px,transparent 2px),
+    radial-gradient(circle at 60% 70%,rgba(255,255,255,.05) 0 1px,transparent 2px),
+    repeating-conic-gradient(from 0deg at 40% 45%,rgba(255,255,255,.04) 0deg 4deg,transparent 4deg 12deg),
+    repeating-conic-gradient(from 0deg at 75% 60%,rgba(255,255,255,.03) 0deg 3deg,transparent 3deg 10deg)}
+.ba .lbl{position:absolute;bottom:16px;z-index:3;font-size:.66rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;
+  padding:6px 12px;border-radius:var(--pill);background:rgba(6,7,10,.7);backdrop-filter:blur(6px);border:1px solid var(--line-2)}
+.ba .lbl.b{left:16px;color:var(--steel)}
+.ba .lbl.a{right:16px;color:var(--gold-2)}
+.ba .handle{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--gold);z-index:4;transform:translateX(-1px);box-shadow:0 0 20px rgba(216,180,107,.6)}
+.ba .knob{position:absolute;top:50%;left:50%;z-index:5;width:44px;height:44px;transform:translate(-50%,-50%);border-radius:50%;
+  background:rgba(8,9,12,.85);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold);
+  backdrop-filter:blur(4px);cursor:ew-resize;box-shadow:0 8px 26px rgba(0,0,0,.5)}
+.ba input[type=range]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;z-index:6;margin:0}
+.ba-copy ul{list-style:none;margin-top:24px;display:flex;flex-direction:column;gap:16px}
+.ba-copy li{display:flex;gap:14px;align-items:flex-start;font-size:.98rem;color:var(--muted)}
+.ba-copy li .tick{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:rgba(216,180,107,.12);border:1px solid var(--line);
+  color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;margin-top:2px}
+.ba-copy li b{color:var(--ink);font-weight:700}
+
+/* ============================== CORRECTION PHOTO ============================== */
+.corr-photo{position:relative;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 30px 80px rgba(0,0,0,.55);aspect-ratio:1200/1000}
+.corr-photo img{width:100%;height:100%;object-fit:cover;display:block;animation:kbCorr 16s var(--ease-soft) infinite alternate}
+@keyframes kbCorr{from{transform:scale(1.03)}to{transform:scale(1.11)}}
+.corr-photo .shine2{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.14) 48%,rgba(190,214,255,.26) 50%,rgba(255,255,255,.14) 52%,transparent 60%);
+  background-size:300% 100%;background-position:150% 0;animation:paintSweep 6.5s var(--ease-soft) infinite}
+.corr-photo::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 55%,rgba(6,7,10,.55))}
+.corr-photo figcaption{position:absolute;left:18px;bottom:16px;z-index:2}
+.corr-photo figcaption b{display:block;font-size:1rem;font-weight:800;color:var(--ink);margin-top:6px}
+.corr-photo .live{display:inline-flex;align-items:center;gap:7px;font-size:.64rem;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold-2);background:rgba(8,9,12,.55);backdrop-filter:blur(6px);
+  border:1px solid var(--line);border-radius:var(--pill);padding:5px 11px}
+.corr-photo .live i{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 2.4s infinite}
+@media(prefers-reduced-motion:reduce){.corr-photo img,.corr-photo .shine2{animation:none!important}}
+
+/* ============================== GALLERY ============================== */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.gitem{position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line-2);cursor:pointer;
+  aspect-ratio:4/3;transition:transform .45s var(--ease),border-color .45s,box-shadow .45s}
+.gitem .zoom{position:absolute;top:14px;right:14px;z-index:3;display:inline-flex;align-items:center;gap:6px;
+  font-size:.64rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);
+  background:rgba(8,9,12,.6);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--pill);
+  padding:6px 11px;opacity:0;transform:translateY(-6px);transition:.35s var(--ease);pointer-events:none}
+.gitem:hover .zoom,.gitem:focus-visible .zoom{opacity:1;transform:none}
+.gitem.big{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+.gitem img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--ease)}
+.gitem:hover{transform:translateY(-5px);border-color:var(--line);box-shadow:0 26px 60px rgba(0,0,0,.5)}
+.gitem:hover img{transform:scale(1.06)}
+.gitem::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(6,7,10,.72));pointer-events:none}
+.gitem figcaption{position:absolute;left:16px;bottom:14px;z-index:2}
+.gitem figcaption b{display:block;font-size:1rem;font-weight:800;color:var(--ink)}
+.gitem figcaption span{font-size:.76rem;color:var(--gold-2)}
+.work-cta{margin-top:30px;text-align:center}
+@media(max-width:960px){.gallery{grid-template-columns:repeat(2,1fr)}.gitem.big{grid-column:span 2;grid-row:auto;aspect-ratio:16/10}}
+@media(max-width:640px){.gallery{grid-template-columns:1fr}.gitem.big{grid-column:auto;aspect-ratio:4/3}}
+
+/* ============================== LIGHTBOX ============================== */
+.lightbox{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;
+  background:rgba(4,5,8,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:6vh 6vw}
+.lightbox.open{display:flex;animation:lbIn .32s var(--ease)}
+@keyframes lbIn{from{opacity:0}to{opacity:1}}
+.lb-stage{position:relative;display:flex;flex-direction:column;align-items:center;max-width:min(980px,90vw)}
+.lb-stage img{max-width:100%;max-height:80vh;border-radius:var(--r-lg);border:1px solid var(--line);
+  box-shadow:0 40px 100px rgba(0,0,0,.7);object-fit:contain;animation:lbImg .4s var(--ease)}
+@keyframes lbImg{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.lb-cap{margin-top:16px;text-align:center;font-size:.9rem;color:var(--muted)}
+.lb-cap b{display:block;color:var(--ink);font-weight:800;font-size:1.05rem}
+.lb-cap span{color:var(--gold-2)}
+.lb-close{position:absolute;top:22px;right:26px;z-index:3;width:46px;height:46px;border-radius:50%;
+  background:rgba(14,17,24,.7);border:1px solid var(--line);color:var(--ink);font-size:1.05rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:.25s}
+.lb-close:hover{border-color:var(--gold);color:var(--gold)}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:54px;height:54px;border-radius:50%;
+  background:rgba(14,17,24,.7);border:1px solid var(--line);color:var(--ink);font-size:1.7rem;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:.25s}
+.lb-nav:hover{border-color:var(--gold);color:var(--gold);background:rgba(216,180,107,.1)}
+.lb-prev{left:24px}.lb-next{right:24px}
+.lb-dots{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:9px}
+.lb-dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:.3s}
+.lb-dots i.on{background:var(--gold);transform:scale(1.25)}
+.lb-bar{position:absolute;top:0;left:0;height:3px;width:0;background:var(--grad-gold);box-shadow:0 0 12px rgba(216,180,107,.6)}
+@media(max-width:640px){.lb-nav{width:44px;height:44px;font-size:1.4rem}.lb-prev{left:8px}.lb-next{right:8px}.lb-stage img{max-height:72vh}}
+
+/* ============================== PROCESS ============================== */
+.proc{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:step}
+.step{position:relative;padding:30px 24px;border-radius:var(--r-lg);background:var(--panel);border:1px solid var(--line-2);
+  transition:border-color .4s,transform .4s}
+.step:hover{border-color:var(--line);transform:translateY(-4px)}
+.step::before{counter-increment:step;content:"0" counter(step);display:block;font-size:2.4rem;font-weight:800;
+  background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:14px;letter-spacing:-.04em}
+.step h4{font-size:1.08rem;margin-bottom:8px;text-transform:none}
+.step p{font-size:.9rem;color:var(--muted)}
+.step .conn{position:absolute;top:44px;right:-9px;width:18px;height:1px;background:var(--line);z-index:1}
+
+/* ============================== PACKAGES ============================== */
+.pk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
+.pk{display:flex;flex-direction:column;padding:34px 30px;border-radius:var(--r-xl);background:var(--panel);
+  border:1px solid var(--line-2);position:relative;overflow:hidden;transition:transform .4s var(--ease),border-color .4s}
+.pk:hover{transform:translateY(-6px)}
+.pk.pop{border-color:var(--gold);background:linear-gradient(180deg,#15120c,#0c0e13)}
+.pk.pop::before{content:"Most Popular";position:absolute;top:18px;right:18px;font-size:.6rem;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:#0a0a0a;background:var(--grad-gold);padding:5px 12px;border-radius:var(--pill)}
+.pk .pk-name{font-size:.72rem;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.pk h3{font-size:1.7rem;margin-bottom:10px;text-transform:none;font-weight:800}
+.pk .pk-desc{font-size:.92rem;color:var(--muted);margin-bottom:20px;min-height:44px}
+.pk .pk-price{font-size:.86rem;color:var(--faint);margin-bottom:22px}
+.pk .pk-price b{font-size:1.9rem;color:var(--ink);font-weight:800;letter-spacing:-.02em}
+.pk ul{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:26px;flex-grow:1}
+.pk li{display:flex;gap:11px;font-size:.9rem;color:var(--muted)}
+.pk li svg{flex-shrink:0;width:17px;height:17px;color:var(--gold);margin-top:3px}
+.pk .btn{width:100%}
+
+/* ============================== COLLECTION / STUDIO STRIP ============================== */
+.studio{position:relative;overflow:hidden;border-radius:var(--r-xl);border:1px solid var(--line);
+  background:linear-gradient(120deg,#12110d,#0a0c11 60%);padding:clamp(36px,5vw,60px)}
+.studio-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;position:relative;z-index:2}
+.studio h2{margin-bottom:16px}
+.studio .mini{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px}
+.mini .m{padding:18px;border-radius:var(--r);background:rgba(255,255,255,.03);border:1px solid var(--line-2)}
+.mini .m .k{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.mini .m .v{font-size:1.02rem;font-weight:700;color:var(--ink)}
+.mini .m .v.sm{font-size:.9rem;font-weight:600;color:var(--muted)}
+.studio .map{aspect-ratio:1/1;border-radius:var(--r-lg);border:1px solid var(--line);position:relative;overflow:hidden;
+  background:radial-gradient(circle at 60% 40%,rgba(216,180,107,.16),transparent 55%),linear-gradient(160deg,#0e1118,#07090d)}
+.studio .map .pin{position:absolute;top:44%;left:52%;transform:translate(-50%,-50%);z-index:2;color:var(--gold);
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.6));animation:bob 3s var(--ease-soft) infinite}
+@keyframes bob{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-64%)}}
+.studio .map .ring{position:absolute;top:44%;left:52%;width:60%;height:60%;transform:translate(-50%,-50%);border-radius:50%;
+  border:1px dashed var(--line);}
+.studio .map .grid-lines{position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(var(--line-2) 1px,transparent 1px),linear-gradient(90deg,var(--line-2) 1px,transparent 1px);
+  background-size:38px 38px;-webkit-mask:radial-gradient(circle at 52% 44%,#000,transparent 72%);mask:radial-gradient(circle at 52% 44%,#000,transparent 72%)}
+.studio .map .tag{position:absolute;bottom:14px;left:14px;z-index:3;font-size:.7rem;font-weight:700;color:var(--muted)}
+
+/* ============================== REVIEWS ============================== */
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.rev{padding:28px;border-radius:var(--r-lg);background:var(--panel);border:1px solid var(--line-2);transition:border-color .4s,transform .4s}
+.rev:hover{border-color:var(--line);transform:translateY(-4px)}
+.rev .stars{color:var(--gold);letter-spacing:2px;margin-bottom:14px;font-size:1rem}
+.rev p{font-size:.98rem;color:var(--ink);margin-bottom:20px;line-height:1.6}
+.rev .who{display:flex;align-items:center;gap:12px}
+.rev .ava{width:42px;height:42px;border-radius:50%;background:var(--grad-gold);color:#0a0a0a;display:flex;align-items:center;
+  justify-content:center;font-weight:800;font-size:.9rem}
+.rev .who b{display:block;font-size:.9rem;font-weight:700}
+.rev .who small{font-size:.76rem;color:var(--faint)}
+
+/* ============================== FAQ ============================== */
+.faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:start}
+.faq-list{display:flex;flex-direction:column;gap:12px}
+.qa{border:1px solid var(--line-2);border-radius:var(--r);background:var(--panel);overflow:hidden;transition:border-color .3s}
+.qa[open]{border-color:var(--line)}
+.qa summary{list-style:none;cursor:pointer;padding:22px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  font-size:1.02rem;font-weight:700;color:var(--ink)}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary .plus{flex-shrink:0;width:24px;height:24px;position:relative;transition:transform .3s var(--ease)}
+.qa summary .plus::before,.qa summary .plus::after{content:"";position:absolute;background:var(--gold);border-radius:2px}
+.qa summary .plus::before{top:11px;left:2px;right:2px;height:2px}
+.qa summary .plus::after{left:11px;top:2px;bottom:2px;width:2px;transition:transform .3s var(--ease)}
+.qa[open] summary .plus{transform:rotate(90deg)}
+.qa[open] summary .plus::after{transform:scaleY(0)}
+.qa .a{padding:0 24px 22px;color:var(--muted);font-size:.96rem}
+
+/* ============================== CONTACT ============================== */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.cinfo{display:flex;flex-direction:column;gap:14px;margin-top:26px}
+.crow{display:flex;gap:16px;align-items:flex-start;padding:18px 20px;border-radius:var(--r);background:var(--panel);border:1px solid var(--line-2);
+  transition:border-color .3s,transform .3s}
+.crow:hover{border-color:var(--line);transform:translateX(4px)}
+.crow .ci{flex-shrink:0;width:40px;height:40px;border-radius:10px;background:rgba(216,180,107,.1);border:1px solid var(--line);
+  color:var(--gold);display:flex;align-items:center;justify-content:center}
+.crow .ck{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+.crow .cv{font-size:1.02rem;font-weight:700;color:var(--ink)}
+.crow .cv.sm{font-size:.9rem;font-weight:600}
+.hours{margin-top:14px;padding:20px;border-radius:var(--r);background:var(--panel);border:1px solid var(--line-2)}
+.hours .hr{display:flex;justify-content:space-between;padding:8px 0;font-size:.92rem;border-bottom:1px solid var(--line-2)}
+.hours .hr:last-child{border-bottom:none}
+.hours .hr span{color:var(--muted)}.hours .hr b{color:var(--ink);font-weight:700}
+.hours .hr.closed b{color:var(--faint)}
+form{display:flex;flex-direction:column;gap:14px;padding:32px;border-radius:var(--r-lg);background:linear-gradient(160deg,var(--panel),var(--bg-2));border:1px solid var(--line)}
+form h3{font-size:1.3rem;margin-bottom:4px;text-transform:none}
+form p.fp{font-size:.9rem;color:var(--muted);margin-bottom:8px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:700}
+input,textarea,select{padding:13px 16px;border:1px solid var(--line-2);border-radius:10px;font-size:.95rem;font-family:inherit;
+  background:rgba(255,255,255,.03);color:var(--ink);transition:border-color .25s,background .25s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);background:rgba(216,180,107,.05)}
+input::placeholder,textarea::placeholder{color:var(--faint)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23d8b46b' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 16px center}
+
+/* ============================== FOOTER ============================== */
+footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--bg-2)}
+.foot-top{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap;margin-bottom:40px}
+.foot-brand{max-width:320px}
+.foot-brand .brand{margin-bottom:14px}
+.foot-brand p{font-size:.9rem;color:var(--muted)}
+.foot-cols{display:flex;gap:60px;flex-wrap:wrap}
+.foot-col h5{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.foot-col a,.foot-col span{display:block;font-size:.9rem;color:var(--muted);margin-bottom:10px;transition:color .25s}
+.foot-col a:hover{color:var(--ink)}
+.foot-bottom{border-top:1px solid var(--line-2);padding-top:26px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  font-size:.82rem;color:var(--faint)}
+.concept{margin-top:20px;font-size:.8rem;color:var(--faint);line-height:1.7;max-width:760px}
+.concept b{color:var(--gold-2)}
+
+/* ============================== CONCEPT FLAG ============================== */
+.flag{position:fixed;right:16px;bottom:16px;z-index:400;display:flex;align-items:center;gap:8px;
+  background:rgba(8,9,12,.86);backdrop-filter:blur(10px);color:var(--ink);font-size:.76rem;font-weight:600;
+  padding:10px 16px;border-radius:var(--pill);box-shadow:0 12px 34px rgba(0,0,0,.5);border:1px solid var(--line)}
+.flag b{color:var(--gold)}.flag .sp{color:var(--gold-2)}
+.flag:hover{border-color:var(--gold)}
+
+/* ============================== REVEAL ============================== */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
 .reveal.in{opacity:1;transform:none}
-.grid .card,.revs .rev{opacity:0;transform:translateY(26px);transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .6s cubic-bezier(.2,.7,.2,1)}
-.grid.in .card,.revs.in .rev{opacity:1;transform:none}
-.grid.in .card:nth-child(2),.revs.in .rev:nth-child(2){transition-delay:.08s}
-.grid.in .card:nth-child(3),.revs.in .rev:nth-child(3){transition-delay:.16s}
-.grid.in .card:nth-child(4){transition-delay:.24s}
-.grid.in .card:nth-child(5){transition-delay:.32s}
-.grid.in .card:nth-child(6){transition-delay:.4s}
-.statbar .stat{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
-.statbar.in .stat{opacity:1;transform:none}
-.statbar.in .stat:nth-child(2){transition-delay:.1s}
-.statbar.in .stat:nth-child(3){transition-delay:.2s}
-.statbar.in .stat:nth-child(4){transition-delay:.3s}
-.card .ico{transition:transform .3s}
-.card:hover .ico{transform:scale(1.15) rotate(-5deg)}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal,.grid .card,.revs .rev,.statbar .stat,.hero .badge,.hero h1,.hero p,.hero .btns{opacity:1!important;transform:none!important}}
-@media(max-width:820px){.nlinks{display:none}.why-wrap,.contact-wrap{grid-template-columns:1fr}.visual{min-height:220px;font-size:90px}}
+.stagger>*{opacity:0;transform:translateY(26px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.stagger.in>*{opacity:1;transform:none}
+.stagger.in>*:nth-child(2){transition-delay:.07s}
+.stagger.in>*:nth-child(3){transition-delay:.14s}
+.stagger.in>*:nth-child(4){transition-delay:.21s}
+.stagger.in>*:nth-child(5){transition-delay:.28s}
+.stagger.in>*:nth-child(6){transition-delay:.35s}
+.stagger.in>*:nth-child(7){transition-delay:.42s}
+.stagger.in>*:nth-child(8){transition-delay:.49s}
+
+/* ============================== RESPONSIVE ============================== */
+@media(max-width:960px){
+  .svc-grid,.pk-grid,.rev-grid{grid-template-columns:1fr 1fr}
+  .svc.feat{grid-column:span 2}
+  .proc{grid-template-columns:1fr 1fr}
+  .ba-grid,.faq-grid,.contact-grid,.studio-grid{grid-template-columns:1fr;gap:36px}
+  .studio .map{max-width:420px}
+}
+@media(max-width:860px){
+  .hero{min-height:94svh}
+  .hero h1{font-size:clamp(2.6rem,8vw,4rem)}
+  .hero-scrim{background:
+    linear-gradient(180deg,rgba(6,7,10,.5),rgba(6,7,10,.34) 26%,rgba(6,7,10,.72) 54%,rgba(6,7,10,.92)),
+    linear-gradient(0deg,rgba(6,7,10,.4),transparent 60%)}
+  .float-badge{display:none}
+  .hero-meta .scroll-hint{display:none}
+  .hero-caption{margin:0 auto}
+}
+@media(max-width:640px){
+  .nlinks,.nav-cta .btn-ghost{display:none}
+  .svc-grid,.pk-grid,.rev-grid,.proc,.two,.studio .mini{grid-template-columns:1fr}
+  .svc.feat{grid-column:span 1}
+  .foot-cols{gap:36px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal,.stagger>*,.hero h1 .line>span,.hero .slogan,.hero p.lead,.hero .cta-row,.hero-trust{opacity:1!important;transform:none!important}
+}
 </style>
-<style>body{font-family:Georgia,serif}
-h1,h2,h3,h4,.logo,.tag,.num,.price{font-family:Verdana,Geneva,sans-serif}
-.card,.rev,form,.crow,input,textarea,.ncta,.bp,.bs,.fsub,.badge,.price,.visual{border-radius:16px}
-.mid{display:flex;flex-direction:column}
-#services{order:0}
-#reviews{order:1}
-#about{order:2}
-.hero .hwrap{margin-left:auto;margin-right:auto;text-align:center;max-width:720px}
-.hero .btns{justify-content:center}
-.hero{background:radial-gradient(circle at 78% 28%,#f9731655,transparent 55%),linear-gradient(165deg,#0f1f33,#16293f)}
-.card{background:#f4f7fb;border-color:transparent}
-.why-wrap{direction:rtl}.why-wrap>*{direction:ltr}</style>
 </head>
 <body>
-<nav id="nav">
-  <div class="logo">Detail <span>Kings</span></div>
-  <ul class="nlinks">
-    <li><a href="#services">Our Services</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#reviews">Reviews</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <a href="tel:+441494211802" class="ncta">📞 +44 1494 211802</a>
+<a href="#services" class="skip">Skip to content</a>
+<div class="scroll-progress" id="prog" aria-hidden="true"></div>
+<div class="atmo"></div>
+<div class="grain"></div>
+
+<!-- ============ NAV ============ -->
+<nav class="nav" id="nav">
+  <div class="wrap">
+    <a href="#top" class="brand" aria-label="Detail King&#39;s home">
+      <svg class="mk" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <rect width="64" height="64" rx="14" fill="#0e1118" stroke="#d8b46b" stroke-opacity=".4"/>
+        <path d="M18 46 32 14l14 32" stroke="#d8b46b" stroke-width="3.4" stroke-linejoin="round"/>
+        <path d="M25 34h14" stroke="#d8b46b" stroke-width="3.4"/>
+        <path d="M32 14l3.4 6-3.4 3-3.4-3z" fill="#f0d9a8"/>
+      </svg>
+      <div><b>Detail <span class="ks">King's</span></b><small>High Wycombe · Bucks</small></div>
+    </a>
+    <ul class="nlinks">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#correction">Correction</a></li>
+      <li><a href="#packages">Packages</a></li>
+      <li><a href="#studio">Studio</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="tel:+441494211802" class="btn btn-ghost btn-sm">01494 211802</a>
+      <a href="#contact" class="btn btn-gold btn-sm">Free Quote</a>
+    </div>
+  </div>
 </nav>
 
-<section class="hero">
-  <div class="hwrap">
-    <div class="badge">🔧 Garage & MOT Centre · High Wycombe</div>
-    <h1>Car Care <span>You Can Trust</span></h1>
-    <p>MOTs, servicing and repairs in High Wycombe — honest prices, straight answers and work done right the first time.</p>
-    <div class="btns">
-      <a href="tel:+441494211802" class="bp">Book Your MOT →</a>
-      <a href="#services" class="bs">See More</a>
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-bg" id="reel" aria-hidden="true">
+    <div class="reel">
+      <div class="slide is-active" style="background-image:url(img/m8-front.jpg)"></div>
+      <div class="slide" style="background-image:url(img/ferrari-front.jpg)"></div>
+      <div class="slide" style="background-image:url(img/x6-front.jpg)"></div>
     </div>
+    <span class="shine"></span>
+    <div class="hero-scrim"></div>
   </div>
-</section>
-
-<div class="statbar"><div class="stat"><div class="num">Free</div><div class="lab">Quotes</div></div><div class="stat"><div class="num">Fully</div><div class="lab">Insured</div></div><div class="stat"><div class="num">Fast</div><div class="lab">Response</div></div><div class="stat"><div class="num">12mo</div><div class="lab">Guarantee</div></div></div>
-
-<div class="mid">
-<section id="services">
-  <div class="reveal">
-    <div class="tag">Our Services</div>
-    <h2>Everything Your Car Needs</h2>
-    <p class="sub">From MOTs to major repairs — all makes and models, all under one roof.</p>
-  </div>
-  <div class="grid"><div class="card"><div class="ico">📋</div><h3>MOT Testing</h3><p>Fast turnaround, fair retest policy.</p><div class="price">from £45</div></div><div class="card"><div class="ico">🔧</div><h3>Servicing</h3><p>Interim and full services to schedule.</p><div class="price">from £99</div></div><div class="card"><div class="ico">🛞</div><h3>Tyres & Tracking</h3><p>Supplied, fitted and balanced while you wait.</p></div><div class="card"><div class="ico">🔋</div><h3>Batteries & Electrics</h3><p>Diagnostics, batteries and auto-electrics.</p></div><div class="card"><div class="ico">🛑</div><h3>Brakes & Clutches</h3><p>Pads, discs and clutch replacement.</p></div><div class="card"><div class="ico">❄️</div><h3>Air-Con Service</h3><p>Regas and repair to keep you cool.</p></div></div>
-</section>
-
-<section id="about" class="cream">
-  <div class="why-wrap">
-    <div class="reveal">
-      <div class="tag">Why Detail Kings</div>
-      <h2>Why Locals Choose Us</h2>
-      <p class="sub">We're proud to serve High Wycombe and the surrounding area — and we work hard to keep it that way.</p>
-      <ul class="whys"><li class="why"><div class="chk">✓</div><div><h4>Fixed Prices, No Surprises</h4><p>We quote upfront and stick to it — you'll never get a shock invoice.</p></div></li><li class="why"><div class="chk">✓</div><div><h4>Fully Insured & Certified</h4><p>Properly qualified, fully insured work you can rely on.</p></div></li><li class="why"><div class="chk">✓</div><div><h4>Fast Local Response</h4><p>We answer the phone and turn up when we say we will.</p></div></li><li class="why"><div class="chk">✓</div><div><h4>Workmanship Guarantee</h4><p>If something's not right, we come back and fix it.</p></div></li></ul>
-    </div>
-    <div class="visual reveal">🚗</div>
-  </div>
-</section>
-
-<section id="reviews">
-  <div class="reveal">
-    <div class="tag">Reviews</div>
-    <h2>What People Say</h2>
-    <p class="sub">Real words from happy customers across High Wycombe and beyond.</p>
-  </div>
-  <div class="revs"><div class="rev"><div class="stars">★★★★★</div><p>"Turned up on time, fair price, tidy work. Exactly what you want from a local trade."</p><div class="auth"><div class="ava">MK</div><div><div class="an">Mark K.</div><div class="al">High Wycombe</div></div></div></div><div class="rev"><div class="stars">★★★★★</div><p>"Called in a panic and they came straight out. Sorted it fast and didn't overcharge. Lifesavers."</p><div class="auth"><div class="ava">LP</div><div><div class="an">Lisa P.</div><div class="al">Marlow</div></div></div></div><div class="rev"><div class="stars">★★★★★</div><p>"Quoted upfront and stuck to it. Honest, reliable and a quality job. Highly recommend."</p><div class="auth"><div class="ava">SR</div><div><div class="an">Steve R.</div><div class="al">Beaconsfield</div></div></div></div></div>
-</section>
-</div>
-
-<section id="contact" class="cream">
-  <div class="contact-wrap">
-    <div class="reveal">
-      <div class="tag">Get In Touch</div>
-      <h2>Book Your MOT</h2>
-      <p class="sub">We'd love to hear from you. Call us or drop a message and we'll get straight back to you.</p>
-      <div class="cinfo">
-        <div class="crow"><div class="ci">📞</div><div><div class="cl">Phone</div><div class="cv">+44 1494 211802</div></div></div>
-        <div class="crow"><div class="ci">📍</div><div><div class="cl">Area</div><div class="cv">High Wycombe & surrounding areas</div></div></div>
-        <div class="crow"><div class="ci">🕒</div><div><div class="cl">Hours</div><div class="cv">Open 6 days a week</div></div></div>
+  <img src="img/m8-front.jpg" alt="Blue BMW M8 Competition finished in custom Satin PPF in the Detail King's High Wycombe studio" width="1200" height="1354" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" aria-hidden="true">
+  <div class="float-badge" aria-hidden="true"><span class="stars">★★★★★</span> Real work, real cars</div>
+  <div class="wrap hero-wrap">
+    <div class="hero-inner">
+      <span class="kicker"><span class="dot"></span> Paintwork Specialists · Aesthetic Enhancements</span>
+      <h1>
+        <span class="line"><span>Flawless</span></span>
+        <span class="line"><span class="gold-text">Paintwork,</span></span>
+        <span class="line"><span>Protected.</span></span>
+      </h1>
+      <div class="slogan"><i>Revive</i><em></em><i>Customise</i><em></em><i>Protect</i></div>
+      <p class="lead">High Wycombe's dedicated paint protection &amp; detailing studio. We specialise in precision
+        paint protection film and expert paint correction — bringing a showroom finish back to your car, then
+        keeping it that way for years.</p>
+      <div class="cta-row">
+        <a href="#contact" class="btn btn-gold">Get Your Free Quote →</a>
+        <a href="#work" class="btn btn-ghost">See Our Work</a>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-item"><span class="stars">★★★★★</span> <b>5.0</b> · 128 Google reviews</div>
+        <div class="trust-item">✦ Free collection within 15 miles</div>
+        <div class="trust-item">✦ Studio-based · not mobile</div>
       </div>
     </div>
-    <form class="reveal" onsubmit="return false">
-      <input type="text" placeholder="Your name" aria-label="Your name">
-      <input type="tel" placeholder="Phone number" aria-label="Phone number">
-      <input type="email" placeholder="Email address" aria-label="Email address">
-      <textarea rows="4" placeholder="How can we help?" aria-label="Message"></textarea>
-      <button class="fsub" type="submit">Send Message →</button>
-    </form>
+  </div>
+  <div class="hero-meta">
+    <div class="wrap">
+      <div class="hero-caption">
+        <figcaption class="ph-tag" id="reelCap"><b>BMW M8 Competition</b><span>Custom Satin PPF · our studio</span></figcaption>
+        <div class="reel-dots" id="reelDots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ MARQUEE ============ -->
+<div class="marquee" aria-hidden="true">
+  <div class="mq-track">
+    <span>Paint Protection Film</span><span>Ceramic Coatings</span><span>Paint Correction</span><span>Car Wrapping</span>
+    <span>Window Tinting</span><span>Starlight Headliners</span><span>Alloy Refurbishment</span><span>Interior Detailing</span>
+    <span>Paint Protection Film</span><span>Ceramic Coatings</span><span>Paint Correction</span><span>Car Wrapping</span>
+    <span>Window Tinting</span><span>Starlight Headliners</span><span>Alloy Refurbishment</span><span>Interior Detailing</span>
+  </div>
+</div>
+
+<!-- ============ STATS ============ -->
+<section class="stats-band">
+  <div class="wrap">
+    <div class="stats stagger">
+      <div class="stat"><b class="count" data-to="5" data-dec="1" data-suffix="">0</b><span>Google rating</span></div>
+      <div class="stat"><b class="count" data-to="128" data-suffix="">0</b><span>Five-star reviews</span></div>
+      <div class="stat"><b class="count" data-to="15" data-suffix="mi">0</b><span>Free collection radius</span></div>
+      <div class="stat"><b class="count" data-to="9" data-suffix="">0</b><span>Signature services</span></div>
+    </div>
   </div>
 </section>
 
+<!-- ============ SERVICES ============ -->
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">What We Do</div>
+      <h2>The Full <span class="gold-text">Detail King's</span> Menu</h2>
+      <p class="lead">From invisible armour for your paintwork to a finish that turns heads on the driveway —
+        every service delivered to a genuinely obsessive standard.</p>
+    </div>
+    <div class="svc-grid stagger">
+      <article class="svc feat">
+        <svg class="ic" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M24 4l16 6v10c0 10-7 17-16 20-9-3-16-10-16-20V10z"/><path d="M17 24l5 5 10-11"/></svg>
+        <h3>Paint Protection Film (PPF)</h3>
+        <p>Our core craft. A self-healing, near-invisible urethane film applied by hand to shield your paint
+          from stone chips, scratches and swirl marks — full-front, track packs or full-body.</p>
+        <span class="tagpill">Signature Service</span>
+      </article>
+      <article class="svc">
+        <svg class="ic" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M24 6c8 6 14 10 14 18a14 14 0 1 1-28 0c0-8 6-12 14-18z"/><path d="M24 30a6 6 0 0 0 6-6"/></svg>
+        <h3>Ceramic Coatings</h3>
+        <p>A hard, hydrophobic ceramic layer that locks in gloss, repels water and dirt, and makes every future wash easier.</p>
+      </article>
+      <article class="svc">
+        <svg class="ic" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><circle cx="24" cy="24" r="10"/><path d="M24 4v6M24 38v6M4 24h6M38 24h6M10 10l4 4M34 34l4 4M38 10l-4 4M14 34l-4 4"/></svg>
+        <h3>Paint Correction</h3>
+        <p>Multi-stage machine polishing that removes swirls, holograms and oxidation to restore true depth and clarity.</p>
+      </article>
+      <article class="svc">
+        <svg class="ic" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 30c8-14 30-14 36 0"/><path d="M6 30l6 8h24l6-8"/><path d="M18 18l-4-8M30 18l4-8"/></svg>
+        <h3>Car Wrapping</h3>
+        <p>Colour changes, satin, gloss and custom finishes — a full new look without touching the original paint.</p>
+      </article>
+      <article class="svc">
+        <svg class="ic" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="12" width="32" height="24" rx="3"/><path d="M8 20h32M20 20v16"/></svg>
+        <h3>Window Tinting</h3>
+        <p>Premium films for a sharper look, UV protection, glare reduction and cooler, more private interiors.</p>
+      </article>
+      <article class="svc">
+        <svg class="ic" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 30c6-8 30-8 36 0" /><path d="M12 22l3-3M24 20v-4M36 22l-3-3"/><circle cx="16" cy="14" r="1"/><circle cx="30" cy="12" r="1"/><circle cx="24" cy="9" r="1"/></svg>
+        <h3>Starlight Headliner</h3>
+        <p>Fibre-optic star ceilings fitted into your roof lining for a bespoke, luxury-cabin atmosphere.</p>
+      </article>
+      <article class="svc">
+        <svg class="ic" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="6"/><path d="M24 8v8M24 32v8M8 24h8M32 24h8"/></svg>
+        <h3>Alloy Wheel Refurb</h3>
+        <p>Kerbed, corroded or tired wheels stripped, repaired and refinished to look factory-fresh again.</p>
+      </article>
+      <article class="svc">
+        <svg class="ic" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="18" width="32" height="20" rx="3"/><path d="M14 18v-4a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v4M8 30h32"/></svg>
+        <h3>Interior Deep Clean</h3>
+        <p>Full interior detailing — seats, trim, carpets and glass brought back to an as-new, sanitised finish.</p>
+      </article>
+      <article class="svc">
+        <svg class="ic" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M14 34c-4 0-8-3-8-8s4-7 6-7c0-6 5-11 12-11s11 4 12 9c4 0 6 3 6 7s-3 8-8 8"/><path d="M18 40l4-6M28 40l-4-6M24 30v10"/></svg>
+        <h3>Professional Valeting</h3>
+        <p>Maintenance washes and full valets to keep protected paintwork looking its absolute best.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BEFORE / AFTER ============ -->
+<section id="correction" class="ba-sec">
+  <div class="wrap">
+    <div class="ba-grid">
+      <div class="ba-copy reveal">
+        <div class="eyebrow">Paint Correction</div>
+        <h2>Swirls Gone. <span class="gold-text">Depth Restored.</span></h2>
+        <p class="lead">This is what expert multi-stage correction looks like — swirls and holograms machined out to
+          restore true depth and clarity. It's the same process that goes under every ceramic coating and PPF install.</p>
+        <ul>
+          <li><span class="tick">✓</span><div><b>Yes, we remove scratches.</b> Light scratches and swirl marks are machine-polished out; deeper marks are dramatically reduced.</div></li>
+          <li><span class="tick">✓</span><div><b>A true mirror finish.</b> We refine paint in stages rather than hiding defects with fillers that wash away.</div></li>
+          <li><span class="tick">✓</span><div><b>The right base.</b> Correction first means coatings and film bond to flawless paint — and lock that finish in.</div></li>
+        </ul>
+      </div>
+      <figure class="corr-photo reveal">
+        <img src="img/ferrari-polish.jpg" alt="Technician machine-polishing the red Ferrari 458 during multi-stage paint correction" width="1200" height="1303" loading="lazy">
+        <span class="shine2" aria-hidden="true"></span>
+        <figcaption><span class="live"><i></i> In progress</span><b>Ferrari 458 · multi-stage correction</b></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WORK / GALLERY ============ -->
+<section id="work">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Recent Work</div>
+      <h2>Straight From <span class="gold-text">Our Studio</span></h2>
+      <p class="lead">Ferrari, BMW and beyond — paint protection film, paint correction, ceramic coatings and
+        colour-change wraps, all finished in our High Wycombe studio. Real cars, real results — not stock photos.</p>
+    </div>
+    <div class="gallery stagger">
+      <figure class="gitem big">
+        <img src="img/ferrari-front.jpg" alt="Red Ferrari 458 in the Detail King's studio after paint correction" width="1200" height="1280" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>Ferrari 458</b><span>Paint correction &amp; ceramic coating</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/m8-front.jpg" alt="Front three-quarter of the blue BMW M8 in Detail King's studio" width="1200" height="1354" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>BMW M8 Competition</b><span>Custom Satin PPF</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/x6-front.jpg" alt="Green wrapped BMW X6 front in the Detail King's studio" width="1200" height="1280" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>BMW X6</b><span>Colour-change wrap</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/ferrari-polish.jpg" alt="Technician machine-polishing the red Ferrari 458 during paint correction" width="1200" height="1303" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>Paint correction</b><span>Machine-polished by hand</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/ppf-cut.jpg" alt="Paint protection film being precision-cut by hand" width="1200" height="1364" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>PPF, precision cut</b><span>Applied by hand</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/x6-rear.jpg" alt="Rear of the gloss green BMW X6 with the studio logo behind" width="1200" height="1200" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>Gloss green X6</b><span>Full studio finish</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/m8-rear.jpg" alt="Rear of the blue BMW M8 Competition showing the wing and diffuser" width="1200" height="1354" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>Satin finish &amp; tint</b><span>Flawless reflection</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/x6-badge.jpg" alt="Close-up of the BMW badge on the gloss green X6 wrap" width="1200" height="1120" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>Wrapped to the detail</b><span>Gloss green, badge in</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/m8-interior.jpg" alt="Detailed interior of the BMW M8 Competition" width="1200" height="1354" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>Interior detail</b><span>As-new finish</span></figcaption>
+      </figure>
+    </div>
+    <div class="work-cta reveal">
+      <a href="https://www.instagram.com/detailkings_hw/" target="_blank" rel="noopener" class="btn btn-ghost">See more on Instagram · @detailkings_hw</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section id="process">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <div class="eyebrow">How It Works</div>
+      <h2>From Booking to <span class="gold-text">Showroom</span></h2>
+    </div>
+    <div class="proc stagger">
+      <div class="step"><span class="conn"></span><h4>Free Quote</h4><p>Tell us about your car and what you want. We advise the right protection and give you a clear, no-obligation quote.</p></div>
+      <div class="step"><span class="conn"></span><h4>We Collect</h4><p>Free collection within 15 miles of the studio, or arrange transport further afield — no need to be without your day.</p></div>
+      <div class="step"><span class="conn"></span><h4>The Work</h4><p>Correction, film and coatings applied by hand in a controlled studio — never rushed, never outdoors.</p></div>
+      <div class="step"><h4>Handover</h4><p>Your car returned looking its absolute best, with simple advice on keeping that finish for years.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PACKAGES ============ -->
+<section id="packages">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <div class="eyebrow">Signature Packages</div>
+      <h2>Revive · Customise · <span class="gold-text">Protect</span></h2>
+      <p class="lead" style="margin:0 auto">Three ways in, every one tailored to your car. Indicative starting points —
+        your exact quote is always free and specific to your vehicle.</p>
+    </div>
+    <div class="pk-grid stagger">
+      <article class="pk">
+        <div class="pk-name">Revive</div>
+        <h3>The Refresh</h3>
+        <p class="pk-desc">Bring a tired car back to life — deep clean and a corrected, glossy finish.</p>
+        <div class="pk-price">from <b>£POA</b></div>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Full exterior decontamination wash</li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Single-stage paint correction</li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Interior deep clean</li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Wheels &amp; glass sealed</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost">Enquire</a>
+      </article>
+      <article class="pk pop">
+        <div class="pk-name">Protect</div>
+        <h3>The Shield</h3>
+        <p class="pk-desc">Our specialism — flawless paint locked in behind protection film and ceramic.</p>
+        <div class="pk-price">from <b>£POA</b></div>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Multi-stage paint correction</li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Paint protection film (front / full)</li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Ceramic coating over film &amp; glass</li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Self-healing, years of protection</li>
+        </ul>
+        <a href="#contact" class="btn btn-gold">Get Quote</a>
+      </article>
+      <article class="pk">
+        <div class="pk-name">Customise</div>
+        <h3>The Statement</h3>
+        <p class="pk-desc">Make it unmistakably yours — wraps, tints and bespoke interior touches.</p>
+        <div class="pk-price">from <b>£POA</b></div>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Full or partial colour-change wrap</li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Window tinting to legal spec</li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Starlight headliner install</li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg> Alloy wheel refurbishment</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost">Enquire</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STUDIO / COLLECTION ============ -->
+<section id="studio">
+  <div class="wrap">
+    <div class="studio reveal">
+      <div class="studio-grid">
+        <div>
+          <div class="eyebrow">The Studio</div>
+          <h2>Bring It To Us —<br>Or We'll <span class="gold-text">Come To You</span></h2>
+          <p class="lead">All work is carried out in our controlled detailing studio on Victoria Street, High Wycombe —
+            never on a driveway or in the rain. Can't make the drop-off? We collect free within 15 miles, with
+            transport arranged for cars further afield.</p>
+          <div class="mini">
+            <div class="m"><div class="k">Free Collection</div><div class="v">Within 15 miles</div></div>
+            <div class="m"><div class="k">Beyond 15 miles</div><div class="v sm">Transport arranged</div></div>
+            <div class="m"><div class="k">Google Rating</div><div class="v">★★★★★ 5.0</div></div>
+            <div class="m"><div class="k">Studio-Based</div><div class="v sm">Not a mobile service</div></div>
+          </div>
+        </div>
+        <div class="map" role="img" aria-label="Map marker showing the studio location in High Wycombe">
+          <div class="grid-lines"></div>
+          <div class="ring"></div>
+          <svg class="pin" width="46" height="46" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+          <span class="tag">Victoria Street · High Wycombe · HP11 2LU</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEWS ============ -->
+<section id="reviews">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <div class="eyebrow">5.0 ★ · 128 Google Reviews</div>
+      <h2>What Owners Are <span class="gold-text">Saying</span></h2>
+    </div>
+    <div class="rev-grid stagger">
+      <article class="rev">
+        <div class="stars">★★★★★</div>
+        <p>"Had the full front wrapped in PPF and I genuinely can't tell it's there — until a stone hits it. Faultless work and they kept me updated the whole way through."</p>
+        <div class="who"><div class="ava">JR</div><div><b>James R.</b><small>High Wycombe</small></div></div>
+      </article>
+      <article class="rev">
+        <div class="stars">★★★★★</div>
+        <p>"Paint correction and a ceramic coat on my daily. The swirls are completely gone and the depth of colour is unreal. Water just rolls off it now."</p>
+        <div class="who"><div class="ava">SH</div><div><b>Sarah H.</b><small>Marlow</small></div></div>
+      </article>
+      <article class="rev">
+        <div class="stars">★★★★★</div>
+        <p>"Collected the car, did a stunning job on the wrap and starlight headliner, and dropped it back spotless. True professionals — worth every penny."</p>
+        <div class="who"><div class="ava">DP</div><div><b>Danny P.</b><small>Beaconsfield</small></div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="faq-grid">
+      <div class="reveal">
+        <div class="eyebrow">Good To Know</div>
+        <h2>Your Questions, <span class="gold-text">Answered</span></h2>
+        <p class="lead">Still unsure about something? Call us on <a href="tel:+441494211802" style="color:var(--gold-2);font-weight:600">01494 211802</a>
+          — we're happy to talk it through.</p>
+      </div>
+      <div class="faq-list reveal">
+        <details class="qa" open>
+          <summary>Can you remove scratches from my car's paintwork? <span class="plus"></span></summary>
+          <div class="a">In most cases, yes. Light scratches and swirl marks are removed through multi-stage machine
+            paint correction, while deeper scratches that haven't gone through the clear coat can be significantly
+            reduced. We'll always assess your paint honestly and tell you exactly what's achievable before we start.</div>
+        </details>
+        <details class="qa">
+          <summary>How long does ceramic coating last? <span class="plus"></span></summary>
+          <div class="a">It depends on the coating and how the car is cared for, but a professionally applied ceramic
+            coating typically protects for several years. Regular maintenance washes and the occasional top-up keep
+            the hydrophobic, glossy finish performing at its best for as long as possible.</div>
+        </details>
+        <details class="qa">
+          <summary>How long does a full car detailing service take? <span class="plus"></span></summary>
+          <div class="a">A maintenance valet can be same-day, while full paint correction, PPF or a ceramic coating
+            often needs the car for a few days to allow proper preparation, application and curing time. We'll give
+            you a clear timeframe with your quote — and our free local collection means minimal disruption to you.</div>
+        </details>
+        <details class="qa">
+          <summary>Do you offer mobile car detailing services? <span class="plus"></span></summary>
+          <div class="a">No — all work is carried out in our dedicated studio, where we can control the environment,
+            lighting and dust for a truly flawless finish. Instead, we bring the convenience to you with free
+            collection within 15 miles and arranged transport for cars further afield.</div>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Get In Touch</div>
+      <h2>Get Your <span class="gold-text">Free Quote</span></h2>
+      <p class="lead">Tell us about your car and what you'd like done. We'll come back with honest advice and a
+        no-obligation quote — no pressure, ever.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="reveal">
+        <div class="cinfo">
+          <a href="tel:+441494211802" class="crow">
+            <span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span>
+            <div><div class="ck">Call the studio</div><div class="cv">01494 211802</div></div>
+          </a>
+          <a href="mailto:enq@detailkings.uk" class="crow">
+            <span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7 10-7"/></svg></span>
+            <div><div class="ck">Email us</div><div class="cv sm">enq@detailkings.uk</div></div>
+          </a>
+          <div class="crow">
+            <span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+            <div><div class="ck">The studio</div><div class="cv sm">Victoria Street, High Wycombe, HP11 2LU</div></div>
+          </div>
+        </div>
+        <div class="hours">
+          <div class="hr"><span>Monday – Friday</span><b>9:00 – 18:00</b></div>
+          <div class="hr"><span>Saturday</span><b>10:00 – 14:00</b></div>
+          <div class="hr closed"><span>Sunday</span><b>Closed</b></div>
+        </div>
+      </div>
+      <form class="reveal" onsubmit="event.preventDefault();this.querySelector('.fmsg').style.display='block';">
+        <h3>Request a callback</h3>
+        <p class="fp">We usually respond the same working day.</p>
+        <div class="two">
+          <div class="field"><label for="nm">Name</label><input id="nm" type="text" placeholder="Your name" required></div>
+          <div class="field"><label for="ph">Phone</label><input id="ph" type="tel" placeholder="Phone number" required></div>
+        </div>
+        <div class="field"><label for="car">Vehicle</label><input id="car" type="text" placeholder="e.g. BMW M3, 2022"></div>
+        <div class="field"><label for="svc">Service of interest</label>
+          <select id="svc">
+            <option>Paint Protection Film (PPF)</option>
+            <option>Ceramic Coating</option>
+            <option>Paint Correction</option>
+            <option>Car Wrapping</option>
+            <option>Window Tinting</option>
+            <option>Starlight Headliner</option>
+            <option>Alloy Wheel Refurbishment</option>
+            <option>Interior Detailing / Valet</option>
+            <option>Not sure — please advise</option>
+          </select>
+        </div>
+        <div class="field"><label for="msg">Details</label><textarea id="msg" rows="3" placeholder="Tell us what you're after…"></textarea></div>
+        <button class="btn btn-gold" type="submit">Send Enquiry →</button>
+        <p class="fp fmsg" style="display:none;color:var(--gold-2)">✓ Thanks — this is a concept demo, so nothing is actually sent. On the live site this would reach the Detail King's inbox.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
 <footer>
-  <div class="fn">Detail <span>Kings</span></div>
-  <div>Garage & MOT Centre · High Wycombe · +44 1494 211802</div>
-  <p class="concept">This is a free design concept created by <b>HW Web Design</b> to show Detail Kings
-    what a modern website could look like. Sample text, prices and reviews are for illustration only.
-    Like it? Let's make it real — hwwebdesign.co.uk</p>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a href="#top" class="brand">
+          <svg class="mk" viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0e1118" stroke="#d8b46b" stroke-opacity=".4"/><path d="M18 46 32 14l14 32" stroke="#d8b46b" stroke-width="3.4" stroke-linejoin="round"/><path d="M25 34h14" stroke="#d8b46b" stroke-width="3.4"/></svg>
+          <div><b>Detail <span class="ks">King's</span></b><small>High Wycombe · Bucks</small></div>
+        </a>
+        <p>Paintwork specialists &amp; aesthetic enhancements. Revive · Customise · Protect.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h5>Services</h5>
+          <a href="#services">Paint Protection Film</a>
+          <a href="#services">Ceramic Coatings</a>
+          <a href="#correction">Paint Correction</a>
+          <a href="#services">Car Wrapping</a>
+          <a href="#services">Window Tinting</a>
+        </div>
+        <div class="foot-col">
+          <h5>Studio</h5>
+          <span>Victoria Street</span>
+          <span>High Wycombe, HP11 2LU</span>
+          <a href="tel:+441494211802">01494 211802</a>
+          <a href="mailto:enq@detailkings.uk">enq@detailkings.uk</a>
+          <a href="https://www.instagram.com/detailkings_hw/" target="_blank" rel="noopener">@detailkings_hw</a>
+        </div>
+        <div class="foot-col">
+          <h5>Hours</h5>
+          <span>Mon–Fri · 9:00–18:00</span>
+          <span>Sat · 10:00–14:00</span>
+          <span>Sun · Closed</span>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div>© 2026 Detail King's · High Wycombe, Buckinghamshire</div>
+      <div>Revive · Customise · Protect</div>
+    </div>
+    <p class="concept">This is a free design concept created by <b>HW Web Design</b> to show Detail King's what a
+      modern, high-end website could look like. Sample package details and reviews are illustrative; all business
+      facts, services and contact details are real. Like it? Let's make it yours — hwwebdesign.co.uk</p>
+  </div>
 </footer>
 
-<a class="flag" href="https://hwwebdesign.co.uk" target="_blank" rel="noopener">✦ Concept by <b>HW Web Design</b> — <span>let's build yours</span></a>
+<!-- ============ LIGHTBOX ============ -->
+<div class="lightbox" id="lb" role="dialog" aria-modal="true" aria-label="Recent work gallery" aria-hidden="true">
+  <div class="lb-bar" id="lbBar" aria-hidden="true"></div>
+  <button class="lb-close" id="lbClose" aria-label="Close gallery">✕</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous photo">‹</button>
+  <figure class="lb-stage">
+    <img id="lbImg" src="" alt="">
+    <figcaption class="lb-cap" id="lbCap"></figcaption>
+  </figure>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Next photo">›</button>
+  <div class="lb-dots" id="lbDots" aria-hidden="true"></div>
+</div>
+
+<a class="flag" href="https://hwwebdesign.co.uk" target="_blank" rel="noopener">✦ Concept by <b>HW&nbsp;Web&nbsp;Design</b> — <span class="sp">let's build yours</span></a>
+
 <script>
-addEventListener('scroll',function(){document.getElementById('nav').classList.toggle('solid',scrollY>30)},{passive:true});
-var mio=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');mio.unobserve(e.target)}})},{threshold:.14});
-document.querySelectorAll('.reveal,.grid,.revs,.statbar').forEach(function(el){mio.observe(el)});
+// sticky nav
+var nav=document.getElementById('nav');
+addEventListener('scroll',function(){nav.classList.toggle('solid',scrollY>24)},{passive:true});
+nav.classList.toggle('solid',scrollY>24);
+
+// scroll reveals
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.14,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal,.stagger').forEach(function(el){io.observe(el)});
+
+// before/after slider
+(function(){
+  var range=document.getElementById('baRange'),before=document.getElementById('baBefore'),handle=document.getElementById('baHandle');
+  if(!range)return;
+  function set(v){before.style.clipPath='inset(0 '+(100-v)+'% 0 0)';handle.style.left=v+'%';}
+  range.addEventListener('input',function(){set(this.value)});
+  set(50);
+})();
+
+var reduceMotion=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+// scroll progress bar
+(function(){
+  var bar=document.getElementById('prog');if(!bar)return;
+  function upd(){var h=document.documentElement,max=h.scrollHeight-h.clientHeight;
+    bar.style.width=(max>0?(scrollY/max*100):0)+'%';}
+  addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);upd();
+})();
+
+// cinematic hero reel — "PPF laying" diagonal wipe between real photos
+(function(){
+  var reel=document.getElementById('reel');if(!reel||reduceMotion)return;
+  var slides=reel.querySelectorAll('.slide'),dots=document.querySelectorAll('#reelDots i'),cap=document.getElementById('reelCap');
+  var caps=[['BMW M8 Competition','Custom Satin PPF · our studio'],
+            ['Ferrari 458','Paint correction &amp; ceramic coating'],
+            ['BMW X6','Full gloss colour-change wrap']];
+  var i=0;
+  setInterval(function(){
+    var prev=i;
+    i=(i+1)%slides.length;
+    slides.forEach(function(sl,k){ if(k!==i&&k!==prev) sl.classList.remove('is-active','wipe','prev'); });
+    slides[prev].classList.remove('wipe');slides[prev].classList.add('prev'); // stays visible beneath, keeps its zoom
+    var s=slides[i];s.classList.remove('prev');void s.offsetWidth;
+    s.classList.add('is-active','wipe');                                       // wipes in on top
+    dots[prev].classList.remove('on');dots[i].classList.add('on');
+    cap.innerHTML='<b>'+caps[i][0]+'</b><span>'+caps[i][1]+'</span>';
+  },5000);
+})();
+
+// 3D pointer parallax tilt (hero reel + gallery items)
+(function(){
+  if(reduceMotion||matchMedia('(pointer:coarse)').matches)return;
+  function bind(el,max){
+    var raf;
+    el.addEventListener('mousemove',function(e){
+      var r=el.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;
+      cancelAnimationFrame(raf);raf=requestAnimationFrame(function(){
+        el.style.transform='perspective(1200px) rotateY('+(px*max)+'deg) rotateX('+(-py*max)+'deg)';});
+    });
+    el.addEventListener('mouseleave',function(){el.style.transform='';});
+  }
+  document.querySelectorAll('.gitem').forEach(function(g){bind(g,5)});
+})();
+
+// count-up stats
+(function(){
+  var els=document.querySelectorAll('.count');if(!els.length)return;
+  function run(el){
+    var to=parseFloat(el.dataset.to),dec=parseInt(el.dataset.dec||'0'),suf=el.dataset.suffix||'',t0=null,dur=1400;
+    if(reduceMotion){el.textContent=to.toFixed(dec)+suf;return;}
+    function step(t){t0=t0||t;var p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,3);
+      el.textContent=(to*e).toFixed(dec)+suf;if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  }
+  var so=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){run(e.target);so.unobserve(e.target)}})},{threshold:.6});
+  els.forEach(function(el){so.observe(el)});
+})();
+
+// auto-playing gallery lightbox
+(function(){
+  var lb=document.getElementById('lb');if(!lb)return;
+  var items=[].slice.call(document.querySelectorAll('.gitem'));if(!items.length)return;
+  var data=items.map(function(g){var im=g.querySelector('img'),c=g.querySelector('figcaption');
+    return {src:im.getAttribute('src'),alt:im.alt,html:c?c.innerHTML:''};});
+  var img=document.getElementById('lbImg'),cap=document.getElementById('lbCap'),
+      dw=document.getElementById('lbDots'),bar=document.getElementById('lbBar');
+  var cur=0,timer=null,raf=null,AUTO=4200;
+  data.forEach(function(d,k){var b=document.createElement('i');if(!k)b.className='on';
+    b.addEventListener('click',function(){show(k)});dw.appendChild(b);});
+  var dots=dw.querySelectorAll('i');
+  function arm(){clearTimeout(timer);cancelAnimationFrame(raf);bar.style.width='0';
+    if(reduceMotion)return;var t0=performance.now();
+    (function tick(t){var p=Math.min((t-t0)/AUTO,1);bar.style.width=(p*100)+'%';
+      if(p<1)raf=requestAnimationFrame(tick);})(t0);
+    timer=setTimeout(function(){show(cur+1)},AUTO);}
+  function show(k){cur=(k+data.length)%data.length;var d=data[cur];
+    img.style.animation='none';void img.offsetWidth;img.style.animation='';
+    img.src=d.src;img.alt=d.alt;cap.innerHTML=d.html;
+    dots.forEach(function(x,j){x.classList.toggle('on',j===cur)});arm();}
+  function open(k){lb.classList.add('open');lb.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';show(k);}
+  function close(){lb.classList.remove('open');lb.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';clearTimeout(timer);cancelAnimationFrame(raf);}
+  items.forEach(function(g,k){g.setAttribute('tabindex','0');g.setAttribute('role','button');
+    g.setAttribute('aria-label','View photo: '+(g.querySelector('img')||{}).alt);
+    g.addEventListener('click',function(){open(k)});
+    g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open(k)}});});
+  document.getElementById('lbNext').addEventListener('click',function(){show(cur+1)});
+  document.getElementById('lbPrev').addEventListener('click',function(){show(cur-1)});
+  document.getElementById('lbClose').addEventListener('click',close);
+  lb.addEventListener('click',function(e){if(e.target===lb)close()});
+  addEventListener('keydown',function(e){if(!lb.classList.contains('open'))return;
+    if(e.key==='Escape')close();else if(e.key==='ArrowRight')show(cur+1);else if(e.key==='ArrowLeft')show(cur-1);});
+})();
 </script>
 </body>
 </html>
