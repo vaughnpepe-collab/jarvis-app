@@ -251,8 +251,25 @@ h2{font-size:var(--f-h2);text-transform:uppercase}
   color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;margin-top:2px}
 .ba-copy li b{color:var(--ink);font-weight:700}
 
+/* ============================== CORRECTION PHOTO ============================== */
+.corr-photo{position:relative;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 30px 80px rgba(0,0,0,.55);aspect-ratio:1200/1000}
+.corr-photo img{width:100%;height:100%;object-fit:cover;display:block;animation:kbCorr 16s var(--ease-soft) infinite alternate}
+@keyframes kbCorr{from{transform:scale(1.03)}to{transform:scale(1.11)}}
+.corr-photo .shine2{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.14) 48%,rgba(190,214,255,.26) 50%,rgba(255,255,255,.14) 52%,transparent 60%);
+  background-size:300% 100%;background-position:150% 0;animation:paintSweep 6.5s var(--ease-soft) infinite}
+.corr-photo::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 55%,rgba(6,7,10,.55))}
+.corr-photo figcaption{position:absolute;left:18px;bottom:16px;z-index:2}
+.corr-photo figcaption b{display:block;font-size:1rem;font-weight:800;color:var(--ink);margin-top:6px}
+.corr-photo .live{display:inline-flex;align-items:center;gap:7px;font-size:.64rem;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold-2);background:rgba(8,9,12,.55);backdrop-filter:blur(6px);
+  border:1px solid var(--line);border-radius:var(--pill);padding:5px 11px}
+.corr-photo .live i{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 2.4s infinite}
+@media(prefers-reduced-motion:reduce){.corr-photo img,.corr-photo .shine2{animation:none!important}}
+
 /* ============================== GALLERY ============================== */
-.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .gitem{position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line-2);cursor:pointer;
   aspect-ratio:4/3;transition:transform .45s var(--ease),border-color .45s,box-shadow .45s}
 .gitem .zoom{position:absolute;top:14px;right:14px;z-index:3;display:inline-flex;align-items:center;gap:6px;
@@ -260,7 +277,7 @@ h2{font-size:var(--f-h2);text-transform:uppercase}
   background:rgba(8,9,12,.6);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--pill);
   padding:6px 11px;opacity:0;transform:translateY(-6px);transition:.35s var(--ease);pointer-events:none}
 .gitem:hover .zoom,.gitem:focus-visible .zoom{opacity:1;transform:none}
-.gitem.big{grid-row:span 2;aspect-ratio:auto}
+.gitem.big{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
 .gitem img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--ease)}
 .gitem:hover{transform:translateY(-5px);border-color:var(--line);box-shadow:0 26px 60px rgba(0,0,0,.5)}
 .gitem:hover img{transform:scale(1.06)}
@@ -269,7 +286,8 @@ h2{font-size:var(--f-h2);text-transform:uppercase}
 .gitem figcaption b{display:block;font-size:1rem;font-weight:800;color:var(--ink)}
 .gitem figcaption span{font-size:.76rem;color:var(--gold-2)}
 .work-cta{margin-top:30px;text-align:center}
-@media(max-width:640px){.gallery{grid-template-columns:1fr}.gitem.big{grid-row:auto}}
+@media(max-width:960px){.gallery{grid-template-columns:repeat(2,1fr)}.gitem.big{grid-column:span 2;grid-row:auto;aspect-ratio:16/10}}
+@media(max-width:640px){.gallery{grid-template-columns:1fr}.gitem.big{grid-column:auto;aspect-ratio:4/3}}
 
 /* ============================== LIGHTBOX ============================== */
 .lightbox{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;
@@ -508,8 +526,8 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
   <div class="hero-bg" id="reel" aria-hidden="true">
     <div class="reel">
       <div class="slide is-active" style="background-image:url(img/m8-front.jpg)"></div>
-      <div class="slide" style="background-image:url(img/m8-rear.jpg)"></div>
-      <div class="slide" style="background-image:url(img/m8-interior.jpg)"></div>
+      <div class="slide" style="background-image:url(img/ferrari-front.jpg)"></div>
+      <div class="slide" style="background-image:url(img/x6-front.jpg)"></div>
     </div>
     <span class="shine"></span>
     <div class="hero-scrim"></div>
@@ -533,7 +551,7 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
         <a href="#work" class="btn btn-ghost">See Our Work</a>
       </div>
       <div class="hero-trust">
-        <div class="trust-item"><span class="stars">★★★★★</span> <b>5.0</b> on Google</div>
+        <div class="trust-item"><span class="stars">★★★★★</span> <b>5.0</b> · 128 Google reviews</div>
         <div class="trust-item">✦ Free collection within 15 miles</div>
         <div class="trust-item">✦ Studio-based · not mobile</div>
       </div>
@@ -564,9 +582,9 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
   <div class="wrap">
     <div class="stats stagger">
       <div class="stat"><b class="count" data-to="5" data-dec="1" data-suffix="">0</b><span>Google rating</span></div>
+      <div class="stat"><b class="count" data-to="128" data-suffix="">0</b><span>Five-star reviews</span></div>
       <div class="stat"><b class="count" data-to="15" data-suffix="mi">0</b><span>Free collection radius</span></div>
       <div class="stat"><b class="count" data-to="9" data-suffix="">0</b><span>Signature services</span></div>
-      <div class="stat"><b class="count" data-to="100" data-suffix="%">0</b><span>Studio-based work</span></div>
     </div>
   </div>
 </section>
@@ -639,24 +657,19 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
       <div class="ba-copy reveal">
         <div class="eyebrow">Paint Correction</div>
         <h2>Swirls Gone. <span class="gold-text">Depth Restored.</span></h2>
-        <p class="lead">Drag the slider to see what expert multi-stage correction does to tired, swirled paintwork —
-          the same process that goes under every ceramic coating and PPF install.</p>
+        <p class="lead">This is what expert multi-stage correction looks like — swirls and holograms machined out to
+          restore true depth and clarity. It's the same process that goes under every ceramic coating and PPF install.</p>
         <ul>
           <li><span class="tick">✓</span><div><b>Yes, we remove scratches.</b> Light scratches and swirl marks are machine-polished out; deeper marks are dramatically reduced.</div></li>
           <li><span class="tick">✓</span><div><b>A true mirror finish.</b> We refine paint in stages rather than hiding defects with fillers that wash away.</div></li>
           <li><span class="tick">✓</span><div><b>The right base.</b> Correction first means coatings and film bond to flawless paint — and lock that finish in.</div></li>
         </ul>
       </div>
-      <div class="ba reveal" id="ba">
-        <div class="panel-img after"></div>
-        <div class="panel-img before" id="baBefore"></div>
-        <span class="lbl b">Before</span>
-        <span class="lbl a">After</span>
-        <div class="handle" id="baHandle"><span class="knob" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-4 6 4 6M15 6l4 6-4 6"/></svg>
-        </span></div>
-        <input type="range" min="0" max="100" value="50" id="baRange" aria-label="Reveal before and after paint correction">
-      </div>
+      <figure class="corr-photo reveal">
+        <img src="img/ferrari-polish.jpg" alt="Technician machine-polishing the red Ferrari 458 during multi-stage paint correction" width="1200" height="1303" loading="lazy">
+        <span class="shine2" aria-hidden="true"></span>
+        <figcaption><span class="live"><i></i> In progress</span><b>Ferrari 458 · multi-stage correction</b></figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -667,19 +680,49 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
     <div class="sec-head reveal">
       <div class="eyebrow">Recent Work</div>
       <h2>Straight From <span class="gold-text">Our Studio</span></h2>
-      <p class="lead">A BMW M8 Competition finished in custom Satin PPF, ceramic-coated and tinted in our High
-        Wycombe studio. Real cars, real results — not stock photos.</p>
+      <p class="lead">Ferrari, BMW and beyond — paint protection film, paint correction, ceramic coatings and
+        colour-change wraps, all finished in our High Wycombe studio. Real cars, real results — not stock photos.</p>
     </div>
     <div class="gallery stagger">
       <figure class="gitem big">
+        <img src="img/ferrari-front.jpg" alt="Red Ferrari 458 in the Detail King's studio after paint correction" width="1200" height="1280" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>Ferrari 458</b><span>Paint correction &amp; ceramic coating</span></figcaption>
+      </figure>
+      <figure class="gitem">
         <img src="img/m8-front.jpg" alt="Front three-quarter of the blue BMW M8 in Detail King's studio" width="1200" height="1354" loading="lazy">
         <span class="zoom">⤢ View</span>
-        <figcaption><b>BMW M8 Competition</b><span>Custom Satin PPF · full front</span></figcaption>
+        <figcaption><b>BMW M8 Competition</b><span>Custom Satin PPF</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/x6-front.jpg" alt="Green wrapped BMW X6 front in the Detail King's studio" width="1200" height="1280" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>BMW X6</b><span>Colour-change wrap</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/ferrari-polish.jpg" alt="Technician machine-polishing the red Ferrari 458 during paint correction" width="1200" height="1303" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>Paint correction</b><span>Machine-polished by hand</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/ppf-cut.jpg" alt="Paint protection film being precision-cut by hand" width="1200" height="1364" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>PPF, precision cut</b><span>Applied by hand</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/x6-rear.jpg" alt="Rear of the gloss green BMW X6 with the studio logo behind" width="1200" height="1200" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>Gloss green X6</b><span>Full studio finish</span></figcaption>
       </figure>
       <figure class="gitem">
         <img src="img/m8-rear.jpg" alt="Rear of the blue BMW M8 Competition showing the wing and diffuser" width="1200" height="1354" loading="lazy">
         <span class="zoom">⤢ View</span>
         <figcaption><b>Satin finish &amp; tint</b><span>Flawless reflection</span></figcaption>
+      </figure>
+      <figure class="gitem">
+        <img src="img/x6-badge.jpg" alt="Close-up of the BMW badge on the gloss green X6 wrap" width="1200" height="1120" loading="lazy">
+        <span class="zoom">⤢ View</span>
+        <figcaption><b>Wrapped to the detail</b><span>Gloss green, badge in</span></figcaption>
       </figure>
       <figure class="gitem">
         <img src="img/m8-interior.jpg" alt="Detailed interior of the BMW M8 Competition" width="1200" height="1354" loading="lazy">
@@ -795,7 +838,7 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
 <section id="reviews">
   <div class="wrap">
     <div class="sec-head center reveal">
-      <div class="eyebrow">5.0 on Google</div>
+      <div class="eyebrow">5.0 ★ · 128 Google Reviews</div>
       <h2>What Owners Are <span class="gold-text">Saying</span></h2>
     </div>
     <div class="rev-grid stagger">
@@ -884,8 +927,8 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
           </div>
         </div>
         <div class="hours">
-          <div class="hr"><span>Monday – Friday</span><b>9:00 – 17:30</b></div>
-          <div class="hr"><span>Saturday</span><b>9:00 – 14:00</b></div>
+          <div class="hr"><span>Monday – Friday</span><b>9:00 – 18:00</b></div>
+          <div class="hr"><span>Saturday</span><b>10:00 – 14:00</b></div>
           <div class="hr closed"><span>Sunday</span><b>Closed</b></div>
         </div>
       </div>
@@ -948,8 +991,8 @@ footer{border-top:1px solid var(--line-2);padding:60px 0 40px;background:var(--b
         </div>
         <div class="foot-col">
           <h5>Hours</h5>
-          <span>Mon–Fri · 9:00–17:30</span>
-          <span>Sat · 9:00–14:00</span>
+          <span>Mon–Fri · 9:00–18:00</span>
+          <span>Sat · 10:00–14:00</span>
           <span>Sun · Closed</span>
         </div>
       </div>
@@ -1013,8 +1056,8 @@ var reduceMotion=matchMedia('(prefers-reduced-motion:reduce)').matches;
   var reel=document.getElementById('reel');if(!reel||reduceMotion)return;
   var slides=reel.querySelectorAll('.slide'),dots=document.querySelectorAll('#reelDots i'),cap=document.getElementById('reelCap');
   var caps=[['BMW M8 Competition','Custom Satin PPF · our studio'],
-            ['Satin finish & tint','Flawless studio reflection'],
-            ['Interior detail','Finished to as-new']];
+            ['Ferrari 458','Paint correction &amp; ceramic coating'],
+            ['BMW X6','Full gloss colour-change wrap']];
   var i=0;
   setInterval(function(){
     var prev=i;
