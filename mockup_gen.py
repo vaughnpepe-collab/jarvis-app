@@ -250,6 +250,18 @@ NICHE = {
                   svc("👶", "Children's Eye Care", "Gentle, NHS-covered kids' eye tests."),
                   svc("💻", "Screen-Strain Advice", "Lenses tuned for modern screen life."),
                   svc("🏠", "Home Visits", "Eye care for those who can't get to us.")]),
+    "detailing": dict(arch="trades", emoji="✨", visual="🚘",
+        badge="Detailing & Valeting", hl="Every Time",
+        head="Showroom Shine, <span>Every Time</span>",
+        sub="Professional car detailing and valeting in {town} — paint correction, ceramic coatings and protection that keeps your car looking its best.",
+        cta="Get a Free Quote", stag="Our Services", shead="Detailing & Protection",
+        ssub="From a deep clean to full paint protection — proper products, proper process, proper results.",
+        services=[svc("🧼", "Full Valet", "Inside and out, back to its best.", "from £45"),
+                  svc("✨", "Machine Polish & Correction", "Swirls and scratches carefully removed."),
+                  svc("🛡", "Ceramic Coating", "Long-term gloss and protection.", "from £199"),
+                  svc("🎞", "Paint Protection Film", "Invisible armour for high-impact areas."),
+                  svc("🪑", "Interior Deep Clean", "Seats, carpets and trim, properly refreshed."),
+                  svc("🛞", "Wheels & Callipers", "Deep-cleaned, sealed and dressed.")]),
     "bakery": dict(arch="food", emoji="🥖", visual="🍞",
         badge="Bakery", hl="Baked Fresh Daily",
         head="Real Bread, <span>Baked Fresh Daily</span>",
@@ -285,6 +297,9 @@ REVIEWS = {  # (text, name) — first review localised to the lead's town
                      ("Fixed fees, real advice and they actually pick up the phone. Exactly what a small business needs.", "Emma V.")],
 }
 NEARBY = ["High Wycombe", "Marlow", "Beaconsfield", "Amersham"]
+
+# Hand-built one-off mockups that must NEVER be overwritten by the generator.
+BESPOKE_SLUGS = {"detail-kings-high-wycombe"}
 
 # ---------------------------------------------------------------- variants
 # Each business gets a deterministic-but-unique combination so no two mockups
@@ -931,6 +946,8 @@ def main():
     os.makedirs("mockups", exist_ok=True)
     for b in items:
         slug = lead_slug(b["name"], b["town"])
+        if slug in BESPOKE_SLUGS:
+            continue
         d = os.path.join("mockups", slug)
         os.makedirs(d, exist_ok=True)
         with open(os.path.join(d, "index.html"), "w") as f:
