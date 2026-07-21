@@ -6,7 +6,9 @@ __pycache__/
 # Prospect data — repo is PUBLIC, so never commit leads/contacts/outreach.
 # (Generated locally by the scripts; the code stays, the data stays private.)
 leads/*.csv
+leads/*.json
 leads/leads_*.md
 leads/outreach_pack_*.md
 leads/email_drafts*.json
 leads/email_drafts*.md
+leads/followups*
