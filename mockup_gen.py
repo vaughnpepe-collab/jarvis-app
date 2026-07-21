@@ -771,7 +771,9 @@ CSS_MOMENTUM = """
 .t-momentum input::placeholder,.t-momentum textarea::placeholder{color:rgba(255,255,255,.4)}
 .t-momentum input:focus,.t-momentum textarea:focus{outline:none;border-color:var(--a)}
 .t-momentum footer{background:#070a10}
+.m-bc{min-width:0}
 @media(max-width:880px){.m-awrap,.t-momentum .cwrap{grid-template-columns:1fr;gap:40px}.m-row{grid-template-columns:auto 1fr;gap:16px}.m-arrow{display:none}}
+@media(max-width:560px){.m-big{grid-template-columns:1fr}}
 """
 
 # ================================================================ BLOOM
