@@ -1,404 +1,191 @@
-<!DOCTYPE html>
-<html lang="en-GB">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Elite Electrical — Electrical Services in High Wycombe. Certified electrical work across High Wycombe. Rewires, fuse boards, sockets, lighting and EV chargers — fully tested, fairly priced.">
-<meta name="robots" content="noindex">
-<title>Elite Electrical | Electrical Services in High Wycombe</title>
-<style>
+<!DOCTYPE html><html lang="en-GB"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Elite Electrical — Electrical Services in High Wycombe. Certified electrical work across High Wycombe. Rewires, fuse boards, sockets, lighting and EV chargers — fully tested, fairly priced."><meta name="robots" content="noindex"><title>Elite Electrical | Electrical Services in High Wycombe</title><style>:root{--p:#1e3a5f;--pd:#142b47;--a:#f97316;--a2:#fdba74;--tx:#1f2937;--g:#64748b;--bd:#dbe3ec;--cr:#f4f7fb;--h0:#0f1f33;--h1:#1e3a5f;--h2:#16293f;--ease:cubic-bezier(.16,1,.3,1)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-:root{--p:#1e3a5f;--pd:#142b47;--a:#f97316;--a2:#fdba74;--tx:#1f2937;--g:#64748b;--bd:#dbe3ec;--cr:#f4f7fb;--r:14px;
---ease:cubic-bezier(.16,1,.3,1)}
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--tx);line-height:1.65;background:#fff;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{color:var(--tx);line-height:1.65;background:#fff;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
-h1,h2,h3,h4{text-wrap:balance}
+img{max-width:100%;display:block}
+h1,h2,h3,h4{text-wrap:balance;letter-spacing:-.02em}
 :focus-visible{outline:3px solid var(--a2);outline-offset:3px;border-radius:6px}
-.grain{position:fixed;inset:-60px;z-index:5;pointer-events:none;opacity:.28;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E")}
-.progress{position:fixed;top:0;left:0;height:2.5px;width:0;z-index:300;background:linear-gradient(90deg,var(--a),var(--a2));box-shadow:0 0 10px var(--a)}
-
-/* ---------- nav ---------- */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;transition:background .35s,box-shadow .35s,border-color .35s;border-bottom:1px solid transparent;background:rgba(10,12,18,.32);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3)}
-nav.solid{background:rgba(10,12,18,.78);border-bottom-color:rgba(255,255,255,.08);box-shadow:0 8px 32px rgba(0,0,0,.25)}
-.logo{color:#fff;font-size:1.22rem;font-weight:800;letter-spacing:-.01em}
+.grain{position:fixed;inset:-60px;z-index:6;pointer-events:none;opacity:.24;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E")}
+.prog{position:fixed;top:0;left:0;height:2.5px;width:0;z-index:300;background:linear-gradient(90deg,var(--a),var(--a2));box-shadow:0 0 10px var(--a)}
+/* nav skeleton */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;transition:background .35s,box-shadow .35s,border-color .35s,transform .35s}
+.logo{font-size:1.2rem;font-weight:800;color:#fff}
 .logo span{color:var(--a2)}
-.nlinks{display:flex;gap:32px;list-style:none}
-.nlinks a{position:relative;color:rgba(255,255,255,.82);font-size:.92rem;font-weight:600;transition:color .25s}
-.nlinks a::after{content:'';position:absolute;left:0;bottom:-6px;height:2px;width:0;border-radius:2px;background:var(--a);transition:width .3s var(--ease)}
-.nlinks a:hover{color:#fff}
-.nlinks a:hover::after{width:100%}
+.nlinks{display:flex;gap:30px;list-style:none}
+.nlinks a{position:relative;font-size:.9rem;font-weight:600;color:rgba(255,255,255,.82);transition:color .25s}
+.nlinks a::after{content:'';position:absolute;left:0;bottom:-6px;height:2px;width:0;background:var(--a);transition:width .3s var(--ease)}
+.nlinks a:hover{color:#fff}.nlinks a:hover::after{width:100%}
 .nav-right{display:flex;align-items:center;gap:10px}
-.ncta{background:var(--a);color:#11151c;padding:11px 22px;border-radius:calc(var(--r) - 2px);font-weight:800;font-size:.86rem;white-space:nowrap;transition:transform .25s var(--ease),box-shadow .3s,filter .2s;box-shadow:0 10px 26px rgba(0,0,0,.28);will-change:transform}
-.ncta:hover{transform:translateY(-2px);filter:brightness(1.08)}
-.ntgl{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:44px;height:44px;background:transparent;border:0;cursor:pointer}
-.ntgl span{width:22px;height:2px;border-radius:2px;background:#fff;transition:transform .3s var(--ease),opacity .2s}
-.ntgl.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.ntgl.open span:nth-child(2){opacity:0}
-.ntgl.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.mmenu{position:fixed;top:68px;left:0;right:0;z-index:190;background:rgba(10,12,18,.96);backdrop-filter:blur(14px);display:flex;flex-direction:column;padding:8px 5% 20px;transform:translateY(-140%);transition:transform .38s var(--ease);border-bottom:1px solid rgba(255,255,255,.1)}
-.mmenu.open{transform:translateY(0)}
-.mmenu a{color:rgba(255,255,255,.92);font-size:1rem;font-weight:600;padding:14px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
-.mmenu a.mcta{background:var(--a);color:#11151c;text-align:center;border-radius:var(--r);margin-top:12px;padding:14px;border:0;font-weight:800}
-
-/* ---------- hero ---------- */
-.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:128px 5% 120px;background:linear-gradient(135deg,#0f1f33 0%,#1e3a5f 50%,#16293f 100%);overflow:hidden;isolation:isolate}
-.hero::before{content:'';position:absolute;z-index:-1;top:-22%;right:-14%;width:min(56vw,640px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#f973163d 0%,transparent 62%);filter:blur(50px);animation:mkBreathe 11s ease-in-out infinite;pointer-events:none}
-.hero::after{content:'';position:absolute;z-index:-1;left:-14%;bottom:-26%;width:min(44vw,480px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#fdba742e 0%,transparent 60%);filter:blur(56px);animation:mkBreathe 13s ease-in-out infinite reverse;pointer-events:none}
-@keyframes mkBreathe{0%,100%{transform:scale(1) translate(0,0)}50%{transform:scale(1.14) translate(-24px,18px)}}
-.hero-grid{position:relative;width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.08fr .92fr;gap:52px;align-items:center}
-.badge{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.07);border:1px solid #f9731659;color:var(--a2);padding:8px 17px;border-radius:999px;font-size:.8rem;font-weight:700;letter-spacing:.04em;margin-bottom:26px;backdrop-filter:blur(6px);opacity:0;animation:mkUp .7s var(--ease) .08s forwards}
-.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--a2);box-shadow:0 0 10px var(--a2);animation:mkPulse 2.3s infinite}
-@keyframes mkPulse{0%,100%{opacity:1}50%{opacity:.35}}
-.hero h1{font-size:clamp(2.3rem, 1.2rem + 5vw, 4.2rem);font-weight:900;color:#fff;line-height:1.05;letter-spacing:-.025em;margin-bottom:22px}
-.hl{display:block;overflow:hidden}
-.hl>span{display:block;transform:translateY(112%);animation:mkLine 1s var(--ease) forwards}
-.hl:nth-child(1)>span{animation-delay:.14s}
-.hl:nth-child(2)>span{animation-delay:.3s}
-@keyframes mkLine{to{transform:translateY(0)}}
-.hero h1 em{font-style:normal;background:linear-gradient(92deg,var(--a),var(--a2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.hero .lead{font-size:clamp(1.02rem, .96rem + .4vw, 1.2rem);color:rgba(255,255,255,.76);max-width:34em;margin-bottom:30px;opacity:0;animation:mkUp .8s var(--ease) .55s forwards}
-.btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px;opacity:0;animation:mkUp .8s var(--ease) .7s forwards}
-.bp{position:relative;display:inline-flex;align-items:center;gap:9px;background:var(--a);color:#11151c;padding:16px 32px;border-radius:var(--r);font-weight:800;font-size:1rem;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s,filter .2s;box-shadow:0 14px 36px rgba(0,0,0,.32);will-change:transform}
-.bp:hover{filter:brightness(1.07);box-shadow:0 20px 48px rgba(0,0,0,.4)}
-.bp::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.5) 50%,transparent 58%);background-size:240% 100%;background-position:140% 0;animation:mkSheen 5.2s var(--ease) infinite;pointer-events:none}
-@keyframes mkSheen{0%,58%{background-position:140% 0}86%,100%{background-position:-60% 0}}
-.bs{display:inline-flex;align-items:center;background:rgba(255,255,255,.07);color:#fff;padding:16px 30px;border-radius:var(--r);font-weight:600;font-size:1rem;border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);transition:background .25s,border-color .25s,transform .25s var(--ease)}
-.bs:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4);transform:translateY(-2px)}
-.chips{display:flex;gap:10px 18px;flex-wrap:wrap;opacity:0;animation:mkUp .8s var(--ease) .85s forwards}
-.chip{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.72);font-size:.88rem;font-weight:600}
-.chip svg{width:15px;height:15px;stroke:var(--a2);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
-/* hero visual — floating glass composition */
-.hero-visual{position:relative;display:grid;place-items:center;opacity:0;animation:mkUp 1s var(--ease) .5s forwards}
-.hv-main{position:relative;width:min(360px,86%);aspect-ratio:.92;border-radius:calc(var(--r) + 10px);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(12px);box-shadow:0 40px 90px rgba(0,0,0,.42);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:34px;transform:perspective(900px) rotateX(var(--rx,0)) rotateY(var(--ry,0));transition:transform .5s var(--ease);will-change:transform;animation:mkFloat 7s ease-in-out infinite}
-@keyframes mkFloat{0%,100%{margin-top:0}50%{margin-top:-14px}}
-.hv-ico{width:96px;height:96px;border-radius:26px;display:grid;place-items:center;font-size:46px;background:linear-gradient(140deg,var(--a),var(--a2));box-shadow:0 18px 44px rgba(0,0,0,.35)}
-.hv-name{color:#fff;font-weight:800;font-size:1.25rem;text-align:center;letter-spacing:-.01em}
-.hv-sub{color:rgba(255,255,255,.62);font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;text-align:center}
-.hv-line{width:56%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent)}
-.hv-chip{position:absolute;display:flex;align-items:center;gap:9px;background:#fff;color:#101318;border-radius:14px;padding:11px 15px;font-size:.82rem;font-weight:750;box-shadow:0 18px 44px rgba(0,0,0,.35);white-space:nowrap}
-.hv-chip .st{color:var(--a);letter-spacing:2px}
-.hv-c1{top:6%;left:-6%;animation:mkBob 5.5s ease-in-out infinite}
-.hv-c2{bottom:9%;right:-7%;animation:mkBob 5.5s ease-in-out infinite 1.1s}
-@keyframes mkBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
-@keyframes mkUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
-.hero-fade{position:absolute;left:0;right:0;bottom:-1px;height:110px;background:linear-gradient(transparent,#fff);z-index:1;pointer-events:none}
-
-/* ---------- marquee ---------- */
-.mqw{background:var(--pd);padding:20px 0;overflow:hidden;border-top:1px solid rgba(255,255,255,.07)}
-.mq{display:flex;align-items:center;gap:38px;width:max-content;animation:mkMq 30s linear infinite}
-.mq:hover{animation-play-state:paused}
-.mq span{color:rgba(255,255,255,.82);font-size:.92rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
-.mq i{color:var(--a);font-style:normal;font-size:.8rem}
-@keyframes mkMq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-/* ---------- stats ---------- */
-.statwrap{padding:0 5%;transform:translateY(-46px);margin-bottom:-46px;position:relative;z-index:2}
-.statbar{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:2px;border-radius:calc(var(--r) + 6px);overflow:hidden;box-shadow:0 26px 60px rgba(2,6,23,.18)}
-.stat{background:linear-gradient(160deg,var(--p),var(--pd));text-align:center;color:#fff;padding:26px 16px}
-.stat .num{font-size:1.7rem;font-weight:900;color:var(--a2);line-height:1.1}
-.stat .lab{font-size:.82rem;color:rgba(255,255,255,.72);margin-top:4px;letter-spacing:.04em}
-
-/* ---------- sections ---------- */
-section{padding:clamp(72px,9vw,110px) 5%;scroll-margin-top:76px}
+.ncta{background:var(--a);color:#11151c;padding:11px 22px;border-radius:10px;font-weight:800;font-size:.85rem;white-space:nowrap;box-shadow:0 10px 26px rgba(0,0,0,.26);transition:transform .25s var(--ease),filter .2s;will-change:transform}
+.ncta:hover{filter:brightness(1.08)}
+.tgl{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:44px;height:44px;background:transparent;border:0;cursor:pointer}
+.tgl span{width:22px;height:2px;border-radius:2px;background:#fff;transition:transform .3s var(--ease),opacity .2s}
+.tgl.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.tgl.open span:nth-child(2){opacity:0}
+.tgl.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mm{position:fixed;top:70px;left:0;right:0;z-index:190;background:rgba(12,14,20,.97);backdrop-filter:blur(14px);display:flex;flex-direction:column;padding:8px 5% 20px;transform:translateY(-140%);transition:transform .38s var(--ease);border-bottom:1px solid rgba(255,255,255,.1)}
+.mm.open{transform:translateY(0)}
+.mm a{color:rgba(255,255,255,.92);font-size:1rem;font-weight:600;padding:14px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
+.mm a.mcta{background:var(--a);color:#11151c;text-align:center;border-radius:12px;margin-top:12px;border:0;font-weight:800}
+/* buttons */
+.bp{position:relative;display:inline-flex;align-items:center;gap:9px;background:var(--a);color:#11151c;padding:16px 32px;border-radius:12px;font-weight:800;font-size:1rem;overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,.28);transition:transform .3s var(--ease),filter .2s;will-change:transform}
+.bp:hover{filter:brightness(1.07)}
+.bp::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.5) 50%,transparent 58%);background-size:240% 100%;background-position:140% 0;animation:sheen 5.4s var(--ease) infinite;pointer-events:none}
+@keyframes sheen{0%,58%{background-position:140% 0}86%,100%{background-position:-60% 0}}
+.bs{display:inline-flex;align-items:center;gap:8px;padding:16px 30px;border-radius:12px;font-weight:700;font-size:1rem;transition:transform .25s var(--ease),background .25s,border-color .25s}
+.bw{display:inline-flex;align-items:center;gap:9px;background:#fff;color:var(--p);padding:16px 34px;border-radius:12px;font-weight:800;font-size:1.02rem;box-shadow:0 16px 40px rgba(0,0,0,.26);transition:transform .3s var(--ease),box-shadow .3s;will-change:transform}
+/* sections */
+section{padding:clamp(70px,9vw,112px) 5%;scroll-margin-top:78px;position:relative}
 .wrap{max-width:1180px;margin:0 auto}
-.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.76rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--a);margin-bottom:12px}
-.eyebrow::before{content:'';width:24px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--a),var(--a2))}
-h2{font-size:clamp(1.8rem, 1.2rem + 2.6vw, 2.8rem);font-weight:900;color:var(--p);line-height:1.12;letter-spacing:-.02em;margin-bottom:14px}
-.sub{font-size:1.05rem;color:var(--g);max-width:38em;margin-bottom:48px}
-.cream{background:var(--cr)}
-
-/* cards */
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
-.card{--mx:50%;--my:50%;position:relative;background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:30px;overflow:hidden;transform:perspective(900px) rotateX(var(--rx,0)) rotateY(var(--ry,0));transition:transform .45s var(--ease),box-shadow .35s,border-color .3s;will-change:transform}
-.card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .45s;pointer-events:none;background:radial-gradient(380px circle at var(--mx) var(--my),#f9731614,transparent 45%)}
-.card:hover{box-shadow:0 24px 56px rgba(2,6,23,.13)}
-.card:hover::before{opacity:1}
-.card>*{position:relative;z-index:1}
-.ico{width:56px;height:56px;border-radius:calc(var(--r) - 2px);display:grid;place-items:center;margin-bottom:16px;background:linear-gradient(140deg,#f973161f,#fdba7430);border:1px solid #f9731633}
-.ico span{font-size:26px;transition:transform .35s var(--ease)}
-.card:hover .ico span{transform:scale(1.18) rotate(-6deg)}
-.card h3{font-size:1.16rem;font-weight:800;color:var(--tx);margin-bottom:8px}
-.card p{font-size:.94rem;color:var(--g)}
-.price{margin-top:14px;display:inline-block;background:var(--cr);color:var(--p);font-weight:800;font-size:.84rem;padding:6px 15px;border-radius:999px;border:1px solid var(--bd)}
-
-/* about / why */
-.why-wrap{display:grid;grid-template-columns:1.08fr .92fr;gap:56px;align-items:center}
-.whys{list-style:none;display:flex;flex-direction:column;gap:20px;margin-top:8px}
-.why{display:flex;gap:15px}
-.chk{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:linear-gradient(140deg,var(--a),var(--a2));display:grid;place-items:center;box-shadow:0 8px 20px #f9731655}
-.chk svg{width:16px;height:16px;stroke:#11151c;stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.why h4{font-size:1.04rem;font-weight:800;color:var(--tx);margin-bottom:3px}
-.why p{font-size:.92rem;color:var(--g)}
-.visual{position:relative;border-radius:calc(var(--r) + 8px);min-height:400px;overflow:hidden;background:linear-gradient(150deg,var(--p),var(--pd));box-shadow:0 30px 70px rgba(2,6,23,.22);transform:scale(.95);transition:transform 1.1s var(--ease)}
-.visual.in{transform:scale(1)}
-.visual::before{content:'⚡';position:absolute;right:-24px;bottom:-30px;font-size:170px;opacity:.16;transform:rotate(-8deg)}
-.visual::after{content:'';position:absolute;top:-30%;left:-20%;width:70%;height:90%;background:radial-gradient(circle,#f9731638,transparent 62%);filter:blur(30px)}
-.vq{position:absolute;left:22px;right:22px;bottom:22px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(12px);border-radius:var(--r);padding:20px 22px;color:#fff}
-.vq .st{color:var(--a2);letter-spacing:2px;font-size:.9rem;margin-bottom:8px}
-.vq p{font-size:.94rem;line-height:1.55;font-style:italic}
-.vq small{display:block;margin-top:9px;color:rgba(255,255,255,.65);font-size:.76rem;letter-spacing:.14em;text-transform:uppercase}
-.vtag{position:absolute;top:20px;left:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);color:#fff;border-radius:999px;padding:8px 17px;font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
-
-/* reviews */
-.revs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
-.rev{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:28px;transition:transform .35s var(--ease),box-shadow .3s}
-.rev:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(2,6,23,.1)}
-.stars{color:var(--a);font-size:1.05rem;letter-spacing:2px;margin-bottom:12px}
-.rev p{font-size:.95rem;color:#374151;font-style:italic;margin-bottom:18px}
-.auth{display:flex;align-items:center;gap:12px}
-.ava{width:42px;height:42px;border-radius:50%;background:linear-gradient(140deg,var(--p),var(--a));color:#fff;display:grid;place-items:center;font-weight:800;font-size:.82rem}
-.an{font-weight:750;font-size:.9rem;color:var(--tx)}
-.al{font-size:.76rem;color:var(--g)}
-
-/* CTA band */
-.band{position:relative;text-align:center;color:#fff;overflow:hidden;background:linear-gradient(120deg,var(--pd),var(--p) 45%,var(--pd));background-size:200% 200%;animation:mkGrad 11s ease infinite}
-@keyframes mkGrad{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
-.band::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 18% 20%,#f9731630,transparent 44%),radial-gradient(circle at 84% 82%,#fdba7422,transparent 44%)}
-.band .wrap{position:relative}
-.band h2{color:#fff}
-.band p{font-size:1.08rem;color:rgba(255,255,255,.86);max-width:36em;margin:0 auto 30px}
-.bw{display:inline-flex;align-items:center;gap:9px;background:#fff;color:var(--p);padding:16px 34px;border-radius:var(--r);font-weight:800;font-size:1.02rem;transition:transform .3s var(--ease),box-shadow .3s;box-shadow:0 16px 40px rgba(0,0,0,.28);will-change:transform}
-.bw:hover{box-shadow:0 22px 54px rgba(0,0,0,.36)}
-
-/* contact */
-.contact-wrap{display:grid;grid-template-columns:1fr 1.05fr;gap:56px}
-.cinfo{display:flex;flex-direction:column;gap:14px;margin-top:8px}
-.crow{display:flex;gap:15px;align-items:center;background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:16px 19px;transition:transform .25s var(--ease),box-shadow .25s}
-.crow:hover{transform:translateX(5px);box-shadow:0 12px 30px rgba(2,6,23,.08)}
-.ci{flex-shrink:0;width:44px;height:44px;border-radius:calc(var(--r) - 3px);display:grid;place-items:center;background:linear-gradient(140deg,#f973161f,#fdba7430);border:1px solid #f9731633;color:var(--p)}
-.ci svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.cl{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--g);font-weight:700}
-.cv{font-size:1.02rem;font-weight:800;color:var(--tx)}
-form{display:flex;flex-direction:column;gap:14px;background:#fff;border:1px solid var(--bd);border-radius:calc(var(--r) + 4px);padding:32px;box-shadow:0 20px 50px rgba(2,6,23,.07)}
-input,textarea{padding:13px 16px;border:1.5px solid var(--bd);border-radius:calc(var(--r) - 4px);font-size:.96rem;font-family:inherit;background:#fff;transition:border-color .2s,box-shadow .2s}
-input:focus,textarea:focus{outline:none;border-color:var(--a);box-shadow:0 0 0 4px #f9731622}
-.fsub{background:var(--p);color:#fff;border:none;padding:15px;border-radius:calc(var(--r) - 4px);font-weight:800;font-size:1rem;cursor:pointer;transition:transform .25s var(--ease),background .2s,box-shadow .3s;box-shadow:0 12px 30px rgba(2,6,23,.18)}
-.fsub:hover{background:var(--pd);transform:translateY(-2px)}
-
-/* footer + flag */
-footer{background:var(--pd);color:rgba(255,255,255,.6);padding:44px 5% 78px;text-align:center}
-footer .fn{color:#fff;font-size:1.25rem;font-weight:800;margin-bottom:8px}
-footer .fn span{color:var(--a2)}
-.concept{margin-top:22px;font-size:.8rem;color:rgba(255,255,255,.45);max-width:40em;margin-left:auto;margin-right:auto;line-height:1.6}
-.flag{position:fixed;right:16px;bottom:16px;z-index:220;background:#0f172a;color:#fff;font-size:.78rem;font-weight:600;padding:9px 15px;border-radius:999px;box-shadow:0 8px 26px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12)}
-.flag span{color:#7dd3fc}
-.flag b{color:var(--a2)}
-
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.75rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--a);margin-bottom:14px}
+.eyebrow::before{content:'';width:24px;height:2px;background:linear-gradient(90deg,var(--a),var(--a2))}
+h2{font-size:clamp(1.8rem, 1.2rem + 2.6vw, 2.9rem);font-weight:900;color:var(--p);line-height:1.12;margin-bottom:14px}
+.sub{font-size:1.05rem;color:var(--g);max-width:40em;margin-bottom:48px}
 /* reveals */
 .reveal{opacity:0;transform:translateY(30px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .reveal.in{opacity:1;transform:none}
-.grid .card,.revs .rev,.statbar .stat{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
-.grid.in .card,.revs.in .rev,.statbar.in .stat{opacity:1;transform:none}
-.grid.in .card:nth-child(2),.revs.in .rev:nth-child(2),.statbar.in .stat:nth-child(2){transition-delay:.08s}
-.grid.in .card:nth-child(3),.revs.in .rev:nth-child(3),.statbar.in .stat:nth-child(3){transition-delay:.16s}
-.grid.in .card:nth-child(4),.statbar.in .stat:nth-child(4){transition-delay:.24s}
-.grid.in .card:nth-child(5){transition-delay:.32s}
-.grid.in .card:nth-child(6){transition-delay:.4s}
-
+.clip{opacity:0;clip-path:inset(0 0 100% 0);transition:opacity 1s var(--ease),clip-path 1.1s var(--ease)}
+.clip.in{opacity:1;clip-path:inset(0 0 0 0)}
+.blur{opacity:0;filter:blur(14px);transform:translateY(22px) scale(.98);transition:opacity 1s ease,filter 1s ease,transform 1s var(--ease)}
+.blur.in{opacity:1;filter:none;transform:none}
+.stagger>*{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.stagger.in>*{opacity:1;transform:none}
+.stagger.in>*:nth-child(2){transition-delay:.07s}.stagger.in>*:nth-child(3){transition-delay:.14s}
+.stagger.in>*:nth-child(4){transition-delay:.21s}.stagger.in>*:nth-child(5){transition-delay:.28s}
+.stagger.in>*:nth-child(6){transition-delay:.35s}
+/* footer + flag */
+footer{background:var(--pd);color:rgba(255,255,255,.6);padding:46px 5% 78px;text-align:center}
+footer .fn{color:#fff;font-size:1.25rem;font-weight:800;margin-bottom:8px}
+footer .fn span{color:var(--a2)}
+.concept{margin:22px auto 0;font-size:.8rem;color:rgba(255,255,255,.45);max-width:42em;line-height:1.6}
+.flag{position:fixed;right:16px;bottom:16px;z-index:220;background:#0f172a;color:#fff;font-size:.78rem;font-weight:600;padding:9px 15px;border-radius:999px;box-shadow:0 8px 26px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12)}
+.flag b{color:var(--a2)}
+.hl{display:block;overflow:hidden}
+.hl>span{display:block;transform:translateY(115%);animation:line 1s var(--ease) forwards}
+.hl:nth-child(1)>span{animation-delay:.12s}.hl:nth-child(2)>span{animation-delay:.28s}
+@keyframes line{to{transform:translateY(0)}}
+h1 em{font-style:normal;background:linear-gradient(92deg,var(--a),var(--a2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+@keyframes breathe{0%,100%{transform:scale(1) translate(0,0)}50%{transform:scale(1.14) translate(-22px,16px)}}
+@keyframes up{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
 @media(max-width:880px){
-  .nlinks{display:none}
-  .ntgl{display:flex}
-  .ncta{padding:9px 15px;font-size:.74rem}
-  .hero-grid{grid-template-columns:1fr}
-  .hero-visual{display:none}
-  .why-wrap,.contact-wrap{grid-template-columns:1fr;gap:40px}
-  .visual{min-height:320px}
-}
-@media(max-width:600px){
-  .hero{padding:112px 5% 90px}
-  .btns{flex-direction:column;align-items:stretch}
-  .btns a{justify-content:center;text-align:center}
-  .statwrap{transform:translateY(-30px);margin-bottom:-30px}
+  .nlinks{display:none}.tgl{display:flex}.ncta{padding:9px 15px;font-size:.74rem;white-space:nowrap}
+  .logo{font-size:1.05rem;max-width:44vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 }
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
   .hl>span{transform:none!important}
-  .badge,.hero .lead,.btns,.chips,.hero-visual{opacity:1!important}
-  .reveal,.grid .card,.revs .rev,.statbar .stat{opacity:1!important;transform:none!important}
-  .visual{transform:none!important}
+  .reveal,.clip,.blur,.stagger>*{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important}
 }
-</style>
-<style>body{font-family:'Trebuchet MS',Verdana,sans-serif}
-h1,h2,h3,h4,.logo,.eyebrow,.num,.price,.brand{font-family:'Trebuchet MS','Segoe UI',sans-serif}
-:root{--r:26px}
-.mid{display:flex;flex-direction:column}
-#reviews{order:0}
-#services{order:1}
-#about{order:2}
-.hero-grid{grid-template-columns:1fr}
-.hero-copy{margin:0 auto;text-align:center;max-width:760px}
-.hero .btns,.chips{justify-content:center}
-.hero-visual{display:none}
-.hero{background:radial-gradient(circle at 78% 24%,#f9731644,transparent 52%),linear-gradient(165deg,#0f1f33,#16293f)}
-.card{box-shadow:none;border:1.5px solid #dbe3ec}
-.why-wrap{direction:rtl}.why-wrap>*{direction:ltr}
-.hero-grid{direction:rtl}.hero-grid>*{direction:ltr}</style>
-</head>
-<body>
-<div class="grain" aria-hidden="true"></div>
-<div class="progress" id="mkProg" aria-hidden="true"></div>
-
-<nav id="nav">
-  <div class="logo">Elite <span>Electrical</span></div>
-  <ul class="nlinks">
-    <li><a href="#services">What We Do</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#reviews">Reviews</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <div class="nav-right">
-    <a href="tel:+441494259192" class="ncta">📞 +44 1494 259192</a>
-    <button class="ntgl" id="ntgl" aria-label="Open menu" aria-expanded="false" aria-controls="mmenu"><span></span><span></span><span></span></button>
-  </div>
-</nav>
-<div class="mmenu" id="mmenu">
-  <a href="#services">What We Do</a>
-  <a href="#about">About</a>
-  <a href="#reviews">Reviews</a>
-  <a href="#contact">Contact</a>
-  <a href="tel:+441494259192" class="mcta">Get a Free Quote</a>
-</div>
-
-<header class="hero" id="top">
-  <div class="hero-grid">
-    <div class="hero-copy">
-      <span class="badge"><span class="dot"></span>Electrical Services · High Wycombe</span>
-      <h1><span class="hl"><span>Safe, Certified</span></span><span class="hl"><span><em>Electrics</em></span></span></h1>
-      <p class="lead">Certified electrical work across High Wycombe. Rewires, fuse boards, sockets, lighting and EV chargers — fully tested, fairly priced.</p>
-      <div class="btns">
-        <a href="tel:+441494259192" class="bp">Get a Free Quote →</a>
-        <a href="#services" class="bs">See More</a>
-      </div>
-      <div class="chips"><span class="chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Trusted in High Wycombe</span><span class="chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Friendly local team</span><span class="chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Fair, honest prices</span></div>
-    </div>
-    <div class="hero-visual" aria-hidden="true">
-      <div class="hv-main" data-tilt>
-        <div class="hv-ico">⚡</div>
-        <div class="hv-name">Elite Electrical</div>
-        <div class="hv-line"></div>
-        <div class="hv-sub">Electrical Services</div>
-      </div>
-      <div class="hv-chip hv-c1"><span class="st">★★★★★</span> Loved by locals</div>
-      <div class="hv-chip hv-c2">📍 High Wycombe &amp; nearby</div>
-    </div>
-  </div>
-  <div class="hero-fade" aria-hidden="true"></div>
-</header>
-
-<div class="mqw" aria-hidden="true"><div class="mq"><span>Rewiring</span><i>✦</i><span>Fuse Boards</span><i>✦</i><span>Sockets & Lighting</span><i>✦</i><span>EV Charger Install</span><i>✦</i><span>Fault Finding</span><i>✦</i><span>Certificates</span><i>✦</i><span>Rewiring</span><i>✦</i><span>Fuse Boards</span><i>✦</i><span>Sockets & Lighting</span><i>✦</i><span>EV Charger Install</span><i>✦</i><span>Fault Finding</span><i>✦</i><span>Certificates</span><i>✦</i></div></div>
-
-<div class="statwrap"><div class="statbar"><div class="stat"><div class="num">Free</div><div class="lab">Quotes</div></div><div class="stat"><div class="num">Fully</div><div class="lab">Insured</div></div><div class="stat"><div class="num">Fast</div><div class="lab">Response</div></div><div class="stat"><div class="num"><span data-count="12">12</span>mo</div><div class="lab">Guarantee</div></div></div></div>
-
-<div class="mid">
-<section id="services">
-  <div class="wrap">
-    <div class="reveal">
-      <div class="eyebrow">What We Do</div>
-      <h2>Electrical Services</h2>
-      <p class="sub">Qualified, certified electrical work for homes and businesses.</p>
-    </div>
-    <div class="grid"><div class="card" data-tilt><div class="ico"><span>🔌</span></div><h3>Rewiring</h3><p>Full or partial rewires, done safely.</p></div><div class="card" data-tilt><div class="ico"><span>⚡</span></div><h3>Fuse Boards</h3><p>Consumer unit upgrades and replacements.</p></div><div class="card" data-tilt><div class="ico"><span>💡</span></div><h3>Sockets & Lighting</h3><p>Extra sockets, indoor and outdoor lighting.</p></div><div class="card" data-tilt><div class="ico"><span>🔋</span></div><h3>EV Charger Install</h3><p>Home charge points, professionally fitted.</p></div><div class="card" data-tilt><div class="ico"><span>🔍</span></div><h3>Fault Finding</h3><p>We track down and fix the problem fast.</p></div><div class="card" data-tilt><div class="ico"><span>📋</span></div><h3>Certificates</h3><p>EICR and electrical safety certificates.</p></div></div>
-  </div>
-</section>
-
-<section id="about" class="cream">
-  <div class="wrap why-wrap">
-    <div class="reveal">
-      <div class="eyebrow">Why Elite Electrical</div>
-      <h2>Why Locals Choose Us</h2>
-      <p class="sub">We're proud to serve High Wycombe and the surrounding area — and we work hard to keep it that way.</p>
-      <ul class="whys"><li class="why"><span class="chk"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><div><h4>Fixed Prices, No Surprises</h4><p>We quote upfront and stick to it — you'll never get a shock invoice.</p></div></li><li class="why"><span class="chk"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><div><h4>Fully Insured & Certified</h4><p>Properly qualified, fully insured work you can rely on.</p></div></li><li class="why"><span class="chk"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><div><h4>Fast Local Response</h4><p>We answer the phone and turn up when we say we will.</p></div></li><li class="why"><span class="chk"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><div><h4>Workmanship Guarantee</h4><p>If something's not right, we come back and fix it.</p></div></li></ul>
-    </div>
-    <div class="visual">
-      <span class="vtag">High Wycombe</span>
-      <div class="vq"><div class="st">★★★★★</div><p>"Turned up on time, fair price, tidy work. Exactly what you want from a local trade."</p><small>Mark K. · High Wycombe</small></div>
-    </div>
-  </div>
-</section>
-
-<section id="reviews">
-  <div class="wrap">
-    <div class="reveal">
-      <div class="eyebrow">Reviews</div>
-      <h2>What People Say</h2>
-      <p class="sub">Real words from happy customers across High Wycombe and beyond.</p>
-    </div>
-    <div class="revs"><div class="rev"><div class="stars">★★★★★</div><p>"Turned up on time, fair price, tidy work. Exactly what you want from a local trade."</p><div class="auth"><div class="ava">MK</div><div><div class="an">Mark K.</div><div class="al">High Wycombe</div></div></div></div><div class="rev"><div class="stars">★★★★★</div><p>"Called in a panic and they came straight out. Sorted it fast and didn't overcharge. Lifesavers."</p><div class="auth"><div class="ava">LP</div><div><div class="an">Lisa P.</div><div class="al">Marlow</div></div></div></div><div class="rev"><div class="stars">★★★★★</div><p>"Quoted upfront and stuck to it. Honest, reliable and a quality job. Highly recommend."</p><div class="auth"><div class="ava">SR</div><div><div class="an">Steve R.</div><div class="al">Beaconsfield</div></div></div></div></div>
-  </div>
-</section>
-</div>
-
-<section class="band">
-  <div class="wrap reveal">
-    <div class="eyebrow" style="color:var(--a2)">Ready when you are</div>
-    <h2>Get a Free Quote Today</h2>
-    <p>Friendly, local and easy to reach — Elite Electrical is here for High Wycombe. Get in touch and we'll take care of the rest.</p>
-    <a href="tel:+441494259192" class="bw">📞 +44 1494 259192</a>
-  </div>
-</section>
-
-<section id="contact" class="cream">
-  <div class="wrap contact-wrap">
-    <div class="reveal">
-      <div class="eyebrow">Get In Touch</div>
-      <h2>Get a Free Quote</h2>
-      <p class="sub">We'd love to hear from you. Call us or drop a message and we'll get straight back to you.</p>
-      <div class="cinfo">
-        <div class="crow"><span class="ci"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><div><div class="cl">Phone</div><div class="cv">+44 1494 259192</div></div></div>
-        <div class="crow"><span class="ci"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><div><div class="cl">Area</div><div class="cv">High Wycombe &amp; surrounding areas</div></div></div>
-        <div class="crow"><span class="ci"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><div class="cl">Hours</div><div class="cv">Open 6 days a week</div></div></div>
-      </div>
-    </div>
-    <form class="reveal" onsubmit="return false">
-      <input type="text" placeholder="Your name" aria-label="Your name">
-      <input type="tel" placeholder="Phone number" aria-label="Phone number">
-      <input type="email" placeholder="Email address" aria-label="Email address">
-      <textarea rows="4" placeholder="How can we help?" aria-label="Message"></textarea>
-      <button class="fsub" type="submit">Send Message →</button>
-    </form>
-  </div>
-</section>
-
-<footer>
-  <div class="fn">Elite <span>Electrical</span></div>
-  <div>Electrical Services · High Wycombe · +44 1494 259192</div>
-  <p class="concept">This is a free design concept created by <b>HW Web Design</b> to show Elite Electrical
-    what a modern website could look like. Sample text, prices and reviews are for illustration only.
-    Like it? Let's make it real — hwwebdesign.co.uk</p>
-</footer>
-
-<a class="flag" href="https://hwwebdesign.co.uk" target="_blank" rel="noopener">✦ Concept by <b>HW Web Design</b> — <span>let's build yours</span></a>
-
+.badge{display:inline-flex;align-items:center;gap:9px;padding:8px 17px;border-radius:999px;font-size:.8rem;font-weight:700;letter-spacing:.04em;margin-bottom:24px}.badge .dot{width:7px;height:7px;border-radius:50%}.chip{display:inline-flex;align-items:center;gap:6px}.fsub{border:none;cursor:pointer;justify-content:center}
+.t-momentum{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0d14;color:#fff}
+.t-momentum h1,.t-momentum h2,.t-momentum h3,.t-momentum .m-num,.t-momentum .num{font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;text-transform:uppercase;letter-spacing:0}
+.t-momentum section{background:#0a0d14}
+.t-momentum h2{color:#fff}.t-momentum .sub{color:rgba(255,255,255,.6)}
+.t-momentum nav.solid{background:rgba(10,13,20,.85);border-bottom:1px solid rgba(255,255,255,.08)}
+.m-hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:120px 6% 0;position:relative;overflow:hidden;background:radial-gradient(70% 60% at 75% 15%,color-mix(in srgb,var(--a) 24%,transparent),transparent 60%),#0a0d14}
+.m-hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(115deg,transparent 0 38px,rgba(255,255,255,.025) 38px 39px);pointer-events:none}
+.m-in{max-width:1180px;margin:0 auto;width:100%;position:relative;padding-bottom:56px}
+.m-eye{display:inline-block;font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;color:var(--a);font-weight:800;margin-bottom:22px}
+.m-hero h1{font-size:clamp(3rem,1.4rem + 9vw,7rem);font-weight:800;line-height:.92;color:#fff;margin-bottom:22px}
+.m-hero .lead{font-size:clamp(1.05rem,1rem + .4vw,1.25rem);color:rgba(255,255,255,.66);max-width:34em;margin-bottom:30px}
+.m-hero .btns{display:flex;gap:14px;flex-wrap:wrap}
+.m-tel{display:inline-flex;align-items:center;padding:16px 26px;border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font-weight:700;will-change:transform}
+.m-strip{border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);padding:18px 0;overflow:hidden;background:rgba(255,255,255,.02)}
+.m-strip .mq{display:flex;gap:34px;width:max-content;animation:mq 26s linear infinite}
+.m-strip .mq span{color:#fff;font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:1rem;white-space:nowrap}
+.m-strip .mq i{color:var(--a);font-style:normal}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.m-stats .statbar{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:rgba(255,255,255,.08);border-radius:16px;overflow:hidden}
+.m-stats .stat{background:#0d111a;text-align:center;padding:30px 16px}
+.m-stats .num{font-size:2.4rem;font-weight:800;color:var(--a)}
+.m-stats .lab{font-size:.82rem;color:rgba(255,255,255,.55);margin-top:4px;text-transform:uppercase;letter-spacing:.08em}
+.m-list{display:flex;flex-direction:column;margin-top:16px}
+.m-row{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:26px;align-items:center;padding:28px 24px;border-top:1px solid rgba(255,255,255,.1);overflow:hidden;transition:background .3s}
+.m-row:last-child{border-bottom:1px solid rgba(255,255,255,.1)}
+.m-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--a);transform:scaleY(0);transform-origin:bottom;transition:transform .35s var(--ease)}
+.m-row:hover{background:rgba(255,255,255,.03)}.m-row:hover::before{transform:scaleY(1)}
+.m-num{font-size:1.5rem;font-weight:800;color:rgba(255,255,255,.3)}
+.m-rc h3{font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:2px}
+.m-rc p{color:rgba(255,255,255,.55);font-size:.96rem}
+.m-arrow{font-size:1.4rem;color:var(--a);opacity:0;transform:translateX(-8px);transition:opacity .3s,transform .3s var(--ease)}
+.m-row:hover .m-arrow{opacity:1;transform:none}
+.m-awrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.m-about h2{font-size:clamp(2rem,1.2rem + 3.4vw,3.4rem);line-height:1}
+.m-whys{list-style:none;display:flex;flex-direction:column;gap:16px;margin-top:20px}
+.m-whys li{display:flex;gap:12px;color:rgba(255,255,255,.72)}
+.m-whys .chk{flex-shrink:0;width:26px;height:26px;border-radius:6px;background:var(--a);color:#0a0d14;display:grid;place-items:center;font-weight:900;font-size:.8rem}
+.m-whys h4{color:#fff;font-size:1rem;font-weight:800;margin-bottom:1px;text-transform:none}
+.m-big{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.m-bc{border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:26px;background:rgba(255,255,255,.02)}
+.m-bc .num{font-size:2.6rem;font-weight:800;color:var(--a);line-height:1}
+.m-bc .lab{color:rgba(255,255,255,.55);font-size:.85rem;margin-top:6px;text-transform:uppercase;letter-spacing:.06em}
+.m-scroll{display:flex;gap:20px;overflow-x:auto;padding-bottom:14px;scroll-snap-type:x mandatory}
+.m-scroll .rev{scroll-snap-align:start;flex:0 0 320px;background:#0d111a;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:26px}
+.m-scroll .stars{color:var(--a);letter-spacing:2px;margin-bottom:12px}
+.m-scroll .rev p{color:rgba(255,255,255,.78);font-style:italic;margin-bottom:16px}
+.m-scroll .auth{display:flex;align-items:center;gap:12px}
+.m-scroll .ava{width:42px;height:42px;border-radius:50%;background:linear-gradient(140deg,var(--a),var(--a2));color:#0a0d14;display:grid;place-items:center;font-weight:800;font-size:.82rem}
+.m-scroll .an{color:#fff;font-weight:750;font-size:.9rem}.m-scroll .al{color:rgba(255,255,255,.5);font-size:.76rem}
+.t-momentum .m-band{text-align:center;background:var(--a);color:#0a0d14}
+.m-band h2{color:#0a0d14;font-size:clamp(2.2rem,1.4rem + 4vw,4rem)}
+.m-band .eyebrow{color:#0a0d14;justify-content:center}.m-band .eyebrow::before{background:#0a0d14}
+.m-band p{color:rgba(10,13,20,.8);max-width:32em;margin:0 auto 26px;font-weight:600}
+.m-band .bw{background:#0a0d14;color:#fff}
+.t-momentum .contact{background:#0a0d14}
+.t-momentum .cwrap{display:grid;grid-template-columns:1fr 1.05fr;gap:56px}
+.t-momentum .cinfo{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.t-momentum .crow{display:flex;gap:14px;align-items:center;background:#0d111a;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px 18px}
+.t-momentum .ci{font-size:20px}
+.t-momentum .cl{color:rgba(255,255,255,.5);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.t-momentum .cv{color:#fff;font-weight:800}
+.t-momentum form{display:flex;flex-direction:column;gap:14px;background:#0d111a;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:30px}
+.t-momentum input,.t-momentum textarea{background:#0a0d14;border:1px solid rgba(255,255,255,.14);color:#fff;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:.96rem}
+.t-momentum input::placeholder,.t-momentum textarea::placeholder{color:rgba(255,255,255,.4)}
+.t-momentum input:focus,.t-momentum textarea:focus{outline:none;border-color:var(--a)}
+.t-momentum footer{background:#070a10}
+@media(max-width:880px){.m-awrap,.t-momentum .cwrap{grid-template-columns:1fr;gap:40px}.m-row{grid-template-columns:auto 1fr;gap:16px}.m-arrow{display:none}}
+</style></head><body class="t-momentum"><div class="grain" aria-hidden="true"></div><div class="prog" id="prog" aria-hidden="true"></div><nav id="nav"><div class="logo">Elite <span>Electrical</span></div><ul class="nlinks"><li><a href="#services">What We Do</a></li><li><a href="#about">About</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#contact">Contact</a></li></ul><div class="nav-right"><a href="tel:+441494259192" class="ncta">📞 +44 1494 259192</a><button class="tgl" id="tgl" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button></div></nav><div class="mm" id="mm"><a href="#services">What We Do</a><a href="#about">About</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a><a href="tel:+441494259192" class="mcta">Get a Free Quote</a></div><header class="hero m-hero" id="top"><div class="m-in"><span class="m-eye">Electrical Services / High Wycombe</span><h1><span class="hl"><span>Safe, Certified </span></span><span class="hl"><span><em>Electrics</em></span></span></h1><p class="lead">Certified electrical work across High Wycombe. Rewires, fuse boards, sockets, lighting and EV chargers — fully tested, fairly priced.</p><div class="btns"><a href="tel:+441494259192" class="bp">Get a Free Quote →</a><a href="tel:+441494259192" class="m-tel" data-mag>📞 +44 1494 259192</a></div></div><div class="m-strip" aria-hidden="true"><div class="mq"><span>Rewiring</span><i>/</i><span>Fuse Boards</span><i>/</i><span>Sockets &amp; Lighting</span><i>/</i><span>EV Charger Install</span><i>/</i><span>Fault Finding</span><i>/</i><span>Certificates</span><i>/</i><span>Rewiring</span><i>/</i><span>Fuse Boards</span><i>/</i><span>Sockets &amp; Lighting</span><i>/</i><span>EV Charger Install</span><i>/</i><span>Fault Finding</span><i>/</i><span>Certificates</span><i>/</i></div></div></header><section class="m-stats"><div class="wrap statbar stagger count-wrap"><div class="stat"><div class="num">Free</div><div class="lab">Quotes</div></div><div class="stat"><div class="num">Fully</div><div class="lab">Insured</div></div><div class="stat"><div class="num">Fast</div><div class="lab">Response</div></div><div class="stat"><div class="num"><span data-count="12">12</span>mo</div><div class="lab">Guarantee</div></div></div></section><section id="services" class="m-serv"><div class="wrap"><div class="reveal"><div class="eyebrow">What We Do</div><h2>Electrical Services</h2><p class="sub">Qualified, certified electrical work for homes and businesses.</p></div><div class="m-list"><div class="m-row reveal"><span class="m-num">01</span><div class="m-rc"><h3>Rewiring</h3><p>Full or partial rewires, done safely.</p></div><span class="m-arrow">→</span></div><div class="m-row reveal"><span class="m-num">02</span><div class="m-rc"><h3>Fuse Boards</h3><p>Consumer unit upgrades and replacements.</p></div><span class="m-arrow">→</span></div><div class="m-row reveal"><span class="m-num">03</span><div class="m-rc"><h3>Sockets &amp; Lighting</h3><p>Extra sockets, indoor and outdoor lighting.</p></div><span class="m-arrow">→</span></div><div class="m-row reveal"><span class="m-num">04</span><div class="m-rc"><h3>EV Charger Install</h3><p>Home charge points, professionally fitted.</p></div><span class="m-arrow">→</span></div><div class="m-row reveal"><span class="m-num">05</span><div class="m-rc"><h3>Fault Finding</h3><p>We track down and fix the problem fast.</p></div><span class="m-arrow">→</span></div><div class="m-row reveal"><span class="m-num">06</span><div class="m-rc"><h3>Certificates</h3><p>EICR and electrical safety certificates.</p></div><span class="m-arrow">→</span></div></div></div></section><section id="about" class="m-about"><div class="m-awrap"><div class="reveal"><div class="eyebrow">Why Elite Electrical</div><h2>Built on doing it right</h2><ul class="m-whys"><li><span class="chk">✓</span><div><h4>Fixed Prices, No Surprises</h4><p>We quote upfront and stick to it — you'll never get a shock invoice.</p></div></li><li><span class="chk">✓</span><div><h4>Fully Insured &amp; Certified</h4><p>Properly qualified, fully insured work you can rely on.</p></div></li><li><span class="chk">✓</span><div><h4>Fast Local Response</h4><p>We answer the phone and turn up when we say we will.</p></div></li><li><span class="chk">✓</span><div><h4>Workmanship Guarantee</h4><p>If something's not right, we come back and fix it.</p></div></li></ul></div><div class="reveal"><div class="m-big count-wrap"><div class="m-bc"><div class="num">Free</div><div class="lab">Quotes</div></div><div class="m-bc"><div class="num">Fully</div><div class="lab">Insured</div></div><div class="m-bc"><div class="num">Fast</div><div class="lab">Response</div></div><div class="m-bc"><div class="num"><span data-count="12">12</span>mo</div><div class="lab">Guarantee</div></div></div></div></div></section><section id="reviews" class="m-rev"><div class="wrap"><div class="reveal"><div class="eyebrow">Reviews</div><h2>The verdict</h2></div><div class="m-scroll"><div class="rev"><div class="stars">★★★★★</div><p>"Turned up on time, fair price, tidy work. Exactly what you want from a local trade."</p><div class="auth"><div class="ava">MK</div><div><div class="an">Mark K.</div><div class="al">High Wycombe</div></div></div></div><div class="rev"><div class="stars">★★★★★</div><p>"Called in a panic and they came straight out. Sorted it fast and didn't overcharge. Lifesavers."</p><div class="auth"><div class="ava">LP</div><div><div class="an">Lisa P.</div><div class="al">Marlow</div></div></div></div><div class="rev"><div class="stars">★★★★★</div><p>"Quoted upfront and stuck to it. Honest, reliable and a quality job. Highly recommend."</p><div class="auth"><div class="ava">SR</div><div><div class="an">Steve R.</div><div class="al">Beaconsfield</div></div></div></div></div></div></section><section class="band m-band"><div class="wrap reveal"><div class="eyebrow">Ready when you are</div><h2>Get a Free Quote</h2><p>Elite Electrical — here for High Wycombe and ready when you are.</p><a href="tel:+441494259192" class="bw">📞 +44 1494 259192</a></div></section><section id="contact" class="contact"><div class="wrap cwrap"><div class="reveal"><div class="eyebrow">Get in touch</div><h2>Get a Free Quote</h2><p class="sub">We'd love to hear from you. Call or drop a message and we'll get straight back.</p><div class="cinfo"><div class="crow"><span class="ci">📞</span><div><div class="cl">Phone</div><div class="cv">+44 1494 259192</div></div></div><div class="crow"><span class="ci">📍</span><div><div class="cl">Area</div><div class="cv">High Wycombe &amp; nearby</div></div></div><div class="crow"><span class="ci">🕒</span><div><div class="cl">Hours</div><div class="cv">Open 6 days a week</div></div></div></div></div><form class="reveal" onsubmit="return false"><input type="text" placeholder="Your name" aria-label="Your name"><input type="tel" placeholder="Phone number" aria-label="Phone number"><input type="email" placeholder="Email address" aria-label="Email address"><textarea rows="4" placeholder="How can we help?" aria-label="Message"></textarea><button class="fsub bp" type="submit">Send message →</button></form></div></section><footer><div class="fn">Elite <span>Electrical</span></div><div>Electrical Services · High Wycombe · +44 1494 259192</div><p class="concept">This is a free design concept created by <b>HW Web Design</b> to show Elite Electrical what a modern website could look like. Sample text, prices and reviews are for illustration only. Like it? Let's make it real — hwwebdesign.co.uk</p></footer><a class="flag" href="https://hwwebdesign.co.uk" target="_blank" rel="noopener">✦ Concept by <b>HW Web Design</b></a>
 <script>
 (function(){
   "use strict";
-  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var fine=window.matchMedia("(pointer: fine)").matches;
-  var nav=document.getElementById('nav'),prog=document.getElementById('mkProg'),ticking=false;
+  var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fine=matchMedia("(pointer: fine)").matches;
+  var nav=document.getElementById('nav'),prog=document.getElementById('prog'),t=false;
   function onScroll(){
-    if(ticking)return;ticking=true;
+    if(t)return;t=true;
     requestAnimationFrame(function(){
-      var y=window.scrollY||0;
-      nav.classList.toggle('solid',y>40);
-      if(prog){var h=document.documentElement.scrollHeight-window.innerHeight;
-        prog.style.width=(h>0?(y/h*100):0)+'%';}
-      ticking=false;
+      var y=scrollY||0;
+      if(nav)nav.classList.toggle('solid',y>40);
+      if(prog){var h=document.documentElement.scrollHeight-innerHeight;prog.style.width=(h>0?(y/h*100):0)+'%';}
+      t=false;
     });
   }
   addEventListener('scroll',onScroll,{passive:true});onScroll();
 
-  var tgl=document.getElementById('ntgl'),mm=document.getElementById('mmenu');
-  if(tgl&&mm){
-    tgl.addEventListener('click',function(){
-      var open=mm.classList.toggle('open');tgl.classList.toggle('open',open);
-      tgl.setAttribute('aria-expanded',open);
+  var tg=document.getElementById('tgl'),mm=document.getElementById('mm');
+  if(tg&&mm){
+    tg.addEventListener('click',function(){
+      var o=mm.classList.toggle('open');tg.classList.toggle('open',o);tg.setAttribute('aria-expanded',o);
     });
     mm.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){
-      mm.classList.remove('open');tgl.classList.remove('open');tgl.setAttribute('aria-expanded','false');
+      mm.classList.remove('open');tg.classList.remove('open');tg.setAttribute('aria-expanded','false');
     });});
   }
 
+  function count(el){
+    if(el.dataset.done)return;el.dataset.done=1;
+    var target=parseInt(el.dataset.count,10);
+    if(reduce||!target){el.textContent=el.dataset.count;return;}
+    var s=null;
+    function step(ts){
+      if(!s)s=ts;var p=Math.min((ts-s)/1200,1);
+      el.textContent=Math.round(target*(1-Math.pow(1-p,3)));
+      if(p<1)requestAnimationFrame(step);else el.textContent=el.dataset.count;
+    }
+    requestAnimationFrame(step);
+  }
   var io=new IntersectionObserver(function(es){
     es.forEach(function(e){
       if(!e.isIntersecting)return;
@@ -406,46 +193,33 @@ h1,h2,h3,h4,.logo,.eyebrow,.num,.price,.brand{font-family:'Trebuchet MS','Segoe 
       e.target.querySelectorAll('[data-count]').forEach(count);
       io.unobserve(e.target);
     });
-  },{threshold:.1,rootMargin:'0px 0px -6% 0px'});
-  document.querySelectorAll('.reveal,.grid,.revs,.statbar,.visual').forEach(function(el){io.observe(el);});
+  },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.reveal,.clip,.blur,.stagger,.statbar,.panel,.count-wrap').forEach(function(el){io.observe(el);});
 
-  function count(el){
-    if(el.dataset.done)return;el.dataset.done=1;
-    var t=parseInt(el.dataset.count,10);
-    if(reduce||!t){el.textContent=el.dataset.count;return;}
-    var t0=null;
-    function step(ts){
-      if(!t0)t0=ts;
-      var p=Math.min((ts-t0)/1100,1);
-      el.textContent=Math.round(t*(1-Math.pow(1-p,3)));
-      if(p<1)requestAnimationFrame(step);else el.textContent=el.dataset.count;
-    }
-    requestAnimationFrame(step);
+  // rotating pull-quote (atelier)
+  var rot=document.querySelector('.qrot');
+  if(rot&&!reduce){
+    var qs=rot.querySelectorAll('.q'),i=0;
+    if(qs.length>1)setInterval(function(){qs[i].classList.remove('on');i=(i+1)%qs.length;qs[i].classList.add('on');},4200);
   }
 
   if(fine&&!reduce){
-    document.querySelectorAll('.bp,.bw,.ncta').forEach(function(b){
+    document.querySelectorAll('.bp,.bw,.ncta,[data-mag]').forEach(function(b){
       b.addEventListener('mousemove',function(e){
         var r=b.getBoundingClientRect();
-        b.style.transform='translate('+((e.clientX-r.left-r.width/2)*.22)+'px,'+((e.clientY-r.top-r.height/2)*.34)+'px)';
+        b.style.transform='translate('+((e.clientX-r.left-r.width/2)*.2)+'px,'+((e.clientY-r.top-r.height/2)*.3)+'px)';
       });
       b.addEventListener('mouseleave',function(){b.style.transform='';});
     });
     document.querySelectorAll('[data-tilt]').forEach(function(c){
       c.addEventListener('mousemove',function(e){
-        var r=c.getBoundingClientRect(),
-            px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
-        c.style.setProperty('--ry',((px-.5)*7)+'deg');
-        c.style.setProperty('--rx',((.5-py)*5)+'deg');
-        c.style.setProperty('--mx',(px*100)+'%');
-        c.style.setProperty('--my',(py*100)+'%');
+        var r=c.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+        c.style.setProperty('--ry',((px-.5)*7)+'deg');c.style.setProperty('--rx',((.5-py)*5)+'deg');
+        c.style.setProperty('--mx',(px*100)+'%');c.style.setProperty('--my',(py*100)+'%');
       });
-      c.addEventListener('mouseleave',function(){
-        c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg');
-      });
+      c.addEventListener('mouseleave',function(){c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg');});
     });
   }
 })();
 </script>
-</body>
-</html>
+</body></html>

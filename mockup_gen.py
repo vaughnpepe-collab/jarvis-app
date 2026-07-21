@@ -1,27 +1,31 @@
 #!/usr/bin/env python3
 """
-HW Web Design — Free Mockup Generator (premium engine).
+HW Web Design — Free Mockup Generator (multi-architecture engine).
 
-Reads the leads CSV and builds a cinematic, personalised single-page website
-mockup for each top callable lead (business name, town and phone baked in),
-plus a gallery index. These are your closing tool: "I built you a sample —
-have a look." They deploy with the repo, so each lead's mockup is live at
+Reads the leads CSV and builds a personalised single-page website mockup for
+each top callable lead (business name, town and phone baked in), plus a gallery
+index. These are the closing tool: "I built you a sample — have a look." They
+deploy with the repo, so each lead's mockup is live at
   https://hwwebdesign.co.uk/mockups/<slug>/
 once pushed to main.
 
-The presentation layer matches the standard of hwwebdesign.co.uk and the
-/demos/ showcases: glass nav + mobile menu, staggered line-mask hero reveal,
-atmosphere layers (glow + grain), services marquee, 3D-tilt cards with cursor
-glow, count-up stats, magnetic CTAs, scroll reveals, reduced-motion fallbacks.
-Every business still gets a deterministic variant (type, shape, hero, order)
-so no two mockups feel template-stamped.
+Unlike a single template with colour swaps, every mockup is rendered through one
+of FOUR genuinely different site architectures, chosen deterministically from the
+business name + niche so no two feel template-stamped:
+
+  · STAGE     cinematic centred hero, dark→light, service-card grid
+  · ATELIER   cream editorial, serif display, split hero, zig-zag rows, pull-quote
+  · MOMENTUM  full-dark kinetic, condensed caps, poster hero, bold service list
+  · BLOOM     warm soft boutique, rounded floating nav, card-cluster hero, tiles
+
+Each has its own theme, type, hero, section rhythm, navigation and motion.
 
 Usage:
     python mockup_gen.py                      # uses the default area CSV
     python mockup_gen.py leads/leads_x.csv    # any sweep CSV
 
-Sample content (reviews, prices, stats) is illustrative and clearly labelled
-as a design concept on every page.
+Sample content (reviews, prices, stats) is illustrative and clearly labelled as
+a design concept on every page.
 """
 import csv
 import hashlib
@@ -301,89 +305,34 @@ NEARBY = ["High Wycombe", "Marlow", "Beaconsfield", "Amersham"]
 # Hand-built one-off mockups that must NEVER be overwritten by the generator.
 BESPOKE_SLUGS = {"detail-kings-high-wycombe"}
 
-# ---------------------------------------------------------------- variants
-# Each business gets a deterministic-but-unique combination so no two mockups
-# feel template-stamped: typography, shape language, hero treatment, card
-# style, section order and visual side all vary by a hash of the name.
-V_HFONT = ["Georgia,'Times New Roman',serif",
-           "'Segoe UI',system-ui,-apple-system,sans-serif",
-           "'Trebuchet MS','Segoe UI',sans-serif",
-           "'Palatino Linotype','Book Antiqua',Georgia,serif",
-           "Verdana,Geneva,sans-serif"]
-V_BFONT = ["'Segoe UI',system-ui,-apple-system,sans-serif",
-           "Georgia,serif",
-           "'Trebuchet MS',Verdana,sans-serif"]
-V_RAD = ["4px", "12px", "18px", "26px"]
-V_HALIGN = ["left", "center"]
-V_HBG = ["grad", "mesh", "spot", "duo"]
-V_CARD = ["elevated", "bordered", "tinted"]
-V_ORDER = [("services", "about", "reviews"),
-           ("about", "services", "reviews"),
-           ("reviews", "services", "about"),
-           ("services", "reviews", "about")]
-V_VIS = ["right", "left"]
+# ---------------------------------------------------------------- architecture pick
+# Each niche maps to a shortlist of suitable architectures; the business name
+# hash chooses within it, so pages vary even within one niche.
+CANDIDATES = {
+    "restaurant": ["stage", "bloom"], "cafe": ["bloom", "stage"], "bakery": ["bloom", "atelier"],
+    "salon": ["atelier", "bloom"], "dentist": ["atelier", "stage"], "vet": ["stage", "atelier"],
+    "plumber": ["momentum", "stage"], "electrician": ["momentum", "stage"], "roofer": ["momentum", "stage"],
+    "gym": ["momentum", "stage"], "accountant": ["atelier", "stage"], "garage": ["momentum", "stage"],
+    "estate agent": ["atelier", "stage"], "optician": ["atelier", "stage"], "detailing": ["momentum", "stage"],
+}
 
 
-def _pick(seed, opts, salt):
-    h = int(hashlib.md5((seed + salt).encode()).hexdigest(), 16)
-    return opts[h % len(opts)]
+def pick_arch(name, town, niche):
+    cands = CANDIDATES.get(niche, ["stage", "bloom"])
+    h = int(hashlib.md5((name + "|" + town + "|arch").encode()).hexdigest(), 16)
+    return cands[h % len(cands)]
 
 
-def variant(name, town):
-    s = name + "|" + town
-    return {"hfont": _pick(s, V_HFONT, "hf"), "bfont": _pick(s, V_BFONT, "bf"),
-            "rad": _pick(s, V_RAD, "rd"), "halign": _pick(s, V_HALIGN, "ha"),
-            "hbg": _pick(s, V_HBG, "hb"), "card": _pick(s, V_CARD, "cd"),
-            "order": _pick(s, V_ORDER, "or"), "vis": _pick(s, V_VIS, "vs")}
-
-
-def build_variant_css(v, a):
-    """Plain-CSS overrides (concatenated to avoid f-string brace escaping)."""
-    hero = [x.strip() for x in a["hero"].split(",")]
-    h0, h1, h2 = hero[0], hero[1], hero[2]
-    p, pd, ac, bd, cr = a["primary"], a["dark"], a["accent"], a["border"], a["cream"]
-    o = []
-    o.append("body{font-family:" + v["bfont"] + "}")
-    o.append("h1,h2,h3,h4,.logo,.eyebrow,.num,.price,.brand{font-family:" + v["hfont"] + "}")
-    o.append(":root{--r:" + v["rad"] + "}")
-    o.append(".mid{display:flex;flex-direction:column}")
-    om = {"services": "#services", "about": "#about", "reviews": "#reviews"}
-    for i, k in enumerate(v["order"]):
-        o.append(om[k] + "{order:" + str(i) + "}")
-    if v["halign"] == "center":
-        o.append(".hero-grid{grid-template-columns:1fr}")
-        o.append(".hero-copy{margin:0 auto;text-align:center;max-width:760px}")
-        o.append(".hero .btns,.chips{justify-content:center}")
-        o.append(".hero-visual{display:none}")
-    if v["hbg"] == "mesh":
-        o.append(".hero{background-color:" + h2 + ";background-image:radial-gradient("
-                 "rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(135deg,"
-                 + h0 + "," + h1 + "," + h2 + ");background-size:26px 26px,cover}")
-    elif v["hbg"] == "spot":
-        o.append(".hero{background:radial-gradient(circle at 78% 24%," + ac
-                 + "44,transparent 52%),linear-gradient(165deg," + h0 + "," + h2 + ")}")
-    elif v["hbg"] == "duo":
-        o.append(".hero{background:linear-gradient(115deg," + p + " 0%," + pd
-                 + " 55%,#07080e 100%)}")
-    if v["card"] == "bordered":
-        o.append(".card{box-shadow:none;border:1.5px solid " + bd + "}")
-    elif v["card"] == "tinted":
-        o.append(".card{background:" + cr + ";border-color:transparent}")
-    else:
-        o.append(".card{box-shadow:0 14px 34px rgba(2,6,23,.08);border-color:transparent}")
-    if v["vis"] == "left":
-        o.append(".why-wrap{direction:rtl}.why-wrap>*{direction:ltr}")
-        o.append(".hero-grid{direction:rtl}.hero-grid>*{direction:ltr}")
-    return "\n".join(o)
+# ---------------------------------------------------------------- helpers
+def esc(s):
+    return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
 
 def tel(phone):
-    digits = "".join(c for c in (phone or "") if c.isdigit() or c == "+")
-    return digits or ""
+    return "".join(c for c in (phone or "") if c.isdigit() or c == "+")
 
 
 def _count_num(s):
-    """Leading integer of a stat like '12mo'/'4.9★' -> (prefixable int, suffix) or None."""
     digits = ""
     for ch in s:
         if ch.isdigit():
@@ -395,503 +344,771 @@ def _count_num(s):
     return None
 
 
-def render(biz):
-    name, niche, town = biz["name"], biz["niche"], biz["town"]
-    n = NICHE.get(niche, NICHE["restaurant"])
-    a = ARCH[n["arch"]]
-    v = variant(name, town)
-    vcss = build_variant_css(v, a)
-    phone = biz.get("phone") or ""
-    href = f"tel:{tel(phone)}" if phone else "#contact"
-    fmt = lambda s: s.format(town=town)
-    hero_cols = a["hero"].split(",")
+def _vars(a):
+    h = [x.strip() for x in a["hero"].split(",")]
+    return (":root{"
+            "--p:" + a["primary"] + ";--pd:" + a["dark"] + ";--a:" + a["accent"] +
+            ";--a2:" + a["accent2"] + ";--tx:" + a["text"] + ";--g:" + a["grey"] +
+            ";--bd:" + a["border"] + ";--cr:" + a["cream"] +
+            ";--h0:" + h[0] + ";--h1:" + h[1] + ";--h2:" + h[2] +
+            ";--ease:cubic-bezier(.16,1,.3,1)}")
 
-    parts = name.split()
-    logo = (" ".join(parts[:-1]) + f' <span>{parts[-1]}</span>') if len(parts) > 1 else f'<span>{name}</span>'
 
-    # split headline at the accent <span> for the line-mask stagger
-    head = fmt(n["head"])
+def _logo(name):
+    parts = esc(name).split()
+    if len(parts) > 1:
+        return " ".join(parts[:-1]) + ' <span>' + parts[-1] + "</span>"
+    return "<span>" + esc(name) + "</span>"
+
+
+def _headline(head, town):
+    """Split head at its <span> accent into line-mask spans."""
+    head = head.format(town=town)
     if "<span>" in head:
         pre, rest = head.split("<span>", 1)
         acc, post = rest.split("</span>", 1)
-        lines = []
+        out = ""
         if pre.strip():
-            lines.append(f'<span class="hl"><span>{pre.strip()}</span></span>')
-        lines.append(f'<span class="hl"><span><em>{acc}</em>{post}</span></span>')
-        h1 = "".join(lines)
-    else:
-        h1 = f'<span class="hl"><span>{head}</span></span>'
+            out += '<span class="hl"><span>' + esc(pre.strip()) + " </span></span>"
+        out += '<span class="hl"><span><em>' + esc(acc) + "</em>" + esc(post) + "</span></span>"
+        return out
+    return '<span class="hl"><span>' + esc(head) + "</span></span>"
 
-    stats = ""
+
+def _stats_html(a):
+    out = ""
     for num, lab in a["stats"]:
         c = _count_num(num)
-        if c:
-            stats += (f'<div class="stat"><div class="num"><span data-count="{c[0]}">{c[0]}</span>'
-                      f'{c[1]}</div><div class="lab">{lab}</div></div>')
-        else:
-            stats += f'<div class="stat"><div class="num">{num}</div><div class="lab">{lab}</div></div>'
+        inner = ('<span data-count="' + c[0] + '">' + c[0] + "</span>" + c[1]) if c else esc(num)
+        out += '<div class="stat"><div class="num">' + inner + '</div><div class="lab">' + esc(lab) + "</div></div>"
+    return out
 
-    services = "".join(
-        f'<div class="card" data-tilt><div class="ico"><span>{s["icon"]}</span></div>'
-        f'<h3>{fmt(s["title"])}</h3><p>{fmt(s["desc"])}</p>'
-        + (f'<div class="price">{s["price"]}</div>' if s["price"] else "")
-        + "</div>" for s in n["services"])
 
-    mq_items = "".join(f'<span>{fmt(s["title"])}</span><i>✦</i>' for s in n["services"])
-
-    why = "".join(
-        '<li class="why"><span class="chk"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>'
-        f'<div><h4>{h}</h4><p>{p}</p></div></li>' for h, p in a["why"])
-
+def _reviews_list(n, town):
     rev_towns = [town] + [t for t in NEARBY if t != town]
-    reviews = "".join(
-        f'<div class="rev"><div class="stars">★★★★★</div><p>"{txt}"</p>'
-        f'<div class="auth"><div class="ava">{nm.split()[0][0]}{nm.split()[-1][0]}</div>'
-        f'<div><div class="an">{nm}</div><div class="al">{rev_towns[i % len(rev_towns)]}</div></div></div></div>'
-        for i, (txt, nm) in enumerate(REVIEWS[n["arch"]]))
-    quote_txt, quote_nm = REVIEWS[n["arch"]][0]
+    items = []
+    for i, (txt, nm) in enumerate(REVIEWS[n["arch"]]):
+        initials = nm.split()[0][0] + nm.split()[-1][0]
+        items.append(dict(txt=txt, nm=nm, initials=initials, place=rev_towns[i % len(rev_towns)]))
+    return items
 
-    chips = "".join(f'<span class="chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>{c}</span>'
-                    for c in [f"Trusted in {town}", "Friendly local team", "Fair, honest prices"])
 
-    return f"""<!DOCTYPE html>
-<html lang="en-GB">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="{name} — {fmt(n['badge'])} in {town}. {fmt(n['sub'])}">
-<meta name="robots" content="noindex">
-<title>{name} | {fmt(n['badge'])} in {town}</title>
-<style>
-*,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
-html{{scroll-behavior:smooth}}
-:root{{--p:{a['primary']};--pd:{a['dark']};--a:{a['accent']};--a2:{a['accent2']};--tx:{a['text']};--g:{a['grey']};--bd:{a['border']};--cr:{a['cream']};--r:14px;
---ease:cubic-bezier(.16,1,.3,1)}}
-body{{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--tx);line-height:1.65;background:#fff;overflow-x:hidden;-webkit-font-smoothing:antialiased}}
-a{{text-decoration:none;color:inherit}}
-h1,h2,h3,h4{{text-wrap:balance}}
-:focus-visible{{outline:3px solid var(--a2);outline-offset:3px;border-radius:6px}}
-.grain{{position:fixed;inset:-60px;z-index:5;pointer-events:none;opacity:.28;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E")}}
-.progress{{position:fixed;top:0;left:0;height:2.5px;width:0;z-index:300;background:linear-gradient(90deg,var(--a),var(--a2));box-shadow:0 0 10px var(--a)}}
-
-/* ---------- nav ---------- */
-nav{{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;transition:background .35s,box-shadow .35s,border-color .35s;border-bottom:1px solid transparent;background:rgba(10,12,18,.32);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3)}}
-nav.solid{{background:rgba(10,12,18,.78);border-bottom-color:rgba(255,255,255,.08);box-shadow:0 8px 32px rgba(0,0,0,.25)}}
-.logo{{color:#fff;font-size:1.22rem;font-weight:800;letter-spacing:-.01em}}
-.logo span{{color:var(--a2)}}
-.nlinks{{display:flex;gap:32px;list-style:none}}
-.nlinks a{{position:relative;color:rgba(255,255,255,.82);font-size:.92rem;font-weight:600;transition:color .25s}}
-.nlinks a::after{{content:'';position:absolute;left:0;bottom:-6px;height:2px;width:0;border-radius:2px;background:var(--a);transition:width .3s var(--ease)}}
-.nlinks a:hover{{color:#fff}}
-.nlinks a:hover::after{{width:100%}}
-.nav-right{{display:flex;align-items:center;gap:10px}}
-.ncta{{background:var(--a);color:#11151c;padding:11px 22px;border-radius:calc(var(--r) - 2px);font-weight:800;font-size:.86rem;white-space:nowrap;transition:transform .25s var(--ease),box-shadow .3s,filter .2s;box-shadow:0 10px 26px rgba(0,0,0,.28);will-change:transform}}
-.ncta:hover{{transform:translateY(-2px);filter:brightness(1.08)}}
-.ntgl{{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:44px;height:44px;background:transparent;border:0;cursor:pointer}}
-.ntgl span{{width:22px;height:2px;border-radius:2px;background:#fff;transition:transform .3s var(--ease),opacity .2s}}
-.ntgl.open span:nth-child(1){{transform:translateY(7px) rotate(45deg)}}
-.ntgl.open span:nth-child(2){{opacity:0}}
-.ntgl.open span:nth-child(3){{transform:translateY(-7px) rotate(-45deg)}}
-.mmenu{{position:fixed;top:68px;left:0;right:0;z-index:190;background:rgba(10,12,18,.96);backdrop-filter:blur(14px);display:flex;flex-direction:column;padding:8px 5% 20px;transform:translateY(-140%);transition:transform .38s var(--ease);border-bottom:1px solid rgba(255,255,255,.1)}}
-.mmenu.open{{transform:translateY(0)}}
-.mmenu a{{color:rgba(255,255,255,.92);font-size:1rem;font-weight:600;padding:14px 4px;border-bottom:1px solid rgba(255,255,255,.08)}}
-.mmenu a.mcta{{background:var(--a);color:#11151c;text-align:center;border-radius:var(--r);margin-top:12px;padding:14px;border:0;font-weight:800}}
-
-/* ---------- hero ---------- */
-.hero{{position:relative;min-height:100svh;display:flex;align-items:center;padding:128px 5% 120px;background:linear-gradient(135deg,{hero_cols[0]} 0%,{hero_cols[1]} 50%,{hero_cols[2]} 100%);overflow:hidden;isolation:isolate}}
-.hero::before{{content:'';position:absolute;z-index:-1;top:-22%;right:-14%;width:min(56vw,640px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,{a['accent']}3d 0%,transparent 62%);filter:blur(50px);animation:mkBreathe 11s ease-in-out infinite;pointer-events:none}}
-.hero::after{{content:'';position:absolute;z-index:-1;left:-14%;bottom:-26%;width:min(44vw,480px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,{a['accent2']}2e 0%,transparent 60%);filter:blur(56px);animation:mkBreathe 13s ease-in-out infinite reverse;pointer-events:none}}
-@keyframes mkBreathe{{0%,100%{{transform:scale(1) translate(0,0)}}50%{{transform:scale(1.14) translate(-24px,18px)}}}}
-.hero-grid{{position:relative;width:100%;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.08fr .92fr;gap:52px;align-items:center}}
-.badge{{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.07);border:1px solid {a['accent']}59;color:var(--a2);padding:8px 17px;border-radius:999px;font-size:.8rem;font-weight:700;letter-spacing:.04em;margin-bottom:26px;backdrop-filter:blur(6px);opacity:0;animation:mkUp .7s var(--ease) .08s forwards}}
-.badge .dot{{width:7px;height:7px;border-radius:50%;background:var(--a2);box-shadow:0 0 10px var(--a2);animation:mkPulse 2.3s infinite}}
-@keyframes mkPulse{{0%,100%{{opacity:1}}50%{{opacity:.35}}}}
-.hero h1{{font-size:clamp(2.3rem, 1.2rem + 5vw, 4.2rem);font-weight:900;color:#fff;line-height:1.05;letter-spacing:-.025em;margin-bottom:22px}}
-.hl{{display:block;overflow:hidden}}
-.hl>span{{display:block;transform:translateY(112%);animation:mkLine 1s var(--ease) forwards}}
-.hl:nth-child(1)>span{{animation-delay:.14s}}
-.hl:nth-child(2)>span{{animation-delay:.3s}}
-@keyframes mkLine{{to{{transform:translateY(0)}}}}
-.hero h1 em{{font-style:normal;background:linear-gradient(92deg,var(--a),var(--a2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}}
-.hero .lead{{font-size:clamp(1.02rem, .96rem + .4vw, 1.2rem);color:rgba(255,255,255,.76);max-width:34em;margin-bottom:30px;opacity:0;animation:mkUp .8s var(--ease) .55s forwards}}
-.btns{{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px;opacity:0;animation:mkUp .8s var(--ease) .7s forwards}}
-.bp{{position:relative;display:inline-flex;align-items:center;gap:9px;background:var(--a);color:#11151c;padding:16px 32px;border-radius:var(--r);font-weight:800;font-size:1rem;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s,filter .2s;box-shadow:0 14px 36px rgba(0,0,0,.32);will-change:transform}}
-.bp:hover{{filter:brightness(1.07);box-shadow:0 20px 48px rgba(0,0,0,.4)}}
-.bp::after{{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.5) 50%,transparent 58%);background-size:240% 100%;background-position:140% 0;animation:mkSheen 5.2s var(--ease) infinite;pointer-events:none}}
-@keyframes mkSheen{{0%,58%{{background-position:140% 0}}86%,100%{{background-position:-60% 0}}}}
-.bs{{display:inline-flex;align-items:center;background:rgba(255,255,255,.07);color:#fff;padding:16px 30px;border-radius:var(--r);font-weight:600;font-size:1rem;border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);transition:background .25s,border-color .25s,transform .25s var(--ease)}}
-.bs:hover{{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4);transform:translateY(-2px)}}
-.chips{{display:flex;gap:10px 18px;flex-wrap:wrap;opacity:0;animation:mkUp .8s var(--ease) .85s forwards}}
-.chip{{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.72);font-size:.88rem;font-weight:600}}
-.chip svg{{width:15px;height:15px;stroke:var(--a2);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}}
-/* hero visual — floating glass composition */
-.hero-visual{{position:relative;display:grid;place-items:center;opacity:0;animation:mkUp 1s var(--ease) .5s forwards}}
-.hv-main{{position:relative;width:min(360px,86%);aspect-ratio:.92;border-radius:calc(var(--r) + 10px);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(12px);box-shadow:0 40px 90px rgba(0,0,0,.42);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:34px;transform:perspective(900px) rotateX(var(--rx,0)) rotateY(var(--ry,0));transition:transform .5s var(--ease);will-change:transform;animation:mkFloat 7s ease-in-out infinite}}
-@keyframes mkFloat{{0%,100%{{margin-top:0}}50%{{margin-top:-14px}}}}
-.hv-ico{{width:96px;height:96px;border-radius:26px;display:grid;place-items:center;font-size:46px;background:linear-gradient(140deg,var(--a),var(--a2));box-shadow:0 18px 44px rgba(0,0,0,.35)}}
-.hv-name{{color:#fff;font-weight:800;font-size:1.25rem;text-align:center;letter-spacing:-.01em}}
-.hv-sub{{color:rgba(255,255,255,.62);font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;text-align:center}}
-.hv-line{{width:56%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent)}}
-.hv-chip{{position:absolute;display:flex;align-items:center;gap:9px;background:#fff;color:#101318;border-radius:14px;padding:11px 15px;font-size:.82rem;font-weight:750;box-shadow:0 18px 44px rgba(0,0,0,.35);white-space:nowrap}}
-.hv-chip .st{{color:var(--a);letter-spacing:2px}}
-.hv-c1{{top:6%;left:-6%;animation:mkBob 5.5s ease-in-out infinite}}
-.hv-c2{{bottom:9%;right:-7%;animation:mkBob 5.5s ease-in-out infinite 1.1s}}
-@keyframes mkBob{{0%,100%{{transform:translateY(0)}}50%{{transform:translateY(-11px)}}}}
-@keyframes mkUp{{from{{opacity:0;transform:translateY(26px)}}to{{opacity:1;transform:none}}}}
-.hero-fade{{position:absolute;left:0;right:0;bottom:-1px;height:110px;background:linear-gradient(transparent,#fff);z-index:1;pointer-events:none}}
-
-/* ---------- marquee ---------- */
-.mqw{{background:var(--pd);padding:20px 0;overflow:hidden;border-top:1px solid rgba(255,255,255,.07)}}
-.mq{{display:flex;align-items:center;gap:38px;width:max-content;animation:mkMq 30s linear infinite}}
-.mq:hover{{animation-play-state:paused}}
-.mq span{{color:rgba(255,255,255,.82);font-size:.92rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}}
-.mq i{{color:var(--a);font-style:normal;font-size:.8rem}}
-@keyframes mkMq{{from{{transform:translateX(0)}}to{{transform:translateX(-50%)}}}}
-
-/* ---------- stats ---------- */
-.statwrap{{padding:0 5%;transform:translateY(-46px);margin-bottom:-46px;position:relative;z-index:2}}
-.statbar{{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:2px;border-radius:calc(var(--r) + 6px);overflow:hidden;box-shadow:0 26px 60px rgba(2,6,23,.18)}}
-.stat{{background:linear-gradient(160deg,var(--p),var(--pd));text-align:center;color:#fff;padding:26px 16px}}
-.stat .num{{font-size:1.7rem;font-weight:900;color:var(--a2);line-height:1.1}}
-.stat .lab{{font-size:.82rem;color:rgba(255,255,255,.72);margin-top:4px;letter-spacing:.04em}}
-
-/* ---------- sections ---------- */
-section{{padding:clamp(72px,9vw,110px) 5%;scroll-margin-top:76px}}
-.wrap{{max-width:1180px;margin:0 auto}}
-.eyebrow{{display:inline-flex;align-items:center;gap:10px;font-size:.76rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--a);margin-bottom:12px}}
-.eyebrow::before{{content:'';width:24px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--a),var(--a2))}}
-h2{{font-size:clamp(1.8rem, 1.2rem + 2.6vw, 2.8rem);font-weight:900;color:var(--p);line-height:1.12;letter-spacing:-.02em;margin-bottom:14px}}
-.sub{{font-size:1.05rem;color:var(--g);max-width:38em;margin-bottom:48px}}
-.cream{{background:var(--cr)}}
-
-/* cards */
-.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}}
-.card{{--mx:50%;--my:50%;position:relative;background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:30px;overflow:hidden;transform:perspective(900px) rotateX(var(--rx,0)) rotateY(var(--ry,0));transition:transform .45s var(--ease),box-shadow .35s,border-color .3s;will-change:transform}}
-.card::before{{content:'';position:absolute;inset:0;opacity:0;transition:opacity .45s;pointer-events:none;background:radial-gradient(380px circle at var(--mx) var(--my),{a['accent']}14,transparent 45%)}}
-.card:hover{{box-shadow:0 24px 56px rgba(2,6,23,.13)}}
-.card:hover::before{{opacity:1}}
-.card>*{{position:relative;z-index:1}}
-.ico{{width:56px;height:56px;border-radius:calc(var(--r) - 2px);display:grid;place-items:center;margin-bottom:16px;background:linear-gradient(140deg,{a['accent']}1f,{a['accent2']}30);border:1px solid {a['accent']}33}}
-.ico span{{font-size:26px;transition:transform .35s var(--ease)}}
-.card:hover .ico span{{transform:scale(1.18) rotate(-6deg)}}
-.card h3{{font-size:1.16rem;font-weight:800;color:var(--tx);margin-bottom:8px}}
-.card p{{font-size:.94rem;color:var(--g)}}
-.price{{margin-top:14px;display:inline-block;background:var(--cr);color:var(--p);font-weight:800;font-size:.84rem;padding:6px 15px;border-radius:999px;border:1px solid var(--bd)}}
-
-/* about / why */
-.why-wrap{{display:grid;grid-template-columns:1.08fr .92fr;gap:56px;align-items:center}}
-.whys{{list-style:none;display:flex;flex-direction:column;gap:20px;margin-top:8px}}
-.why{{display:flex;gap:15px}}
-.chk{{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:linear-gradient(140deg,var(--a),var(--a2));display:grid;place-items:center;box-shadow:0 8px 20px {a['accent']}55}}
-.chk svg{{width:16px;height:16px;stroke:#11151c;stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round}}
-.why h4{{font-size:1.04rem;font-weight:800;color:var(--tx);margin-bottom:3px}}
-.why p{{font-size:.92rem;color:var(--g)}}
-.visual{{position:relative;border-radius:calc(var(--r) + 8px);min-height:400px;overflow:hidden;background:linear-gradient(150deg,var(--p),var(--pd));box-shadow:0 30px 70px rgba(2,6,23,.22);transform:scale(.95);transition:transform 1.1s var(--ease)}}
-.visual.in{{transform:scale(1)}}
-.visual::before{{content:'{n['visual']}';position:absolute;right:-24px;bottom:-30px;font-size:170px;opacity:.16;transform:rotate(-8deg)}}
-.visual::after{{content:'';position:absolute;top:-30%;left:-20%;width:70%;height:90%;background:radial-gradient(circle,{a['accent']}38,transparent 62%);filter:blur(30px)}}
-.vq{{position:absolute;left:22px;right:22px;bottom:22px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(12px);border-radius:var(--r);padding:20px 22px;color:#fff}}
-.vq .st{{color:var(--a2);letter-spacing:2px;font-size:.9rem;margin-bottom:8px}}
-.vq p{{font-size:.94rem;line-height:1.55;font-style:italic}}
-.vq small{{display:block;margin-top:9px;color:rgba(255,255,255,.65);font-size:.76rem;letter-spacing:.14em;text-transform:uppercase}}
-.vtag{{position:absolute;top:20px;left:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);color:#fff;border-radius:999px;padding:8px 17px;font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase}}
-
-/* reviews */
-.revs{{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}}
-.rev{{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:28px;transition:transform .35s var(--ease),box-shadow .3s}}
-.rev:hover{{transform:translateY(-6px);box-shadow:0 20px 48px rgba(2,6,23,.1)}}
-.stars{{color:var(--a);font-size:1.05rem;letter-spacing:2px;margin-bottom:12px}}
-.rev p{{font-size:.95rem;color:#374151;font-style:italic;margin-bottom:18px}}
-.auth{{display:flex;align-items:center;gap:12px}}
-.ava{{width:42px;height:42px;border-radius:50%;background:linear-gradient(140deg,var(--p),var(--a));color:#fff;display:grid;place-items:center;font-weight:800;font-size:.82rem}}
-.an{{font-weight:750;font-size:.9rem;color:var(--tx)}}
-.al{{font-size:.76rem;color:var(--g)}}
-
-/* CTA band */
-.band{{position:relative;text-align:center;color:#fff;overflow:hidden;background:linear-gradient(120deg,var(--pd),var(--p) 45%,var(--pd));background-size:200% 200%;animation:mkGrad 11s ease infinite}}
-@keyframes mkGrad{{0%,100%{{background-position:0 50%}}50%{{background-position:100% 50%}}}}
-.band::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 18% 20%,{a['accent']}30,transparent 44%),radial-gradient(circle at 84% 82%,{a['accent2']}22,transparent 44%)}}
-.band .wrap{{position:relative}}
-.band h2{{color:#fff}}
-.band p{{font-size:1.08rem;color:rgba(255,255,255,.86);max-width:36em;margin:0 auto 30px}}
-.bw{{display:inline-flex;align-items:center;gap:9px;background:#fff;color:var(--p);padding:16px 34px;border-radius:var(--r);font-weight:800;font-size:1.02rem;transition:transform .3s var(--ease),box-shadow .3s;box-shadow:0 16px 40px rgba(0,0,0,.28);will-change:transform}}
-.bw:hover{{box-shadow:0 22px 54px rgba(0,0,0,.36)}}
-
-/* contact */
-.contact-wrap{{display:grid;grid-template-columns:1fr 1.05fr;gap:56px}}
-.cinfo{{display:flex;flex-direction:column;gap:14px;margin-top:8px}}
-.crow{{display:flex;gap:15px;align-items:center;background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:16px 19px;transition:transform .25s var(--ease),box-shadow .25s}}
-.crow:hover{{transform:translateX(5px);box-shadow:0 12px 30px rgba(2,6,23,.08)}}
-.ci{{flex-shrink:0;width:44px;height:44px;border-radius:calc(var(--r) - 3px);display:grid;place-items:center;background:linear-gradient(140deg,{a['accent']}1f,{a['accent2']}30);border:1px solid {a['accent']}33;color:var(--p)}}
-.ci svg{{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}}
-.cl{{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--g);font-weight:700}}
-.cv{{font-size:1.02rem;font-weight:800;color:var(--tx)}}
-form{{display:flex;flex-direction:column;gap:14px;background:#fff;border:1px solid var(--bd);border-radius:calc(var(--r) + 4px);padding:32px;box-shadow:0 20px 50px rgba(2,6,23,.07)}}
-input,textarea{{padding:13px 16px;border:1.5px solid var(--bd);border-radius:calc(var(--r) - 4px);font-size:.96rem;font-family:inherit;background:#fff;transition:border-color .2s,box-shadow .2s}}
-input:focus,textarea:focus{{outline:none;border-color:var(--a);box-shadow:0 0 0 4px {a['accent']}22}}
-.fsub{{background:var(--p);color:#fff;border:none;padding:15px;border-radius:calc(var(--r) - 4px);font-weight:800;font-size:1rem;cursor:pointer;transition:transform .25s var(--ease),background .2s,box-shadow .3s;box-shadow:0 12px 30px rgba(2,6,23,.18)}}
-.fsub:hover{{background:var(--pd);transform:translateY(-2px)}}
-
-/* footer + flag */
-footer{{background:var(--pd);color:rgba(255,255,255,.6);padding:44px 5% 78px;text-align:center}}
-footer .fn{{color:#fff;font-size:1.25rem;font-weight:800;margin-bottom:8px}}
-footer .fn span{{color:var(--a2)}}
-.concept{{margin-top:22px;font-size:.8rem;color:rgba(255,255,255,.45);max-width:40em;margin-left:auto;margin-right:auto;line-height:1.6}}
-.flag{{position:fixed;right:16px;bottom:16px;z-index:220;background:#0f172a;color:#fff;font-size:.78rem;font-weight:600;padding:9px 15px;border-radius:999px;box-shadow:0 8px 26px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12)}}
-.flag span{{color:#7dd3fc}}
-.flag b{{color:var(--a2)}}
-
-/* reveals */
-.reveal{{opacity:0;transform:translateY(30px);transition:opacity .9s var(--ease),transform .9s var(--ease)}}
-.reveal.in{{opacity:1;transform:none}}
-.grid .card,.revs .rev,.statbar .stat{{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}}
-.grid.in .card,.revs.in .rev,.statbar.in .stat{{opacity:1;transform:none}}
-.grid.in .card:nth-child(2),.revs.in .rev:nth-child(2),.statbar.in .stat:nth-child(2){{transition-delay:.08s}}
-.grid.in .card:nth-child(3),.revs.in .rev:nth-child(3),.statbar.in .stat:nth-child(3){{transition-delay:.16s}}
-.grid.in .card:nth-child(4),.statbar.in .stat:nth-child(4){{transition-delay:.24s}}
-.grid.in .card:nth-child(5){{transition-delay:.32s}}
-.grid.in .card:nth-child(6){{transition-delay:.4s}}
-
-@media(max-width:880px){{
-  .nlinks{{display:none}}
-  .ntgl{{display:flex}}
-  .ncta{{padding:9px 15px;font-size:.74rem}}
-  .hero-grid{{grid-template-columns:1fr}}
-  .hero-visual{{display:none}}
-  .why-wrap,.contact-wrap{{grid-template-columns:1fr;gap:40px}}
-  .visual{{min-height:320px}}
-}}
-@media(max-width:600px){{
-  .hero{{padding:112px 5% 90px}}
-  .btns{{flex-direction:column;align-items:stretch}}
-  .btns a{{justify-content:center;text-align:center}}
-  .statwrap{{transform:translateY(-30px);margin-bottom:-30px}}
-}}
-@media(prefers-reduced-motion:reduce){{
-  *{{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
-  .hl>span{{transform:none!important}}
-  .badge,.hero .lead,.btns,.chips,.hero-visual{{opacity:1!important}}
-  .reveal,.grid .card,.revs .rev,.statbar .stat{{opacity:1!important;transform:none!important}}
-  .visual{{transform:none!important}}
-}}
-</style>
-<style>{vcss}</style>
-</head>
-<body>
-<div class="grain" aria-hidden="true"></div>
-<div class="progress" id="mkProg" aria-hidden="true"></div>
-
-<nav id="nav">
-  <div class="logo">{logo}</div>
-  <ul class="nlinks">
-    <li><a href="#services">{n['stag']}</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#reviews">Reviews</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <div class="nav-right">
-    <a href="{href}" class="ncta">{('📞 ' + phone) if phone else n['cta']}</a>
-    <button class="ntgl" id="ntgl" aria-label="Open menu" aria-expanded="false" aria-controls="mmenu"><span></span><span></span><span></span></button>
-  </div>
-</nav>
-<div class="mmenu" id="mmenu">
-  <a href="#services">{n['stag']}</a>
-  <a href="#about">About</a>
-  <a href="#reviews">Reviews</a>
-  <a href="#contact">Contact</a>
-  <a href="{href}" class="mcta">{n['cta']}</a>
-</div>
-
-<header class="hero" id="top">
-  <div class="hero-grid">
-    <div class="hero-copy">
-      <span class="badge"><span class="dot"></span>{fmt(n['badge'])} · {town}</span>
-      <h1>{h1}</h1>
-      <p class="lead">{fmt(n['sub'])}</p>
-      <div class="btns">
-        <a href="{href}" class="bp">{n['cta']} →</a>
-        <a href="#services" class="bs">See More</a>
-      </div>
-      <div class="chips">{chips}</div>
-    </div>
-    <div class="hero-visual" aria-hidden="true">
-      <div class="hv-main" data-tilt>
-        <div class="hv-ico">{n['emoji']}</div>
-        <div class="hv-name">{name}</div>
-        <div class="hv-line"></div>
-        <div class="hv-sub">{fmt(n['badge'])}</div>
-      </div>
-      <div class="hv-chip hv-c1"><span class="st">★★★★★</span> Loved by locals</div>
-      <div class="hv-chip hv-c2">📍 {town} &amp; nearby</div>
-    </div>
-  </div>
-  <div class="hero-fade" aria-hidden="true"></div>
-</header>
-
-<div class="mqw" aria-hidden="true"><div class="mq">{mq_items}{mq_items}</div></div>
-
-<div class="statwrap"><div class="statbar">{stats}</div></div>
-
-<div class="mid">
-<section id="services">
-  <div class="wrap">
-    <div class="reveal">
-      <div class="eyebrow">{n['stag']}</div>
-      <h2>{fmt(n['shead'])}</h2>
-      <p class="sub">{fmt(n['ssub'])}</p>
-    </div>
-    <div class="grid">{services}</div>
-  </div>
-</section>
-
-<section id="about" class="cream">
-  <div class="wrap why-wrap">
-    <div class="reveal">
-      <div class="eyebrow">Why {name}</div>
-      <h2>Why Locals Choose Us</h2>
-      <p class="sub">We're proud to serve {town} and the surrounding area — and we work hard to keep it that way.</p>
-      <ul class="whys">{why}</ul>
-    </div>
-    <div class="visual">
-      <span class="vtag">{town}</span>
-      <div class="vq"><div class="st">★★★★★</div><p>"{quote_txt}"</p><small>{quote_nm} · {town}</small></div>
-    </div>
-  </div>
-</section>
-
-<section id="reviews">
-  <div class="wrap">
-    <div class="reveal">
-      <div class="eyebrow">Reviews</div>
-      <h2>What People Say</h2>
-      <p class="sub">Real words from happy customers across {town} and beyond.</p>
-    </div>
-    <div class="revs">{reviews}</div>
-  </div>
-</section>
-</div>
-
-<section class="band">
-  <div class="wrap reveal">
-    <div class="eyebrow" style="color:var(--a2)">Ready when you are</div>
-    <h2>{n['cta']} Today</h2>
-    <p>Friendly, local and easy to reach — {name} is here for {town}. Get in touch and we'll take care of the rest.</p>
-    <a href="{href}" class="bw">{('📞 ' + phone) if phone else n['cta']}</a>
-  </div>
-</section>
-
-<section id="contact" class="cream">
-  <div class="wrap contact-wrap">
-    <div class="reveal">
-      <div class="eyebrow">Get In Touch</div>
-      <h2>{n['cta']}</h2>
-      <p class="sub">We'd love to hear from you. Call us or drop a message and we'll get straight back to you.</p>
-      <div class="cinfo">
-        <div class="crow"><span class="ci"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><div><div class="cl">Phone</div><div class="cv">{phone or 'Add your number'}</div></div></div>
-        <div class="crow"><span class="ci"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><div><div class="cl">Area</div><div class="cv">{town} &amp; surrounding areas</div></div></div>
-        <div class="crow"><span class="ci"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><div class="cl">Hours</div><div class="cv">Open 6 days a week</div></div></div>
-      </div>
-    </div>
-    <form class="reveal" onsubmit="return false">
-      <input type="text" placeholder="Your name" aria-label="Your name">
-      <input type="tel" placeholder="Phone number" aria-label="Phone number">
-      <input type="email" placeholder="Email address" aria-label="Email address">
-      <textarea rows="4" placeholder="How can we help?" aria-label="Message"></textarea>
-      <button class="fsub" type="submit">Send Message →</button>
-    </form>
-  </div>
-</section>
-
-<footer>
-  <div class="fn">{logo}</div>
-  <div>{fmt(n['badge'])} · {town}{(' · ' + phone) if phone else ''}</div>
-  <p class="concept">This is a free design concept created by <b>HW Web Design</b> to show {name}
-    what a modern website could look like. Sample text, prices and reviews are for illustration only.
-    Like it? Let's make it real — hwwebdesign.co.uk</p>
-</footer>
-
-<a class="flag" href="{BASE_URL}" target="_blank" rel="noopener">✦ Concept by <b>HW Web Design</b> — <span>let's build yours</span></a>
-
+# ---------------------------------------------------------------- shared JS
+CORE_JS = """
 <script>
-(function(){{
+(function(){
   "use strict";
-  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var fine=window.matchMedia("(pointer: fine)").matches;
-  var nav=document.getElementById('nav'),prog=document.getElementById('mkProg'),ticking=false;
-  function onScroll(){{
-    if(ticking)return;ticking=true;
-    requestAnimationFrame(function(){{
-      var y=window.scrollY||0;
-      nav.classList.toggle('solid',y>40);
-      if(prog){{var h=document.documentElement.scrollHeight-window.innerHeight;
-        prog.style.width=(h>0?(y/h*100):0)+'%';}}
-      ticking=false;
-    }});
-  }}
-  addEventListener('scroll',onScroll,{{passive:true}});onScroll();
+  var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fine=matchMedia("(pointer: fine)").matches;
+  var nav=document.getElementById('nav'),prog=document.getElementById('prog'),t=false;
+  function onScroll(){
+    if(t)return;t=true;
+    requestAnimationFrame(function(){
+      var y=scrollY||0;
+      if(nav)nav.classList.toggle('solid',y>40);
+      if(prog){var h=document.documentElement.scrollHeight-innerHeight;prog.style.width=(h>0?(y/h*100):0)+'%';}
+      t=false;
+    });
+  }
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
 
-  var tgl=document.getElementById('ntgl'),mm=document.getElementById('mmenu');
-  if(tgl&&mm){{
-    tgl.addEventListener('click',function(){{
-      var open=mm.classList.toggle('open');tgl.classList.toggle('open',open);
-      tgl.setAttribute('aria-expanded',open);
-    }});
-    mm.querySelectorAll('a').forEach(function(a){{a.addEventListener('click',function(){{
-      mm.classList.remove('open');tgl.classList.remove('open');tgl.setAttribute('aria-expanded','false');
-    }});}});
-  }}
+  var tg=document.getElementById('tgl'),mm=document.getElementById('mm');
+  if(tg&&mm){
+    tg.addEventListener('click',function(){
+      var o=mm.classList.toggle('open');tg.classList.toggle('open',o);tg.setAttribute('aria-expanded',o);
+    });
+    mm.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){
+      mm.classList.remove('open');tg.classList.remove('open');tg.setAttribute('aria-expanded','false');
+    });});
+  }
 
-  var io=new IntersectionObserver(function(es){{
-    es.forEach(function(e){{
+  function count(el){
+    if(el.dataset.done)return;el.dataset.done=1;
+    var target=parseInt(el.dataset.count,10);
+    if(reduce||!target){el.textContent=el.dataset.count;return;}
+    var s=null;
+    function step(ts){
+      if(!s)s=ts;var p=Math.min((ts-s)/1200,1);
+      el.textContent=Math.round(target*(1-Math.pow(1-p,3)));
+      if(p<1)requestAnimationFrame(step);else el.textContent=el.dataset.count;
+    }
+    requestAnimationFrame(step);
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
       if(!e.isIntersecting)return;
       e.target.classList.add('in');
       e.target.querySelectorAll('[data-count]').forEach(count);
       io.unobserve(e.target);
-    }});
-  }},{{threshold:.1,rootMargin:'0px 0px -6% 0px'}});
-  document.querySelectorAll('.reveal,.grid,.revs,.statbar,.visual').forEach(function(el){{io.observe(el);}});
+    });
+  },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.reveal,.clip,.blur,.stagger,.statbar,.panel,.count-wrap').forEach(function(el){io.observe(el);});
 
-  function count(el){{
-    if(el.dataset.done)return;el.dataset.done=1;
-    var t=parseInt(el.dataset.count,10);
-    if(reduce||!t){{el.textContent=el.dataset.count;return;}}
-    var t0=null;
-    function step(ts){{
-      if(!t0)t0=ts;
-      var p=Math.min((ts-t0)/1100,1);
-      el.textContent=Math.round(t*(1-Math.pow(1-p,3)));
-      if(p<1)requestAnimationFrame(step);else el.textContent=el.dataset.count;
-    }}
-    requestAnimationFrame(step);
-  }}
+  // rotating pull-quote (atelier)
+  var rot=document.querySelector('.qrot');
+  if(rot&&!reduce){
+    var qs=rot.querySelectorAll('.q'),i=0;
+    if(qs.length>1)setInterval(function(){qs[i].classList.remove('on');i=(i+1)%qs.length;qs[i].classList.add('on');},4200);
+  }
 
-  if(fine&&!reduce){{
-    document.querySelectorAll('.bp,.bw,.ncta').forEach(function(b){{
-      b.addEventListener('mousemove',function(e){{
+  if(fine&&!reduce){
+    document.querySelectorAll('.bp,.bw,.ncta,[data-mag]').forEach(function(b){
+      b.addEventListener('mousemove',function(e){
         var r=b.getBoundingClientRect();
-        b.style.transform='translate('+((e.clientX-r.left-r.width/2)*.22)+'px,'+((e.clientY-r.top-r.height/2)*.34)+'px)';
-      }});
-      b.addEventListener('mouseleave',function(){{b.style.transform='';}});
-    }});
-    document.querySelectorAll('[data-tilt]').forEach(function(c){{
-      c.addEventListener('mousemove',function(e){{
-        var r=c.getBoundingClientRect(),
-            px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
-        c.style.setProperty('--ry',((px-.5)*7)+'deg');
-        c.style.setProperty('--rx',((.5-py)*5)+'deg');
-        c.style.setProperty('--mx',(px*100)+'%');
-        c.style.setProperty('--my',(py*100)+'%');
-      }});
-      c.addEventListener('mouseleave',function(){{
-        c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg');
-      }});
-    }});
-  }}
-}})();
+        b.style.transform='translate('+((e.clientX-r.left-r.width/2)*.2)+'px,'+((e.clientY-r.top-r.height/2)*.3)+'px)';
+      });
+      b.addEventListener('mouseleave',function(){b.style.transform='';});
+    });
+    document.querySelectorAll('[data-tilt]').forEach(function(c){
+      c.addEventListener('mousemove',function(e){
+        var r=c.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+        c.style.setProperty('--ry',((px-.5)*7)+'deg');c.style.setProperty('--rx',((.5-py)*5)+'deg');
+        c.style.setProperty('--mx',(px*100)+'%');c.style.setProperty('--my',(py*100)+'%');
+      });
+      c.addEventListener('mouseleave',function(){c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg');});
+    });
+  }
+})();
 </script>
-</body>
-</html>
 """
+
+# ---------------------------------------------------------------- shared CSS core
+CORE_CSS = """
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{color:var(--tx);line-height:1.65;background:#fff;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+h1,h2,h3,h4{text-wrap:balance;letter-spacing:-.02em}
+:focus-visible{outline:3px solid var(--a2);outline-offset:3px;border-radius:6px}
+.grain{position:fixed;inset:-60px;z-index:6;pointer-events:none;opacity:.24;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E")}
+.prog{position:fixed;top:0;left:0;height:2.5px;width:0;z-index:300;background:linear-gradient(90deg,var(--a),var(--a2));box-shadow:0 0 10px var(--a)}
+/* nav skeleton */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;transition:background .35s,box-shadow .35s,border-color .35s,transform .35s}
+.logo{font-size:1.2rem;font-weight:800;color:#fff}
+.logo span{color:var(--a2)}
+.nlinks{display:flex;gap:30px;list-style:none}
+.nlinks a{position:relative;font-size:.9rem;font-weight:600;color:rgba(255,255,255,.82);transition:color .25s}
+.nlinks a::after{content:'';position:absolute;left:0;bottom:-6px;height:2px;width:0;background:var(--a);transition:width .3s var(--ease)}
+.nlinks a:hover{color:#fff}.nlinks a:hover::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:10px}
+.ncta{background:var(--a);color:#11151c;padding:11px 22px;border-radius:10px;font-weight:800;font-size:.85rem;white-space:nowrap;box-shadow:0 10px 26px rgba(0,0,0,.26);transition:transform .25s var(--ease),filter .2s;will-change:transform}
+.ncta:hover{filter:brightness(1.08)}
+.tgl{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:44px;height:44px;background:transparent;border:0;cursor:pointer}
+.tgl span{width:22px;height:2px;border-radius:2px;background:#fff;transition:transform .3s var(--ease),opacity .2s}
+.tgl.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.tgl.open span:nth-child(2){opacity:0}
+.tgl.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mm{position:fixed;top:70px;left:0;right:0;z-index:190;background:rgba(12,14,20,.97);backdrop-filter:blur(14px);display:flex;flex-direction:column;padding:8px 5% 20px;transform:translateY(-140%);transition:transform .38s var(--ease);border-bottom:1px solid rgba(255,255,255,.1)}
+.mm.open{transform:translateY(0)}
+.mm a{color:rgba(255,255,255,.92);font-size:1rem;font-weight:600;padding:14px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
+.mm a.mcta{background:var(--a);color:#11151c;text-align:center;border-radius:12px;margin-top:12px;border:0;font-weight:800}
+/* buttons */
+.bp{position:relative;display:inline-flex;align-items:center;gap:9px;background:var(--a);color:#11151c;padding:16px 32px;border-radius:12px;font-weight:800;font-size:1rem;overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,.28);transition:transform .3s var(--ease),filter .2s;will-change:transform}
+.bp:hover{filter:brightness(1.07)}
+.bp::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.5) 50%,transparent 58%);background-size:240% 100%;background-position:140% 0;animation:sheen 5.4s var(--ease) infinite;pointer-events:none}
+@keyframes sheen{0%,58%{background-position:140% 0}86%,100%{background-position:-60% 0}}
+.bs{display:inline-flex;align-items:center;gap:8px;padding:16px 30px;border-radius:12px;font-weight:700;font-size:1rem;transition:transform .25s var(--ease),background .25s,border-color .25s}
+.bw{display:inline-flex;align-items:center;gap:9px;background:#fff;color:var(--p);padding:16px 34px;border-radius:12px;font-weight:800;font-size:1.02rem;box-shadow:0 16px 40px rgba(0,0,0,.26);transition:transform .3s var(--ease),box-shadow .3s;will-change:transform}
+/* sections */
+section{padding:clamp(70px,9vw,112px) 5%;scroll-margin-top:78px;position:relative}
+.wrap{max-width:1180px;margin:0 auto}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.75rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--a);margin-bottom:14px}
+.eyebrow::before{content:'';width:24px;height:2px;background:linear-gradient(90deg,var(--a),var(--a2))}
+h2{font-size:clamp(1.8rem, 1.2rem + 2.6vw, 2.9rem);font-weight:900;color:var(--p);line-height:1.12;margin-bottom:14px}
+.sub{font-size:1.05rem;color:var(--g);max-width:40em;margin-bottom:48px}
+/* reveals */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.clip{opacity:0;clip-path:inset(0 0 100% 0);transition:opacity 1s var(--ease),clip-path 1.1s var(--ease)}
+.clip.in{opacity:1;clip-path:inset(0 0 0 0)}
+.blur{opacity:0;filter:blur(14px);transform:translateY(22px) scale(.98);transition:opacity 1s ease,filter 1s ease,transform 1s var(--ease)}
+.blur.in{opacity:1;filter:none;transform:none}
+.stagger>*{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.stagger.in>*{opacity:1;transform:none}
+.stagger.in>*:nth-child(2){transition-delay:.07s}.stagger.in>*:nth-child(3){transition-delay:.14s}
+.stagger.in>*:nth-child(4){transition-delay:.21s}.stagger.in>*:nth-child(5){transition-delay:.28s}
+.stagger.in>*:nth-child(6){transition-delay:.35s}
+/* footer + flag */
+footer{background:var(--pd);color:rgba(255,255,255,.6);padding:46px 5% 78px;text-align:center}
+footer .fn{color:#fff;font-size:1.25rem;font-weight:800;margin-bottom:8px}
+footer .fn span{color:var(--a2)}
+.concept{margin:22px auto 0;font-size:.8rem;color:rgba(255,255,255,.45);max-width:42em;line-height:1.6}
+.flag{position:fixed;right:16px;bottom:16px;z-index:220;background:#0f172a;color:#fff;font-size:.78rem;font-weight:600;padding:9px 15px;border-radius:999px;box-shadow:0 8px 26px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12)}
+.flag b{color:var(--a2)}
+.hl{display:block;overflow:hidden}
+.hl>span{display:block;transform:translateY(115%);animation:line 1s var(--ease) forwards}
+.hl:nth-child(1)>span{animation-delay:.12s}.hl:nth-child(2)>span{animation-delay:.28s}
+@keyframes line{to{transform:translateY(0)}}
+h1 em{font-style:normal;background:linear-gradient(92deg,var(--a),var(--a2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+@keyframes breathe{0%,100%{transform:scale(1) translate(0,0)}50%{transform:scale(1.14) translate(-22px,16px)}}
+@keyframes up{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
+@media(max-width:880px){
+  .nlinks{display:none}.tgl{display:flex}.ncta{padding:9px 15px;font-size:.74rem;white-space:nowrap}
+  .logo{font-size:1.05rem;max-width:44vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .hl>span{transform:none!important}
+  .reveal,.clip,.blur,.stagger>*{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important}
+}
+"""
+
+# Base bits every page needs (badge/chip layout), themed by each architecture.
+BASE_BITS = (
+    ".badge{display:inline-flex;align-items:center;gap:9px;padding:8px 17px;border-radius:999px;"
+    "font-size:.8rem;font-weight:700;letter-spacing:.04em;margin-bottom:24px}"
+    ".badge .dot{width:7px;height:7px;border-radius:50%}"
+    ".chip{display:inline-flex;align-items:center;gap:6px}"
+    ".fsub{border:none;cursor:pointer;justify-content:center}"
+)
+
+# ================================================================ STAGE
+CSS_STAGE = """
+.t-stage{font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+.s-hero{min-height:100svh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 6% 130px;position:relative;overflow:hidden;isolation:isolate;background:linear-gradient(135deg,var(--h0),var(--h1) 52%,var(--h2))}
+.s-hero::before{content:'';position:absolute;z-index:-1;inset:0;background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--a) 26%,transparent),transparent 55%)}
+.orb{position:absolute;z-index:-1;border-radius:50%;filter:blur(60px);pointer-events:none;animation:breathe 12s ease-in-out infinite}
+.o1{top:-16%;right:-8%;width:min(50vw,560px);aspect-ratio:1;background:radial-gradient(circle,color-mix(in srgb,var(--a) 40%,transparent),transparent 62%)}
+.o2{bottom:-22%;left:-10%;width:min(40vw,440px);aspect-ratio:1;background:radial-gradient(circle,color-mix(in srgb,var(--a2) 34%,transparent),transparent 60%);animation-direction:reverse}
+.grid-ov{position:absolute;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:60px 60px;-webkit-mask-image:radial-gradient(circle at 50% 40%,#000,transparent 75%);mask-image:radial-gradient(circle at 50% 40%,#000,transparent 75%)}
+.s-hero-in{max-width:900px;position:relative}
+.badge{background:rgba(255,255,255,.07);border:1px solid color-mix(in srgb,var(--a) 45%,transparent);color:var(--a2);opacity:0;animation:up .7s var(--ease) .1s forwards}
+.badge .dot{background:var(--a2);box-shadow:0 0 10px var(--a2)}
+.s-hero h1{font-size:clamp(2.4rem, 1.2rem + 5.2vw, 4.4rem);font-weight:900;color:#fff;line-height:1.05;margin-bottom:22px}
+.lead{font-size:clamp(1.02rem,.96rem + .4vw,1.2rem);color:rgba(255,255,255,.78);max-width:38em;margin:0 auto 30px;opacity:0;animation:up .8s var(--ease) .55s forwards}
+.btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:26px;opacity:0;animation:up .8s var(--ease) .7s forwards}
+.s-hero .bs{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.22)}
+.s-hero .bs:hover{background:rgba(255,255,255,.15);transform:translateY(-2px)}
+.chips{display:flex;gap:10px 20px;flex-wrap:wrap;justify-content:center;opacity:0;animation:up .8s var(--ease) .85s forwards}
+.chip{color:rgba(255,255,255,.72);font-size:.88rem;font-weight:600}
+.s-fade{position:absolute;left:0;right:0;bottom:-1px;height:120px;background:linear-gradient(transparent,#fff);z-index:1;pointer-events:none}
+.mqw{background:var(--pd);padding:18px 0;overflow:hidden}
+.mq{display:flex;align-items:center;gap:38px;width:max-content;animation:mq 30s linear infinite}
+.mq:hover{animation-play-state:paused}
+.mq span{color:rgba(255,255,255,.82);font-size:.9rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.mq i{color:var(--a);font-style:normal}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.statwrap{padding:0 5%;transform:translateY(-46px);margin-bottom:-46px;position:relative;z-index:2}
+.statbar{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:2px;border-radius:18px;overflow:hidden;box-shadow:0 26px 60px rgba(2,6,23,.18)}
+.stat{background:linear-gradient(160deg,var(--p),var(--pd));text-align:center;color:#fff;padding:26px 16px}
+.stat .num{font-size:1.7rem;font-weight:900;color:var(--a2)}
+.stat .lab{font-size:.82rem;color:rgba(255,255,255,.72);margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.card{--mx:50%;--my:50%;position:relative;background:#fff;border:1px solid var(--bd);border-radius:16px;padding:30px;overflow:hidden;transform:perspective(900px) rotateX(var(--rx,0)) rotateY(var(--ry,0));transition:transform .45s var(--ease),box-shadow .35s;will-change:transform}
+.card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .45s;pointer-events:none;background:radial-gradient(380px circle at var(--mx) var(--my),color-mix(in srgb,var(--a) 12%,transparent),transparent 45%)}
+.card:hover{box-shadow:0 24px 56px rgba(2,6,23,.13)}.card:hover::before{opacity:1}
+.card>*{position:relative;z-index:1}
+.ico{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:26px;margin-bottom:16px;background:linear-gradient(140deg,color-mix(in srgb,var(--a) 16%,#fff),color-mix(in srgb,var(--a2) 22%,#fff));border:1px solid color-mix(in srgb,var(--a) 30%,transparent)}
+.card h3{font-size:1.14rem;font-weight:800;color:var(--tx);margin-bottom:8px}
+.card p{font-size:.94rem;color:var(--g)}
+.price{margin-top:14px;display:inline-block;background:var(--cr);color:var(--p);font-weight:800;font-size:.84rem;padding:6px 15px;border-radius:999px;border:1px solid var(--bd)}
+.cream{background:var(--cr)}
+.awrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.whys{list-style:none;display:flex;flex-direction:column;gap:18px;margin-top:8px}
+.why{display:flex;gap:14px}
+.chk{flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(140deg,var(--a),var(--a2));display:grid;place-items:center;color:#11151c;font-weight:900;font-size:.9rem}
+.why h4{font-size:1.02rem;font-weight:800;color:var(--tx);margin-bottom:2px}
+.why p{font-size:.92rem;color:var(--g)}
+.svisual{position:relative;border-radius:22px;min-height:400px;overflow:hidden;background:linear-gradient(150deg,var(--p),var(--pd));box-shadow:0 30px 70px rgba(2,6,23,.22)}
+.svisual::before{content:attr(data-emoji);position:absolute;right:-24px;bottom:-30px;font-size:170px;opacity:.16;transform:rotate(-8deg)}
+.svq{position:absolute;left:22px;right:22px;bottom:22px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(12px);border-radius:14px;padding:20px;color:#fff}
+.svq .st{color:var(--a2);letter-spacing:2px;margin-bottom:8px}
+.svq p{font-size:.94rem;font-style:italic}
+.svq small{display:block;margin-top:9px;color:rgba(255,255,255,.65);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase}
+.revs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.rev{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:28px;transition:transform .35s var(--ease),box-shadow .3s}
+.rev:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(2,6,23,.1)}
+.stars{color:var(--a);letter-spacing:2px;margin-bottom:12px}
+.rev p{font-size:.95rem;color:#374151;font-style:italic;margin-bottom:18px}
+.auth{display:flex;align-items:center;gap:12px}
+.ava{width:42px;height:42px;border-radius:50%;background:linear-gradient(140deg,var(--p),var(--a));color:#fff;display:grid;place-items:center;font-weight:800;font-size:.82rem}
+.an{font-weight:750;font-size:.9rem;color:var(--tx)}.al{font-size:.76rem;color:var(--g)}
+.band{text-align:center;color:#fff;overflow:hidden;background:linear-gradient(120deg,var(--pd),var(--p) 45%,var(--pd));background-size:200% 200%;animation:grad 11s ease infinite}
+@keyframes grad{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+.band h2{color:#fff}.band .eyebrow{color:var(--a2)}
+.band p{font-size:1.08rem;color:rgba(255,255,255,.86);max-width:36em;margin:0 auto 30px}
+.contact .cwrap{display:grid;grid-template-columns:1fr 1.05fr;gap:56px}
+.cinfo{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.crow{display:flex;gap:15px;align-items:center;background:#fff;border:1px solid var(--bd);border-radius:14px;padding:15px 18px;transition:transform .25s var(--ease),box-shadow .25s}
+.crow:hover{transform:translateX(5px);box-shadow:0 12px 30px rgba(2,6,23,.08)}
+.ci{flex-shrink:0;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:color-mix(in srgb,var(--a) 12%,#fff);border:1px solid color-mix(in srgb,var(--a) 26%,transparent)}
+.cl{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--g);font-weight:700}
+.cv{font-size:1.02rem;font-weight:800;color:var(--tx)}
+form{display:flex;flex-direction:column;gap:14px;background:#fff;border:1px solid var(--bd);border-radius:20px;padding:32px;box-shadow:0 20px 50px rgba(2,6,23,.07)}
+input,textarea{padding:13px 16px;border:1.5px solid var(--bd);border-radius:10px;font-size:.96rem;font-family:inherit;background:#fff;transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus{outline:none;border-color:var(--a);box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 18%,transparent)}
+@media(max-width:880px){.awrap,.contact .cwrap{grid-template-columns:1fr;gap:40px}.svisual{min-height:320px}}
+@media(max-width:600px){.s-hero{padding:110px 6% 100px}.btns{flex-direction:column;align-items:stretch}.btns a{justify-content:center}}
+"""
+
+# ================================================================ ATELIER
+CSS_ATELIER = """
+.t-atelier{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr)}
+.t-atelier h1,.t-atelier h2,.t-atelier h3,.t-atelier .a-num,.t-atelier .logo{font-family:'Palatino Linotype','Book Antiqua',Georgia,serif;letter-spacing:-.01em}
+.t-atelier .logo{color:var(--p)}
+.t-atelier .nlinks a{color:var(--tx)}
+.t-atelier .tgl span{background:var(--p)}
+.t-atelier nav.solid{background:color-mix(in srgb,var(--cr) 90%,transparent);backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(2,6,23,.06);border-bottom:1px solid var(--bd)}
+.a-hero{padding:150px 6% 90px;border-bottom:1px solid var(--bd)}
+.a-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center}
+.a-eye{font-size:.78rem;letter-spacing:.24em;text-transform:uppercase;color:var(--a);font-weight:700;display:block;margin-bottom:22px}
+.a-hero h1{font-size:clamp(2.6rem,1.4rem + 5vw,4.6rem);font-weight:700;color:var(--p);line-height:1.04;margin-bottom:24px}
+.a-hero .lead{font-size:1.16rem;color:var(--g);max-width:32em;margin-bottom:30px;line-height:1.7}
+.a-act{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.a-tel{font-weight:700;color:var(--p);border-bottom:2px solid var(--a);padding-bottom:2px}
+.a-panel{position:relative}
+.a-frame{position:relative;border-radius:8px;aspect-ratio:.82;background:linear-gradient(150deg,var(--p),var(--pd));overflow:hidden;box-shadow:0 40px 90px rgba(2,6,23,.2)}
+.a-frame::after{content:'';position:absolute;top:-20%;left:-20%;width:70%;height:80%;background:radial-gradient(circle,color-mix(in srgb,var(--a) 40%,transparent),transparent 62%);filter:blur(26px)}
+.a-wm{position:absolute;inset:0;display:grid;place-items:center;font-size:150px;filter:drop-shadow(0 20px 40px rgba(0,0,0,.4))}
+.a-qc{position:absolute;left:-34px;bottom:38px;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:18px 20px;max-width:260px;box-shadow:0 26px 60px rgba(2,6,23,.16)}
+.a-qc .st{color:var(--a);letter-spacing:2px;font-size:.85rem;margin-bottom:8px}
+.a-qc p{font-size:.9rem;font-style:italic;color:var(--tx);margin-bottom:8px}
+.a-qc small{color:var(--g);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase}
+.a-rows{display:flex;flex-direction:column;margin-top:20px}
+.a-row{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;padding:30px 0;border-top:1px solid var(--bd)}
+.a-row:last-child{border-bottom:1px solid var(--bd)}
+.a-num{font-size:1.6rem;font-weight:700;color:color-mix(in srgb,var(--a) 70%,var(--g))}
+.a-rc h3{font-size:1.4rem;font-weight:700;color:var(--p);margin-bottom:4px}
+.a-rc p{color:var(--g);font-size:.98rem;max-width:44em}
+.a-price{font-weight:700;color:var(--p);white-space:nowrap;background:#fff;border:1px solid var(--bd);padding:7px 15px;border-radius:999px;font-size:.82rem}
+.a-about{background:var(--p);color:#fff;text-align:center}
+.a-about h2{color:#fff;font-size:clamp(1.9rem,1.2rem + 3vw,3rem);max-width:16em;margin:0 auto 10px}
+.a-about .eyebrow{color:var(--a2);justify-content:center}
+.a-stats{display:flex;justify-content:center;gap:56px;flex-wrap:wrap;margin-top:40px}
+.a-st .num{font-size:2.4rem;font-weight:700;color:var(--a2);font-family:'Palatino Linotype',Georgia,serif}
+.a-st .lab{font-size:.82rem;color:rgba(255,255,255,.7);letter-spacing:.06em;margin-top:4px}
+.a-rev{text-align:center}
+.qrot{position:relative;max-width:760px;margin:10px auto 0;min-height:220px}
+.q{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.q.on{opacity:1;position:relative}
+.q p{font-size:clamp(1.3rem,1rem + 1.6vw,2rem);font-style:italic;color:var(--p);line-height:1.4;font-family:'Palatino Linotype',Georgia,serif;margin-bottom:18px}
+.q .st{color:var(--a);letter-spacing:3px;margin-bottom:16px}
+.q small{color:var(--g);letter-spacing:.1em;text-transform:uppercase;font-size:.78rem}
+.a-band{background:var(--p);color:#fff;text-align:center}
+.a-band h2{color:#fff}.a-band .eyebrow{color:var(--a2);justify-content:center}
+.a-band p{color:rgba(255,255,255,.82);max-width:34em;margin:0 auto 28px}
+.a-band .bw{background:var(--a);color:#11151c}
+.contact .cwrap{display:grid;grid-template-columns:1fr 1.05fr;gap:56px}
+.cinfo{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.crow{display:flex;gap:14px;align-items:center;padding:12px 2px;border-bottom:1px solid var(--bd)}
+.ci{font-size:20px}
+.cl{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--g);font-weight:700}
+.cv{font-size:1.02rem;font-weight:700;color:var(--p)}
+.t-atelier form{display:flex;flex-direction:column;gap:18px;background:transparent;border:none;padding:0}
+.t-atelier input,.t-atelier textarea{padding:12px 2px;border:none;border-bottom:1.5px solid var(--bd);border-radius:0;background:transparent;font-size:1rem;font-family:inherit}
+.t-atelier input:focus,.t-atelier textarea:focus{outline:none;border-bottom-color:var(--a);box-shadow:none}
+.t-atelier .fsub{background:var(--p);color:#fff;border-radius:8px;margin-top:8px;padding:15px}
+@media(max-width:880px){.a-grid,.contact .cwrap{grid-template-columns:1fr;gap:44px}.a-qc{left:0}.a-row{grid-template-columns:auto 1fr;gap:14px}.a-price{grid-column:2}}
+"""
+
+# ================================================================ MOMENTUM
+CSS_MOMENTUM = """
+.t-momentum{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0d14;color:#fff}
+.t-momentum h1,.t-momentum h2,.t-momentum h3,.t-momentum .m-num,.t-momentum .num{font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;text-transform:uppercase;letter-spacing:0}
+.t-momentum section{background:#0a0d14}
+.t-momentum h2{color:#fff}.t-momentum .sub{color:rgba(255,255,255,.6)}
+.t-momentum nav.solid{background:rgba(10,13,20,.85);border-bottom:1px solid rgba(255,255,255,.08)}
+.m-hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:120px 6% 0;position:relative;overflow:hidden;background:radial-gradient(70% 60% at 75% 15%,color-mix(in srgb,var(--a) 24%,transparent),transparent 60%),#0a0d14}
+.m-hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(115deg,transparent 0 38px,rgba(255,255,255,.025) 38px 39px);pointer-events:none}
+.m-in{max-width:1180px;margin:0 auto;width:100%;position:relative;padding-bottom:56px}
+.m-eye{display:inline-block;font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;color:var(--a);font-weight:800;margin-bottom:22px}
+.m-hero h1{font-size:clamp(3rem,1.4rem + 9vw,7rem);font-weight:800;line-height:.92;color:#fff;margin-bottom:22px}
+.m-hero .lead{font-size:clamp(1.05rem,1rem + .4vw,1.25rem);color:rgba(255,255,255,.66);max-width:34em;margin-bottom:30px}
+.m-hero .btns{display:flex;gap:14px;flex-wrap:wrap}
+.m-tel{display:inline-flex;align-items:center;padding:16px 26px;border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font-weight:700;will-change:transform}
+.m-strip{border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);padding:18px 0;overflow:hidden;background:rgba(255,255,255,.02)}
+.m-strip .mq{display:flex;gap:34px;width:max-content;animation:mq 26s linear infinite}
+.m-strip .mq span{color:#fff;font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:1rem;white-space:nowrap}
+.m-strip .mq i{color:var(--a);font-style:normal}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.m-stats .statbar{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:rgba(255,255,255,.08);border-radius:16px;overflow:hidden}
+.m-stats .stat{background:#0d111a;text-align:center;padding:30px 16px}
+.m-stats .num{font-size:2.4rem;font-weight:800;color:var(--a)}
+.m-stats .lab{font-size:.82rem;color:rgba(255,255,255,.55);margin-top:4px;text-transform:uppercase;letter-spacing:.08em}
+.m-list{display:flex;flex-direction:column;margin-top:16px}
+.m-row{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:26px;align-items:center;padding:28px 24px;border-top:1px solid rgba(255,255,255,.1);overflow:hidden;transition:background .3s}
+.m-row:last-child{border-bottom:1px solid rgba(255,255,255,.1)}
+.m-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--a);transform:scaleY(0);transform-origin:bottom;transition:transform .35s var(--ease)}
+.m-row:hover{background:rgba(255,255,255,.03)}.m-row:hover::before{transform:scaleY(1)}
+.m-num{font-size:1.5rem;font-weight:800;color:rgba(255,255,255,.3)}
+.m-rc h3{font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:2px}
+.m-rc p{color:rgba(255,255,255,.55);font-size:.96rem}
+.m-arrow{font-size:1.4rem;color:var(--a);opacity:0;transform:translateX(-8px);transition:opacity .3s,transform .3s var(--ease)}
+.m-row:hover .m-arrow{opacity:1;transform:none}
+.m-awrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.m-about h2{font-size:clamp(2rem,1.2rem + 3.4vw,3.4rem);line-height:1}
+.m-whys{list-style:none;display:flex;flex-direction:column;gap:16px;margin-top:20px}
+.m-whys li{display:flex;gap:12px;color:rgba(255,255,255,.72)}
+.m-whys .chk{flex-shrink:0;width:26px;height:26px;border-radius:6px;background:var(--a);color:#0a0d14;display:grid;place-items:center;font-weight:900;font-size:.8rem}
+.m-whys h4{color:#fff;font-size:1rem;font-weight:800;margin-bottom:1px;text-transform:none}
+.m-big{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.m-bc{border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:26px;background:rgba(255,255,255,.02)}
+.m-bc .num{font-size:2.6rem;font-weight:800;color:var(--a);line-height:1}
+.m-bc .lab{color:rgba(255,255,255,.55);font-size:.85rem;margin-top:6px;text-transform:uppercase;letter-spacing:.06em}
+.m-scroll{display:flex;gap:20px;overflow-x:auto;padding-bottom:14px;scroll-snap-type:x mandatory}
+.m-scroll .rev{scroll-snap-align:start;flex:0 0 320px;background:#0d111a;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:26px}
+.m-scroll .stars{color:var(--a);letter-spacing:2px;margin-bottom:12px}
+.m-scroll .rev p{color:rgba(255,255,255,.78);font-style:italic;margin-bottom:16px}
+.m-scroll .auth{display:flex;align-items:center;gap:12px}
+.m-scroll .ava{width:42px;height:42px;border-radius:50%;background:linear-gradient(140deg,var(--a),var(--a2));color:#0a0d14;display:grid;place-items:center;font-weight:800;font-size:.82rem}
+.m-scroll .an{color:#fff;font-weight:750;font-size:.9rem}.m-scroll .al{color:rgba(255,255,255,.5);font-size:.76rem}
+.t-momentum .m-band{text-align:center;background:var(--a);color:#0a0d14}
+.m-band h2{color:#0a0d14;font-size:clamp(2.2rem,1.4rem + 4vw,4rem)}
+.m-band .eyebrow{color:#0a0d14;justify-content:center}.m-band .eyebrow::before{background:#0a0d14}
+.m-band p{color:rgba(10,13,20,.8);max-width:32em;margin:0 auto 26px;font-weight:600}
+.m-band .bw{background:#0a0d14;color:#fff}
+.t-momentum .contact{background:#0a0d14}
+.t-momentum .cwrap{display:grid;grid-template-columns:1fr 1.05fr;gap:56px}
+.t-momentum .cinfo{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.t-momentum .crow{display:flex;gap:14px;align-items:center;background:#0d111a;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px 18px}
+.t-momentum .ci{font-size:20px}
+.t-momentum .cl{color:rgba(255,255,255,.5);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.t-momentum .cv{color:#fff;font-weight:800}
+.t-momentum form{display:flex;flex-direction:column;gap:14px;background:#0d111a;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:30px}
+.t-momentum input,.t-momentum textarea{background:#0a0d14;border:1px solid rgba(255,255,255,.14);color:#fff;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:.96rem}
+.t-momentum input::placeholder,.t-momentum textarea::placeholder{color:rgba(255,255,255,.4)}
+.t-momentum input:focus,.t-momentum textarea:focus{outline:none;border-color:var(--a)}
+.t-momentum footer{background:#070a10}
+@media(max-width:880px){.m-awrap,.t-momentum .cwrap{grid-template-columns:1fr;gap:40px}.m-row{grid-template-columns:auto 1fr;gap:16px}.m-arrow{display:none}}
+"""
+
+# ================================================================ BLOOM
+CSS_BLOOM = """
+.t-bloom{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr)}
+.t-bloom h1,.t-bloom h2,.t-bloom h3{font-family:'Trebuchet MS','Segoe UI',sans-serif;letter-spacing:-.01em}
+.t-bloom nav{top:16px;left:50%;transform:translateX(-50%);right:auto;width:min(1080px,92%);height:60px;border-radius:999px;background:rgba(255,255,255,.72);backdrop-filter:blur(16px) saturate(1.4);box-shadow:0 14px 40px rgba(120,80,40,.14);border:1px solid rgba(255,255,255,.6);padding:0 12px 0 24px}
+.t-bloom nav.solid{background:rgba(255,255,255,.92)}
+.t-bloom .logo{color:var(--p)}.t-bloom .logo span{color:var(--a)}
+.t-bloom .nlinks a{color:var(--tx)}
+.t-bloom .tgl span{background:var(--p)}
+.t-bloom .mm{top:84px;left:50%;transform:translate(-50%,-160%);width:min(1080px,92%);border-radius:22px;background:rgba(255,255,255,.98);border:1px solid var(--bd)}
+.t-bloom .mm.open{transform:translate(-50%,0)}
+.t-bloom .mm a{color:var(--tx)}
+.b-hero{min-height:100svh;display:flex;align-items:center;padding:130px 6% 90px;position:relative;overflow:hidden;background:radial-gradient(60% 70% at 80% 10%,color-mix(in srgb,var(--a) 22%,var(--cr)),var(--cr)),radial-gradient(50% 60% at 5% 90%,color-mix(in srgb,var(--a2) 30%,var(--cr)),transparent)}
+.b-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center;width:100%}
+.b-copy .badge{background:#fff;border:1px solid var(--bd);color:var(--p);box-shadow:0 8px 22px rgba(120,80,40,.08);opacity:0;animation:up .7s var(--ease) .1s forwards}
+.b-copy .badge .dot{background:var(--a)}
+.b-hero h1{font-size:clamp(2.4rem,1.3rem + 5vw,4.3rem);font-weight:800;color:var(--p);line-height:1.05;margin-bottom:20px}
+.b-hero .lead{font-size:clamp(1.02rem,.96rem + .4vw,1.2rem);color:var(--g);max-width:32em;margin-bottom:28px}
+.b-hero .btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px}
+.b-hero .bs{background:#fff;color:var(--p);border:1px solid var(--bd);box-shadow:0 8px 22px rgba(120,80,40,.08)}
+.b-hero .bs:hover{transform:translateY(-2px)}
+.b-hero .chips{display:flex;gap:10px 18px;flex-wrap:wrap}.b-hero .chip{color:var(--g);font-size:.88rem;font-weight:600}
+.b-cluster{position:relative;height:400px}
+.b-card{position:absolute;background:#fff;border:1px solid var(--bd);border-radius:22px;padding:18px 20px;box-shadow:0 26px 60px rgba(120,80,40,.16);display:flex;flex-direction:column;gap:6px;width:210px}
+.b-card span{font-size:38px}.b-card b{color:var(--p);font-size:1.02rem}.b-card small{color:var(--g);font-size:.8rem;line-height:1.4}
+.b-c1{top:8%;left:4%;animation:bob 5.5s ease-in-out infinite}
+.b-c2{top:36%;right:0;animation:bob 5.5s ease-in-out infinite 1.1s;z-index:2}
+.b-c3{bottom:2%;left:26%;animation:bob 5.5s ease-in-out infinite 2.2s}
+.b-statwrap{padding:0 6% 6px;margin-top:-30px}
+.b-pills{max-width:1000px;margin:0 auto;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.b-pill{background:#fff;border:1px solid var(--bd);border-radius:999px;padding:14px 26px;box-shadow:0 12px 30px rgba(120,80,40,.1);display:flex;align-items:baseline;gap:8px}
+.b-pill .num{font-size:1.3rem;font-weight:800;color:var(--a)}.b-pill .lab{color:var(--g);font-size:.86rem}
+.b-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.b-tile{background:#fff;border:1px solid var(--bd);border-radius:24px;padding:28px;transition:transform .4s var(--ease),box-shadow .35s}
+.b-tile:hover{transform:translateY(-8px);box-shadow:0 26px 56px rgba(120,80,40,.16)}
+.b-tico{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;font-size:30px;margin-bottom:16px;background:color-mix(in srgb,var(--a) 16%,#fff)}
+.b-tile h3{font-size:1.16rem;font-weight:800;color:var(--p);margin-bottom:6px}
+.b-tile p{color:var(--g);font-size:.94rem}
+.b-tile .price{margin-top:12px;display:inline-block;background:color-mix(in srgb,var(--a) 14%,#fff);color:var(--p);font-weight:800;font-size:.82rem;padding:6px 15px;border-radius:999px}
+.b-about{background:#fff}
+.b-awrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:.9fr 1.1fr;gap:52px;align-items:center}
+.b-blob{aspect-ratio:1;border-radius:42% 58% 55% 45%/48% 42% 58% 52%;background:linear-gradient(150deg,color-mix(in srgb,var(--a) 30%,var(--cr)),color-mix(in srgb,var(--a2) 40%,var(--cr)));display:grid;place-items:center;font-size:110px;box-shadow:0 30px 70px rgba(120,80,40,.16);animation:morph 9s ease-in-out infinite}
+@keyframes morph{0%,100%{border-radius:42% 58% 55% 45%/48% 42% 58% 52%}50%{border-radius:56% 44% 43% 57%/56% 54% 46% 44%}}
+.b-whys{list-style:none;display:flex;flex-direction:column;gap:16px;margin-top:14px}
+.b-whys li{display:flex;gap:13px}
+.b-whys .chk{flex-shrink:0;width:32px;height:32px;border-radius:12px;background:color-mix(in srgb,var(--a) 18%,#fff);color:var(--p);display:grid;place-items:center;font-weight:900}
+.b-whys h4{color:var(--p);font-size:1.02rem;font-weight:800;margin-bottom:1px}.b-whys p{color:var(--g);font-size:.92rem}
+.b-revs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.b-rev{background:#fff;border:1px solid var(--bd);border-radius:24px;padding:28px;position:relative}
+.b-rev::before{content:'“';position:absolute;top:6px;right:22px;font-size:70px;color:color-mix(in srgb,var(--a) 30%,#fff);font-family:Georgia,serif;line-height:1}
+.b-rev .stars{color:var(--a);letter-spacing:2px;margin-bottom:12px}
+.b-rev p{color:#5b4a3a;font-style:italic;margin-bottom:16px}
+.b-rev .auth{display:flex;align-items:center;gap:12px}
+.b-rev .ava{width:42px;height:42px;border-radius:50%;background:linear-gradient(140deg,var(--a),var(--a2));color:#fff;display:grid;place-items:center;font-weight:800;font-size:.82rem}
+.b-rev .an{font-weight:750;color:var(--p);font-size:.9rem}.b-rev .al{color:var(--g);font-size:.76rem}
+.b-band{text-align:center;background:linear-gradient(140deg,color-mix(in srgb,var(--a) 22%,var(--cr)),color-mix(in srgb,var(--a2) 30%,var(--cr)));color:var(--p)}
+.b-band h2{color:var(--p)}.b-band .eyebrow{color:var(--p);justify-content:center}.b-band .eyebrow::before{background:var(--p)}
+.b-band p{color:var(--tx);max-width:34em;margin:0 auto 26px}
+.b-band .bw{background:var(--p);color:#fff}
+.contact{background:#fff}
+.contact .cwrap{display:grid;grid-template-columns:1fr 1.05fr;gap:56px}
+.cinfo{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.crow{display:flex;gap:15px;align-items:center;background:var(--cr);border:1px solid var(--bd);border-radius:18px;padding:15px 18px}
+.ci{flex-shrink:0;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:20px;background:#fff;border:1px solid var(--bd)}
+.cl{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--g);font-weight:700}.cv{font-size:1.02rem;font-weight:800;color:var(--p)}
+.t-bloom form{display:flex;flex-direction:column;gap:14px;background:var(--cr);border:1px solid var(--bd);border-radius:26px;padding:32px}
+.t-bloom input,.t-bloom textarea{padding:14px 16px;border:1.5px solid var(--bd);border-radius:14px;background:#fff;font-size:.96rem;font-family:inherit}
+.t-bloom input:focus,.t-bloom textarea:focus{outline:none;border-color:var(--a);box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 16%,transparent)}
+.t-bloom .fsub{border-radius:14px}
+@media(max-width:880px){.b-grid,.b-awrap,.contact .cwrap{grid-template-columns:1fr;gap:40px}.b-cluster{height:330px}.b-blob{max-width:340px;margin:0 auto}}
+@media(max-width:600px){.t-bloom nav{width:94%;padding:0 10px 0 18px}.t-bloom .ncta{display:none}}
+"""
+
+
+# ---------------------------------------------------------------- fragments
+def _chips(c):
+    labels = ["Trusted in " + esc(c["town"]), "Friendly local team", "Fair, honest prices"]
+    return "".join('<span class="chip">✓ ' + l + "</span>" for l in labels)
+
+
+def _mq(c):
+    items = "".join("<span>" + esc(s["title"]) + '</span><i>✦</i>' for s in c["services"])
+    return items + items
+
+
+def _whys(c, cls="whys", chk="chk"):
+    return "".join('<li class="why"><span class="' + chk + '">✓</span><div><h4>' + esc(h) +
+                   "</h4><p>" + esc(p) + "</p></div></li>" for h, p in c["why"])
+
+
+def _cards(c):
+    return "".join('<div class="card" data-tilt><div class="ico">' + s["icon"] + "</div><h3>" +
+                   esc(s["title"]) + "</h3><p>" + esc(s["desc"]) + "</p>" +
+                   ('<div class="price">' + esc(s["price"]) + "</div>" if s["price"] else "") +
+                   "</div>" for s in c["services"])
+
+
+def _revcards(c):
+    return "".join('<div class="rev"><div class="stars">★★★★★</div><p>"' + esc(r["txt"]) +
+                   '"</p><div class="auth"><div class="ava">' + esc(r["initials"]) +
+                   '</div><div><div class="an">' + esc(r["nm"]) + '</div><div class="al">' +
+                   esc(r["place"]) + "</div></div></div></div>" for r in c["reviews"])
+
+
+def _cta_label(c):
+    return ("📞 " + esc(c["phone"])) if c["phone"] else esc(c["cta"])
+
+
+def _nav(c):
+    return ('<div class="prog" id="prog" aria-hidden="true"></div>'
+            '<nav id="nav"><div class="logo">' + c["logo"] + "</div>"
+            '<ul class="nlinks"><li><a href="#services">' + esc(c["stag"]) + "</a></li>"
+            '<li><a href="#about">About</a></li><li><a href="#reviews">Reviews</a></li>'
+            '<li><a href="#contact">Contact</a></li></ul>'
+            '<div class="nav-right"><a href="' + c["href"] + '" class="ncta">' + _cta_label(c) + "</a>"
+            '<button class="tgl" id="tgl" aria-label="Open menu" aria-expanded="false">'
+            "<span></span><span></span><span></span></button></div></nav>"
+            '<div class="mm" id="mm"><a href="#services">' + esc(c["stag"]) + "</a>"
+            '<a href="#about">About</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a>'
+            '<a href="' + c["href"] + '" class="mcta">' + esc(c["cta"]) + "</a></div>")
+
+
+def _contact(c):
+    ph = esc(c["phone"]) if c["phone"] else "Add your number"
+    return ('<section id="contact" class="contact"><div class="wrap cwrap">'
+            '<div class="reveal"><div class="eyebrow">Get in touch</div><h2>' + esc(c["cta"]) + "</h2>"
+            '<p class="sub">We\'d love to hear from you. Call or drop a message and we\'ll get straight back.</p>'
+            '<div class="cinfo">'
+            '<div class="crow"><span class="ci">📞</span><div><div class="cl">Phone</div><div class="cv">' + ph + "</div></div></div>"
+            '<div class="crow"><span class="ci">📍</span><div><div class="cl">Area</div><div class="cv">' + esc(c["town"]) + " &amp; nearby</div></div></div>"
+            '<div class="crow"><span class="ci">🕒</span><div><div class="cl">Hours</div><div class="cv">Open 6 days a week</div></div></div>'
+            "</div></div>"
+            '<form class="reveal" onsubmit="return false"><input type="text" placeholder="Your name" aria-label="Your name">'
+            '<input type="tel" placeholder="Phone number" aria-label="Phone number">'
+            '<input type="email" placeholder="Email address" aria-label="Email address">'
+            '<textarea rows="4" placeholder="How can we help?" aria-label="Message"></textarea>'
+            '<button class="fsub bp" type="submit">Send message →</button></form></div></section>')
+
+
+def _footer(c):
+    ph = (" · " + esc(c["phone"])) if c["phone"] else ""
+    return ("<footer><div class=\"fn\">" + c["logo"] + "</div>"
+            "<div>" + esc(c["badge"]) + " · " + esc(c["town"]) + ph + "</div>"
+            '<p class="concept">This is a free design concept created by <b>HW Web Design</b> to show '
+            + esc(c["name"]) + " what a modern website could look like. Sample text, prices and reviews "
+            "are for illustration only. Like it? Let's make it real — hwwebdesign.co.uk</p></footer>"
+            '<a class="flag" href="' + BASE_URL + '" target="_blank" rel="noopener">✦ Concept by <b>HW Web Design</b></a>')
+
+
+def _page(c, bodyclass, css, body):
+    a = c["a"]
+    meta = ('<meta name="description" content="' + esc(c["name"]) + " — " + esc(c["badge"]) +
+            " in " + esc(c["town"]) + '. ' + esc(c["sub"]) + '">')
+    return ('<!DOCTYPE html><html lang="en-GB"><head><meta charset="UTF-8">'
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+            + meta + '<meta name="robots" content="noindex">'
+            "<title>" + esc(c["name"]) + " | " + esc(c["badge"]) + " in " + esc(c["town"]) + "</title>"
+            "<style>" + _vars(a) + CORE_CSS + BASE_BITS + css + "</style></head>"
+            '<body class="' + bodyclass + '"><div class="grain" aria-hidden="true"></div>'
+            + _nav(c) + body + _footer(c) + CORE_JS + "</body></html>")
+
+
+# ---------------------------------------------------------------- builders
+def build_stage(c):
+    q = c["reviews"][0]
+    body = (
+        '<header class="hero s-hero" id="top"><span class="orb o1"></span><span class="orb o2"></span>'
+        '<span class="grid-ov"></span><div class="s-hero-in">'
+        '<span class="badge"><span class="dot"></span>' + esc(c["badge"]) + " · " + esc(c["town"]) + "</span>"
+        "<h1>" + c["head"] + '</h1><p class="lead">' + esc(c["sub"]) + "</p>"
+        '<div class="btns"><a href="' + c["href"] + '" class="bp">' + esc(c["cta"]) +
+        ' →</a><a href="#services" class="bs">See services</a></div>'
+        '<div class="chips">' + _chips(c) + '</div></div><div class="s-fade"></div></header>'
+        '<div class="mqw" aria-hidden="true"><div class="mq">' + _mq(c) + "</div></div>"
+        '<div class="statwrap"><div class="statbar stagger">' + c["stats"] + "</div></div>"
+        '<section id="services"><div class="wrap"><div class="reveal"><div class="eyebrow">' +
+        esc(c["stag"]) + "</div><h2>" + esc(c["shead"]) + '</h2><p class="sub">' + esc(c["ssub"]) +
+        '</p></div><div class="grid stagger">' + _cards(c) + "</div></div></section>"
+        '<section id="about" class="cream"><div class="wrap awrap"><div class="reveal">'
+        '<div class="eyebrow">Why ' + esc(c["name"]) + "</div><h2>Why Locals Choose Us</h2>"
+        '<p class="sub">We\'re proud to serve ' + esc(c["town"]) + " and the area — and we work hard to keep it that way.</p>"
+        '<ul class="whys">' + _whys(c) + "</ul></div>"
+        '<div class="svisual" data-emoji="' + c["visual"] + '"><div class="svq"><div class="st">★★★★★</div><p>"' +
+        esc(q["txt"]) + '"</p><small>' + esc(q["nm"]) + " · " + esc(c["town"]) + "</small></div></div></div></section>"
+        '<section id="reviews"><div class="wrap"><div class="reveal"><div class="eyebrow">Reviews</div>'
+        "<h2>What People Say</h2><p class=\"sub\">Real words from happy customers across " + esc(c["town"]) +
+        ' and beyond.</p></div><div class="revs stagger">' + _revcards(c) + "</div></div></section>"
+        '<section class="band"><div class="wrap reveal"><div class="eyebrow">Ready when you are</div>'
+        "<h2>" + esc(c["cta"]) + " Today</h2><p>Friendly, local and easy to reach — " + esc(c["name"]) +
+        " is here for " + esc(c["town"]) + '.</p><a href="' + c["href"] + '" class="bw">' + _cta_label(c) +
+        "</a></div></section>" + _contact(c))
+    return _page(c, "t-stage", CSS_STAGE, body)
+
+
+def build_atelier(c):
+    q = c["reviews"][0]
+    rows = ""
+    for i, s in enumerate(c["services"], 1):
+        price = '<span class="a-price">' + esc(s["price"]) + "</span>" if s["price"] else '<span class="a-price">Enquire</span>'
+        rows += ('<div class="a-row reveal"><span class="a-num">%02d</span><div class="a-rc"><h3>' % i +
+                 esc(s["title"]) + "</h3><p>" + esc(s["desc"]) + "</p></div>" + price + "</div>")
+    qs = ""
+    for i, r in enumerate(c["reviews"]):
+        qs += ('<div class="q' + (" on" if i == 0 else "") + '"><div class="st">★★★★★</div><p>"' +
+               esc(r["txt"]) + '"</p><small>' + esc(r["nm"]) + " · " + esc(r["place"]) + "</small></div>")
+    astats = '<div class="a-stats count-wrap">'
+    for num, lab in c["a"]["stats"]:
+        cc = _count_num(num)
+        inner = ('<span data-count="' + cc[0] + '">' + cc[0] + "</span>" + cc[1]) if cc else esc(num)
+        astats += '<div class="a-st"><div class="num">' + inner + '</div><div class="lab">' + esc(lab) + "</div></div>"
+    astats += "</div>"
+    tel_html = ('<a href="' + c["href"] + '" class="a-tel">or call ' + esc(c["phone"]) + "</a>") if c["phone"] else ""
+    body = (
+        '<header class="hero a-hero" id="top"><div class="a-grid"><div class="a-copy clip">'
+        '<span class="a-eye">' + esc(c["badge"]) + " — " + esc(c["town"]) + "</span><h1>" + c["head"] +
+        '</h1><p class="lead">' + esc(c["sub"]) + '</p><div class="a-act"><a href="' + c["href"] +
+        '" class="bp">' + esc(c["cta"]) + "</a>" + tel_html + "</div></div>"
+        '<div class="a-panel reveal"><div class="a-frame"><span class="a-wm">' + c["visual"] + "</span></div>"
+        '<div class="a-qc"><div class="st">★★★★★</div><p>"' + esc(q["txt"]) + '"</p><small>' + esc(q["nm"]) +
+        "</small></div></div></div></header>"
+        '<section id="services" class="a-serv"><div class="wrap"><div class="reveal"><div class="eyebrow">' +
+        esc(c["stag"]) + "</div><h2>" + esc(c["shead"]) + '</h2><p class="sub">' + esc(c["ssub"]) +
+        '</p></div><div class="a-rows">' + rows + "</div></div></section>"
+        '<section id="about" class="a-about"><div class="wrap reveal"><div class="eyebrow">Why ' +
+        esc(c["name"]) + "</div><h2>A local name " + esc(c["town"]) + " can rely on</h2>" + astats + "</div></section>"
+        '<section id="reviews" class="a-rev"><div class="wrap reveal"><div class="eyebrow" style="justify-content:center">Reviews</div>'
+        '<div class="qrot">' + qs + "</div></div></section>"
+        '<section class="band a-band"><div class="wrap reveal"><div class="eyebrow">Ready when you are</div><h2>' +
+        esc(c["cta"]) + "</h2><p>Friendly, local and easy to reach — " + esc(c["name"]) + " is here for " +
+        esc(c["town"]) + '.</p><a href="' + c["href"] + '" class="bw">' + _cta_label(c) + "</a></div></section>"
+        + _contact(c))
+    return _page(c, "t-atelier", CSS_ATELIER, body)
+
+
+def build_momentum(c):
+    strip = "".join("<span>" + esc(s["title"]) + "</span><i>/</i>" for s in c["services"])
+    strip += strip
+    rows = ""
+    for i, s in enumerate(c["services"], 1):
+        extra = (" · " + esc(s["price"])) if s["price"] else ""
+        rows += ('<div class="m-row reveal"><span class="m-num">%02d</span><div class="m-rc"><h3>' % i +
+                 esc(s["title"]) + "</h3><p>" + esc(s["desc"]) + extra + '</p></div><span class="m-arrow">→</span></div>')
+    big = '<div class="m-big count-wrap">'
+    for num, lab in c["a"]["stats"]:
+        cc = _count_num(num)
+        inner = ('<span data-count="' + cc[0] + '">' + cc[0] + "</span>" + cc[1]) if cc else esc(num)
+        big += '<div class="m-bc"><div class="num">' + inner + '</div><div class="lab">' + esc(lab) + "</div></div>"
+    big += "</div>"
+    whys = "".join('<li><span class="chk">✓</span><div><h4>' + esc(h) + "</h4><p>" + esc(p) + "</p></div></li>"
+                   for h, p in c["why"])
+    tel_html = ('<a href="' + c["href"] + '" class="m-tel" data-mag>📞 ' + esc(c["phone"]) + "</a>") if c["phone"] else ""
+    body = (
+        '<header class="hero m-hero" id="top"><div class="m-in"><span class="m-eye">' + esc(c["badge"]) +
+        " / " + esc(c["town"]) + "</span><h1>" + c["head"] + '</h1><p class="lead">' + esc(c["sub"]) +
+        '</p><div class="btns"><a href="' + c["href"] + '" class="bp">' + esc(c["cta"]) + " →</a>" + tel_html +
+        '</div></div><div class="m-strip" aria-hidden="true"><div class="mq">' + strip + "</div></div></header>"
+        '<section class="m-stats"><div class="wrap statbar stagger count-wrap">' + c["stats"] + "</div></section>"
+        '<section id="services" class="m-serv"><div class="wrap"><div class="reveal"><div class="eyebrow">' +
+        esc(c["stag"]) + "</div><h2>" + esc(c["shead"]) + '</h2><p class="sub">' + esc(c["ssub"]) +
+        '</p></div><div class="m-list">' + rows + "</div></div></section>"
+        '<section id="about" class="m-about"><div class="m-awrap"><div class="reveal"><div class="eyebrow">Why ' +
+        esc(c["name"]) + '</div><h2>Built on doing it right</h2><ul class="m-whys">' + whys + "</ul></div>"
+        '<div class="reveal">' + big + "</div></div></section>"
+        '<section id="reviews" class="m-rev"><div class="wrap"><div class="reveal"><div class="eyebrow">Reviews</div>'
+        '<h2>The verdict</h2></div><div class="m-scroll">' + _revcards(c) + "</div></div></section>"
+        '<section class="band m-band"><div class="wrap reveal"><div class="eyebrow">Ready when you are</div><h2>' +
+        esc(c["cta"]) + "</h2><p>" + esc(c["name"]) + " — here for " + esc(c["town"]) +
+        ' and ready when you are.</p><a href="' + c["href"] + '" class="bw">' + _cta_label(c) + "</a></div></section>"
+        + _contact(c))
+    return _page(c, "t-momentum", CSS_MOMENTUM, body)
+
+
+def build_bloom(c):
+    s = c["services"]
+    def bcard(cls, sv):
+        return ('<div class="b-card ' + cls + '"><span>' + sv["icon"] + "</span><b>" + esc(sv["title"]) +
+                "</b><small>" + esc(sv["desc"]) + "</small></div>")
+    cluster = bcard("b-c1", s[0]) + bcard("b-c2", s[1]) + bcard("b-c3", s[2] if len(s) > 2 else s[0])
+    tiles = "".join('<div class="b-tile"><div class="b-tico">' + sv["icon"] + "</div><h3>" + esc(sv["title"]) +
+                    "</h3><p>" + esc(sv["desc"]) + "</p>" +
+                    ('<div class="price">' + esc(sv["price"]) + "</div>" if sv["price"] else "") + "</div>"
+                    for sv in c["services"])
+    pills = ""
+    for num, lab in c["a"]["stats"]:
+        cc = _count_num(num)
+        inner = ('<span data-count="' + cc[0] + '">' + cc[0] + "</span>" + cc[1]) if cc else esc(num)
+        pills += '<div class="b-pill"><span class="num">' + inner + '</span><span class="lab">' + esc(lab) + "</span></div>"
+    whys = "".join('<li><span class="chk">✓</span><div><h4>' + esc(h) + "</h4><p>" + esc(p) + "</p></div></li>"
+                   for h, p in c["why"])
+    revs = "".join('<div class="b-rev"><div class="stars">★★★★★</div><p>"' + esc(r["txt"]) +
+                   '"</p><div class="auth"><div class="ava">' + esc(r["initials"]) + '</div><div><div class="an">' +
+                   esc(r["nm"]) + '</div><div class="al">' + esc(r["place"]) + "</div></div></div></div>"
+                   for r in c["reviews"])
+    body = (
+        '<header class="hero b-hero" id="top"><div class="b-grid"><div class="b-copy reveal">'
+        '<span class="badge"><span class="dot"></span>' + esc(c["badge"]) + " · " + esc(c["town"]) + "</span><h1>" +
+        c["head"] + '</h1><p class="lead">' + esc(c["sub"]) + '</p><div class="btns"><a href="' + c["href"] +
+        '" class="bp">' + esc(c["cta"]) + ' →</a><a href="#services" class="bs">See more</a></div>'
+        '<div class="chips">' + _chips(c) + '</div></div><div class="b-cluster" aria-hidden="true">' + cluster +
+        "</div></div></header>"
+        '<div class="b-statwrap"><div class="b-pills stagger">' + pills + "</div></div>"
+        '<section id="services"><div class="wrap"><div class="reveal"><div class="eyebrow">' + esc(c["stag"]) +
+        "</div><h2>" + esc(c["shead"]) + '</h2><p class="sub">' + esc(c["ssub"]) + '</p></div><div class="b-tiles stagger">' +
+        tiles + "</div></div></section>"
+        '<section id="about" class="b-about"><div class="b-awrap"><div class="b-blob reveal">' + c["visual"] +
+        '</div><div class="reveal"><div class="eyebrow">Why ' + esc(c["name"]) +
+        '</div><h2>Made with care, loved by locals</h2><ul class="b-whys">' + whys + "</ul></div></div></section>"
+        '<section id="reviews"><div class="wrap"><div class="reveal"><div class="eyebrow">Reviews</div><h2>Kind words</h2></div>'
+        '<div class="b-revs stagger">' + revs + "</div></div></section>"
+        '<section class="band b-band"><div class="wrap reveal"><div class="eyebrow">Come say hello</div><h2>' +
+        esc(c["cta"]) + "</h2><p>" + esc(c["name"]) + " is here for " + esc(c["town"]) +
+        '. We\'d love to see you.</p><a href="' + c["href"] + '" class="bw">' + _cta_label(c) + "</a></div></section>"
+        + _contact(c))
+    return _page(c, "t-bloom", CSS_BLOOM, body)
+
+
+BUILDERS = {"stage": build_stage, "atelier": build_atelier,
+            "momentum": build_momentum, "bloom": build_bloom}
+
+
+def render(biz):
+    name, niche, town = biz["name"], biz["niche"], biz["town"]
+    n = NICHE.get(niche, NICHE["restaurant"])
+    a = ARCH[n["arch"]]
+    phone = (biz.get("phone") or "").strip()
+    href = "tel:" + tel(phone) if phone else "#contact"
+    fmt = lambda s: s.format(town=town)
+    services = [dict(icon=s["icon"], title=fmt(s["title"]), desc=fmt(s["desc"]), price=s["price"])
+                for s in n["services"]]
+    c = dict(name=name, town=town, phone=phone, href=href, logo=_logo(name),
+             badge=fmt(n["badge"]), sub=fmt(n["sub"]), head=_headline(n["head"], town),
+             cta=n["cta"], stag=n["stag"], shead=fmt(n["shead"]), ssub=fmt(n["ssub"]),
+             emoji=n["emoji"], visual=n["visual"], stats=_stats_html(a),
+             services=services, reviews=_reviews_list(n, town), why=a["why"], a=a, n=n)
+    return BUILDERS[pick_arch(name, town, niche)](c)
 
 
 def select(csv_path):
@@ -911,33 +1128,35 @@ def select(csv_path):
 
 
 def gallery(items):
+    def pal(b):
+        return ARCH[NICHE.get(b["niche"], NICHE["restaurant"])["arch"]]
     cards = "".join(
-        f'<a class="g" href="./{lead_slug(b["name"], b["town"])}/" target="_blank">'
-        f'<div class="gt" style="background:linear-gradient(140deg,{ARCH[NICHE.get(b["niche"], NICHE["restaurant"])["arch"]]["primary"]},{ARCH[NICHE.get(b["niche"], NICHE["restaurant"])["arch"]]["dark"]})">'
-        f'<span>{NICHE.get(b["niche"], {}).get("emoji", "🌐")}</span></div>'
-        f'<div class="gb"><div class="gn">{b["name"]}</div>'
-        f'<div class="gm">{b["niche"]} · {b["town"]}</div></div></a>'
+        '<a class="g" href="./' + lead_slug(b["name"], b["town"]) + '/" target="_blank">'
+        '<div class="gt" style="background:linear-gradient(140deg,' + pal(b)["primary"] + "," + pal(b)["dark"] +
+        ')"><span>' + NICHE.get(b["niche"], {}).get("emoji", "🌐") + "</span>"
+        '<em>' + pick_arch(b["name"], b["town"], b["niche"]) + "</em></div>"
+        '<div class="gb"><div class="gn">' + esc(b["name"]) + '</div>'
+        '<div class="gm">' + esc(b["niche"]) + " · " + esc(b["town"]) + "</div></div></a>"
         for b in items)
-    return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex">
-<title>HW Web Design — Live Mockups</title><style>
-*{{margin:0;padding:0;box-sizing:border-box}}body{{font-family:'Segoe UI',system-ui,sans-serif;background:#0b1220;color:#eef2fc}}
-header{{position:relative;background:radial-gradient(60% 90% at 80% -20%,rgba(124,58,237,.3),transparent 60%),radial-gradient(50% 80% at 10% 0%,rgba(37,99,235,.35),transparent 55%),#0b1220;padding:72px 6% 56px;overflow:hidden}}
-header h1{{font-size:clamp(28px,4vw,44px);font-weight:900;letter-spacing:-1px}}
-header h1 span{{background:linear-gradient(92deg,#60a5fa,#a78bfa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}}
-header p{{color:rgba(238,242,252,.7);margin-top:10px;font-size:17px;max-width:640px}}
-.wrap{{max-width:1140px;margin:0 auto;padding:46px 6% 90px}}
-.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}}
-.g{{background:#101a35;border:1px solid rgba(125,160,255,.14);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s,border-color .3s}}
-.g:hover{{transform:translateY(-6px);box-shadow:0 22px 50px rgba(2,6,20,.55);border-color:rgba(125,160,255,.35)}}
-.gt{{height:120px;display:flex;align-items:center;justify-content:center}}
-.gt span{{font-size:46px;filter:drop-shadow(0 6px 16px rgba(0,0,0,.4))}}
-.gb{{padding:16px 18px}}.gn{{font-weight:800;font-size:15.5px}}.gm{{color:rgba(238,242,252,.55);font-size:12.5px;text-transform:capitalize;margin-top:3px}}
-</style></head><body>
-<header><h1>Live Website <span>Mockups</span></h1>
-<p>Free design concepts built by HW Web Design for local businesses. Click any card to view the full mockup.</p></header>
-<div class="wrap"><div class="grid">{cards}</div></div></body></html>"""
+    return ('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+            '<meta name="robots" content="noindex"><title>HW Web Design — Live Mockups</title><style>'
+            "*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;background:#0b1220;color:#eef2fc}"
+            "header{background:radial-gradient(60% 90% at 80% -20%,rgba(124,58,237,.3),transparent 60%),radial-gradient(50% 80% at 10% 0%,rgba(37,99,235,.35),transparent 55%),#0b1220;padding:72px 6% 56px}"
+            "header h1{font-size:clamp(28px,4vw,44px);font-weight:900;letter-spacing:-1px}"
+            "header h1 span{background:linear-gradient(92deg,#60a5fa,#a78bfa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}"
+            "header p{color:rgba(238,242,252,.7);margin-top:10px;font-size:17px;max-width:640px}"
+            ".wrap{max-width:1140px;margin:0 auto;padding:46px 6% 90px}"
+            ".grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}"
+            ".g{background:#101a35;border:1px solid rgba(125,160,255,.14);border-radius:16px;overflow:hidden;color:inherit;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s,border-color .3s}"
+            ".g:hover{transform:translateY(-6px);box-shadow:0 22px 50px rgba(2,6,20,.55);border-color:rgba(125,160,255,.35)}"
+            ".gt{position:relative;height:120px;display:flex;align-items:center;justify-content:center}"
+            ".gt span{font-size:46px;filter:drop-shadow(0 6px 16px rgba(0,0,0,.4))}"
+            ".gt em{position:absolute;top:10px;right:12px;font-style:normal;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);background:rgba(0,0,0,.3);padding:3px 8px;border-radius:999px}"
+            ".gb{padding:16px 18px}.gn{font-weight:800;font-size:15.5px}.gm{color:rgba(238,242,252,.55);font-size:12.5px;text-transform:capitalize;margin-top:3px}"
+            "</style></head><body><header><h1>Live Website <span>Mockups</span></h1>"
+            "<p>Free design concepts built by HW Web Design for local businesses — now in four distinct styles. Click any card to view the full mockup.</p></header>"
+            '<div class="wrap"><div class="grid">' + cards + "</div></div></body></html>")
 
 
 def main():
@@ -954,9 +1173,14 @@ def main():
             f.write(render(b))
     with open("mockups/index.html", "w") as f:
         f.write(gallery(items))
-    print(f"Generated {len(items)} mockups -> mockups/  (gallery: mockups/index.html)")
-    for b in items[:5]:
-        print(f"  · {BASE_URL}/mockups/{lead_slug(b['name'], b['town'])}/  ({b['name']})")
+    counts = {}
+    for b in items:
+        if lead_slug(b["name"], b["town"]) in BESPOKE_SLUGS:
+            continue
+        k = pick_arch(b["name"], b["town"], b["niche"])
+        counts[k] = counts.get(k, 0) + 1
+    print("Generated %d mockups -> mockups/  (gallery: mockups/index.html)" % len(items))
+    print("Architecture spread: " + ", ".join("%s=%d" % (k, v) for k, v in sorted(counts.items())))
 
 
 if __name__ == "__main__":
