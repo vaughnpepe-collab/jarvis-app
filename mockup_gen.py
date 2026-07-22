@@ -405,6 +405,48 @@ NICHE_OVERRIDE = {
     "hairdressing-for-men-amersham": "barber",
 }
 
+# Hand-verified REAL content for chosen leads: actual services taken from the
+# business's own website (prices only where the site publishes them — never
+# invented). Merged over the niche defaults so the page shows their real offer.
+CUSTOM = {
+    "aps-accountancy-aylesbury": dict(
+        shead="How We Help", ssub="Real accountancy support for limited companies, sole traders and individuals in {town}.",
+        services=[svc("🏢", "Limited Company Accounts", "Full accountancy for established and new limited companies."),
+                  svc("🧾", "Sole Trader & Self-Assessment", "Year-end returns and support for the self-employed."),
+                  svc("💷", "Payroll", "Payroll processing and staff payment administration."),
+                  svc("📊", "Personal Tax", "Individual tax management that minimises your liability."),
+                  svc("💡", "Business Advice", "Practical guidance on profitability and strategy."),
+                  svc("🚀", "Start-Ups", "Support for new businesses from launch onwards.")]),
+    "auto-rust-prevention-high-wycombe": dict(
+        badge="Rust Prevention & Car Care",
+        head="Stop the Rust, <span>Protect Your Car</span>",
+        sub="Underbody rust prevention, welding repairs, servicing and detailing in {town} — keeping your car solid, safe and looking its best.",
+        shead="Rust Prevention & Repairs", ssub="From underbody proofing to full servicing and detailing — proper protection, proper care.",
+        services=[svc("🛡", "Underbody Rust Prevention", "Protective coatings against water ingress and road salt."),
+                  svc("🔧", "Rust Repairs & Welding", "MIG welding and corrosion repairs done properly."),
+                  svc("🛠", "Servicing & Repairs", "Diagnostics, oil, brakes, clutch, suspension and electrics."),
+                  svc("✨", "Detailing & Valeting", "Professional cleaning and finishing packages."),
+                  svc("🔍", "Engine Diagnostics", "Fault finding to get to the root of the problem."),
+                  svc("🚗", "All Makes & Models", "Work on any vehicle, whatever you drive.")]),
+    "andrew-milsom-marlow": dict(
+        shead="With You At Every Step", ssub="Selling, letting and managing property across Berkshire, Buckinghamshire and Oxfordshire.",
+        services=[svc("🏷", "Free Market Appraisal", "Honest, professional valuations at no cost."),
+                  svc("🏠", "Residential Sales", "Selling homes across Berks, Bucks & Oxon."),
+                  svc("🔑", "Residential Lettings", "Letting properties of all sizes and styles."),
+                  svc("📋", "Property Management", "Full management for landlords and investors."),
+                  svc("💷", "Mortgage Services", "Links with trusted independent financial advisers."),
+                  svc("🤝", "Landlord Advice", "Guidance on letting or investing in property.")]),
+    "hill-climb-garage-high-wycombe": dict(
+        sub="Award-winning servicing, MOTs and repairs in {town} — including electric & hybrid — with free local collection and drop-off.",
+        shead="Everything Your Car Needs", ssub="Comprehensive servicing and repairs, with EV & hybrid specialists and free local collection.",
+        services=[svc("🔧", "Servicing", "Comprehensive car servicing to schedule."),
+                  svc("📋", "MOT Testing", "MOT testing and certification."),
+                  svc("🔍", "Diagnostics", "Vehicle diagnostics and fault finding."),
+                  svc("❄️", "Air Conditioning", "Air-con servicing and repair."),
+                  svc("🛞", "Tyre Shop", "Tyre sales and fitting."),
+                  svc("🔋", "EV & Hybrid Specialists", "Servicing for electric and hybrid vehicles.")]),
+}
+
 
 def pick_arch(name, town, niche):
     cands = CANDIDATES.get(niche, ["stage", "bloom"])
@@ -1187,8 +1229,10 @@ BUILDERS = {"stage": build_stage, "atelier": build_atelier,
 
 def render(biz):
     name, niche, town = biz["name"], biz["niche"], biz["town"]
-    niche = NICHE_OVERRIDE.get(lead_slug(name, town), niche)
-    n = NICHE.get(niche, NICHE["restaurant"])
+    slug = lead_slug(name, town)
+    niche = NICHE_OVERRIDE.get(slug, niche)
+    n = dict(NICHE.get(niche, NICHE["restaurant"]))
+    n.update(CUSTOM.get(slug, {}))  # real, hand-verified content wins
     a = ARCH[n["arch"]]
     phone = (biz.get("phone") or "").strip()
     href = "tel:" + tel(phone) if phone else "#contact"
