@@ -90,6 +90,33 @@ ARCH = {
                               ("Fixed, Fair Fees", "Know your costs upfront, with no surprise bills."),
                               ("Proactive Support", "We chase the deadlines so you don't have to."),
                               ("Local & Personal", "A real person who knows your business, not a call centre.")]),
+    "barber": dict(primary="#232326", dark="#141416", accent="#b8863b",
+                   accent2="#e3c07f", hero="#0d0d10,#232326,#161618",
+                   text="#26262b", grey="#6b6b73", border="#e6e4e0", cream="#f7f6f3",
+                   stats=[("Walk-ins", "Welcome"), ("Sharp", "Every time"),
+                          ("6 Days", "Open")],
+                   why=[("Skilled Barbers", "Precision cuts, fades and beard work by experienced hands."),
+                        ("Walk-In or Book", "Pop in when it suits, or reserve your chair online."),
+                        ("Relaxed Atmosphere", "Good chat, good music and a proper finish every time."),
+                        ("Sharp, Every Time", "From classic cuts to modern styles — done right.")]),
+    "club": dict(primary="#15603a", dark="#0f4429", accent="#c9972a",
+                 accent2="#f0c060", hero="#08301d,#12563a,#0d4029",
+                 text="#1f2b24", grey="#5f7a6a", border="#dbe8e0", cream="#f2f9f5",
+                 stats=[("All", "Abilities welcome"), ("New", "Members welcome"),
+                        ("Juniors", "& seniors")],
+                 why=[("Everyone's Welcome", "From beginners to seasoned members — there's a place for you."),
+                      ("Great Facilities", "Well-kept grounds, equipment and a friendly clubhouse."),
+                      ("Coaching & Socials", "Improve your game and enjoy the social side too."),
+                      ("Community Spirit", "More than a club — a proper local community.")]),
+    "studio": dict(primary="#7c3a9d", dark="#5c2a76", accent="#e0894a",
+                   accent2="#f4b78a", hero="#2a1233,#4a2258,#3a1a48",
+                   text="#3a2a40", grey="#7a6a80", border="#ecdff2", cream="#faf5fc",
+                   stats=[("All", "Levels welcome"), ("Small", "Class sizes"),
+                          ("Weekly", "Timetable")],
+                   why=[("Every Level Welcome", "Total beginners to advanced — classes for everyone."),
+                        ("Small, Friendly Classes", "Personal attention in a calm, supportive space."),
+                        ("Expert Instructors", "Qualified, encouraging teachers who genuinely care."),
+                        ("Flexible Passes", "Drop in or join — memberships to suit you.")]),
 }
 
 # ---------------------------------------------------------------- niches
@@ -278,6 +305,42 @@ NICHE = {
                   svc("🥪", "Fresh Sandwiches", "Made on our own bread, every lunchtime."),
                   svc("☕", "Coffee To Go", "Proper coffee with your morning loaf."),
                   svc("🏪", "Wholesale", "Supplying local cafés and restaurants.")]),
+    "barber": dict(arch="barber", emoji="💈", visual="💈",
+        badge="Barbershop", hl="Every Time",
+        head="Sharp Cuts, <span>Every Time</span>",
+        sub="Skin fades, classic cuts, beard trims and hot-towel shaves in {town}. Walk in or book your chair — you'll leave looking sharp.",
+        cta="Book a Chair", stag="Our Services", shead="Cuts & Grooming",
+        ssub="From a quick tidy-up to the full works — done properly, every time.",
+        services=[svc("✂️", "Skin Fades & Cuts", "Precision fades and classic cuts.", "from £16"),
+                  svc("🧔", "Beard Trim & Shape", "Sharp lines and a clean finish.", "from £10"),
+                  svc("🪒", "Hot Towel Shave", "A traditional, relaxing wet shave.", "from £20"),
+                  svc("👦", "Kids' Cuts", "Patient, friendly cuts for the little ones.", "from £12"),
+                  svc("💈", "Cut & Beard Combo", "The full works, head to chin.", "from £24"),
+                  svc("🧴", "Styling & Products", "Advice and quality grooming products.")]),
+    "club": dict(arch="club", emoji="🏅", visual="🏆",
+        badge="Members' Club", hl="Local Club",
+        head="Your Local <span>Club</span>",
+        sub="A friendly, welcoming club in {town} — membership, coaching and events for all ages and abilities. Come and be part of it.",
+        cta="Become a Member", stag="What We Offer", shead="Join the Club",
+        ssub="Whether you're brand new or a seasoned member, there's a place for you here.",
+        services=[svc("🎫", "Membership", "Flexible membership for all ages."),
+                  svc("🎓", "Coaching & Lessons", "Improve with friendly, expert coaching."),
+                  svc("📅", "Fixtures & Events", "A full calendar of fixtures and socials."),
+                  svc("🏛", "Facilities & Hire", "Great facilities, available to hire."),
+                  svc("🧒", "Juniors & Beginners", "A warm welcome for newcomers and kids."),
+                  svc("🍻", "Clubhouse & Socials", "The social heart of the club.")]),
+    "studio": dict(arch="studio", emoji="🧘", visual="🧘",
+        badge="Studio", hl="Belong",
+        head="Move, Breathe, <span>Belong</span>",
+        sub="Welcoming classes for every level in {town} — find your flow, build strength and feel great. Your first class is the hardest step.",
+        cta="Book a Class", stag="Our Classes", shead="Classes For Everyone",
+        ssub="Beginners to advanced — small, friendly classes with room to grow.",
+        services=[svc("🌱", "Beginners' Classes", "The perfect place to start."),
+                  svc("🗓", "Weekly Timetable", "Classes morning, noon and evening."),
+                  svc("👥", "Small Group Classes", "Personal attention, friendly faces."),
+                  svc("🧘", "Private Sessions", "One-to-one, tailored to you."),
+                  svc("✨", "All Levels Welcome", "Move at your own pace, always."),
+                  svc("🎟", "Memberships & Passes", "Drop in or join — your choice.", "from £10")]),
 }
 
 REVIEWS = {  # (text, name) — first review localised to the lead's town
@@ -299,6 +362,15 @@ REVIEWS = {  # (text, name) — first review localised to the lead's town
     "professional": [("Took all the stress out of my tax return and saved me money. Clear, no jargon, brilliant.", "Rachel N."),
                      ("Switched to them last year — proactive, responsive and genuinely helpful. Wish I'd done it sooner.", "Paul G."),
                      ("Fixed fees, real advice and they actually pick up the phone. Exactly what a small business needs.", "Emma V.")],
+    "barber": [("Best fade I've had in ages — in and out, sharp finish, sound bloke.", "Jordan M."),
+               ("Been coming here for years. Always a proper cut and good banter.", "Chris P."),
+               ("Took my lad for his first proper haircut, they were brilliant with him.", "Dean R.")],
+    "club": [("Joined last season and everyone made me feel welcome straight away.", "Helen W."),
+             ("Brilliant facilities and a real community feel. My kids love it.", "Mark T."),
+             ("Great coaching and a lovely clubhouse. Best decision we made.", "Sarah L.")],
+    "studio": [("Nervous first-timer and they put me completely at ease. Hooked now!", "Amy R."),
+               ("Small classes mean real attention. I've improved so much already.", "Bec H."),
+               ("The instructors are amazing and the whole vibe is so welcoming.", "Priya K.")],
 }
 NEARBY = ["High Wycombe", "Marlow", "Beaconsfield", "Amersham"]
 
@@ -314,6 +386,23 @@ CANDIDATES = {
     "plumber": ["momentum", "stage"], "electrician": ["momentum", "stage"], "roofer": ["momentum", "stage"],
     "gym": ["momentum", "stage"], "accountant": ["atelier", "stage"], "garage": ["momentum", "stage"],
     "estate agent": ["atelier", "stage"], "optician": ["atelier", "stage"], "detailing": ["momentum", "stage"],
+    "barber": ["momentum", "stage"], "club": ["stage", "atelier"], "studio": ["bloom", "stage"],
+}
+
+# Businesses the source data mis-categorised: correct the niche by slug so the
+# page shows the right trade (a rowing club must not show gym services, etc.).
+NICHE_OVERRIDE = {
+    "marlow-rowing-club-marlow": "club",
+    "upper-thames-rowing-club-henley-on-thames": "club",
+    "farnham-royal-cricket-club-slough": "club",
+    "phyllis-court-croquet-club-henley-on-thames": "club",
+    "henley-yoga-studio-henley-on-thames": "studio",
+    "pole-attack-aylesbury": "studio",
+    "barber-crew-henley-on-thames": "barber",
+    "the-barbershop-group-princes-risborough": "barber",
+    "ozzy-s-traditional-barbers-amersham": "barber",
+    "the-art-of-turkish-barbering-marlow": "barber",
+    "hairdressing-for-men-amersham": "barber",
 }
 
 
@@ -1098,6 +1187,7 @@ BUILDERS = {"stage": build_stage, "atelier": build_atelier,
 
 def render(biz):
     name, niche, town = biz["name"], biz["niche"], biz["town"]
+    niche = NICHE_OVERRIDE.get(lead_slug(name, town), niche)
     n = NICHE.get(niche, NICHE["restaurant"])
     a = ARCH[n["arch"]]
     phone = (biz.get("phone") or "").strip()
