@@ -30,6 +30,7 @@ a design concept on every page.
 import csv
 import hashlib
 import os
+import re
 import sys
 
 from area_sweep import lead_slug, WARM_LIMIT, BASE_URL
@@ -1056,15 +1057,61 @@ def _footer(c):
             '<a class="flag" href="' + BASE_URL + '" target="_blank" rel="noopener">✦ Concept by <b>HW Web Design</b></a>')
 
 
+def _hex_rgb(h):
+    h = h.lstrip("#")
+    if len(h) == 3:
+        h = "".join(ch * 2 for ch in h)
+    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+
+
+_CM_RE = re.compile(
+    r"color-mix\(in srgb,\s*(var\(--[a-z0-9]+\)|#[0-9a-fA-F]{3,6}|transparent)"
+    r"\s+([\d.]+)%\s*,\s*(var\(--[a-z0-9]+\)|#[0-9a-fA-F]{3,6}|transparent)\)")
+
+
+def _resolve_cm(css, pal):
+    """Replace every color-mix() with a plain rgba()/hex so old browsers and
+    in-app webviews (Facebook/Gmail) render correctly — color-mix isn't
+    universally supported and a failed value drops the whole declaration."""
+    def resolve(tok):
+        tok = tok.strip()
+        if tok.startswith("var("):
+            return pal.get(tok[4:-1], "#808080")
+        return tok
+
+    def repl(m):
+        a_col, pct, b_col = resolve(m.group(1)), float(m.group(2)) / 100.0, resolve(m.group(3))
+        ar, ag, ab = _hex_rgb(a_col)
+        if b_col == "transparent":
+            alpha = ("%.3f" % pct).rstrip("0").rstrip(".")
+            return "rgba(%d,%d,%d,%s)" % (ar, ag, ab, alpha)
+        br, bg, bb = _hex_rgb(b_col)
+        return "#%02x%02x%02x" % (round(ar * pct + br * (1 - pct)),
+                                  round(ag * pct + bg * (1 - pct)),
+                                  round(ab * pct + bb * (1 - pct)))
+    return _CM_RE.sub(repl, css)
+
+
+def _compat(css):
+    """Add fallbacks/prefixes for features that fail on older mobile browsers."""
+    css = css.replace("min-height:100svh", "min-height:100vh;min-height:100svh")
+    css = re.sub(r"(?<![-\w])backdrop-filter:([^;]+);",
+                 lambda m: "-webkit-backdrop-filter:%s;backdrop-filter:%s;" % (m.group(1), m.group(1)), css)
+    return css
+
+
 def _page(c, bodyclass, css, body):
     a = c["a"]
+    pal = {"--a": a["accent"], "--a2": a["accent2"], "--cr": a["cream"], "--g": a["grey"],
+           "--p": a["primary"], "--pd": a["dark"], "--bd": a["border"]}
+    style = _compat(_resolve_cm(_vars(a) + CORE_CSS + BASE_BITS + css, pal))
     meta = ('<meta name="description" content="' + esc(c["name"]) + " — " + esc(c["badge"]) +
             " in " + esc(c["town"]) + '. ' + esc(c["sub"]) + '">')
     return ('<!DOCTYPE html><html lang="en-GB"><head><meta charset="UTF-8">'
             '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
             + meta + '<meta name="robots" content="noindex">'
             "<title>" + esc(c["name"]) + " | " + esc(c["badge"]) + " in " + esc(c["town"]) + "</title>"
-            "<style>" + _vars(a) + CORE_CSS + BASE_BITS + css + "</style></head>"
+            "<style>" + style + "</style></head>"
             '<body class="' + bodyclass + '"><div class="grain" aria-hidden="true"></div>'
             + _nav(c) + body + _footer(c) + CORE_JS + "</body></html>")
 

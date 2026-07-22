@@ -24,7 +24,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 .tgl.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
 .tgl.open span:nth-child(2){opacity:0}
 .tgl.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.mm{position:fixed;top:70px;left:0;right:0;z-index:190;background:rgba(12,14,20,.97);backdrop-filter:blur(14px);display:flex;flex-direction:column;padding:8px 5% 20px;transform:translateY(-140%);transition:transform .38s var(--ease);border-bottom:1px solid rgba(255,255,255,.1)}
+.mm{position:fixed;top:70px;left:0;right:0;z-index:190;background:rgba(12,14,20,.97);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);display:flex;flex-direction:column;padding:8px 5% 20px;transform:translateY(-140%);transition:transform .38s var(--ease);border-bottom:1px solid rgba(255,255,255,.1)}
 .mm.open{transform:translateY(0)}
 .mm a{color:rgba(255,255,255,.92);font-size:1rem;font-weight:600;padding:14px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
 .mm a.mcta{background:var(--a);color:#11151c;text-align:center;border-radius:12px;margin-top:12px;border:0;font-weight:800}
@@ -84,7 +84,7 @@ h1 em{font-style:normal;background:linear-gradient(92deg,var(--a),var(--a2));-we
 .t-momentum section{background:#0a0d14}
 .t-momentum h2{color:#fff}.t-momentum .sub{color:rgba(255,255,255,.6)}
 .t-momentum nav.solid{background:rgba(10,13,20,.85);border-bottom:1px solid rgba(255,255,255,.08)}
-.m-hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:120px 6% 0;position:relative;overflow:hidden;background:radial-gradient(70% 60% at 75% 15%,color-mix(in srgb,var(--a) 24%,transparent),transparent 60%),#0a0d14}
+.m-hero{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:120px 6% 0;position:relative;overflow:hidden;background:radial-gradient(70% 60% at 75% 15%,rgba(132,204,22,0.24),transparent 60%),#0a0d14}
 .m-hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(115deg,transparent 0 38px,rgba(255,255,255,.025) 38px 39px);pointer-events:none}
 .m-in{max-width:1180px;margin:0 auto;width:100%;position:relative;padding-bottom:56px}
 .m-eye{display:inline-block;font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;color:var(--a);font-weight:800;margin-bottom:22px}
