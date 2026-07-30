@@ -463,3 +463,56 @@ run.
 - Nothing here models funding, borrow, tax, or a venue freezing withdrawals.
 
 Not advice. The strategy is yours; this only executes it.
+
+---
+
+# Research — the part that tries to talk you out of it
+
+`backtest.py` answers "what would these rules have done?". `research.py` answers
+the only question that matters before risking money: **is that result real, or is
+it noise that looks like a result?**
+
+```
+python research.py BTC-USD 1h 3000
+```
+
+Four tests, each killing a different self-deception:
+
+| test | kills |
+|---|---|
+| **random-entry baseline** | "my signal is doing something" — same exits, same trade count, entries on randomly chosen bars, 500 times. Beat the 95th percentile of dice rolls or you have no signal. |
+| **walk-forward** | "it works on the data I tuned it on" — parameters chosen using only earlier bars, scored on later ones. The gap between the two is your overfitting, quantified. |
+| **multiple-testing correction** | "the best of my 500 tests looks great" — the max of N draws grows with N. `expected_max_t` gives the bar pure noise would clear. |
+| **buy-and-hold + exposure** | "I made money" when you just held. A return that tracks time-in-market is beta in a costume. |
+
+## What it found on this toolkit's own strategies
+
+280 rule combinations, walk-forward over 4 folds, five markets, 3000 hourly bars
+each (Mar–Jul 2026):
+
+```
+market       in-samp%         OOS%    buy&hold%    overfit  vs random
+BTC-USD        +48.22       -25.04        +0.09     +73.27       23%
+ETH-USD        +56.54       -23.91        -1.47     +80.45       26%
+SOL-USD        +59.40       -50.46        -8.29    +109.87        1%
+LINK-USD       +72.54       -25.34        -0.31     +97.88       29%
+DOGE-USD       +60.42       -41.90       -19.20    +102.32       22%
+
+  markets with positive OOS     : 0 of 5
+  markets that beat buy & hold  : 0 of 5
+  markets beating 95% of random : 0 of 5
+  mean overfit gap              : +92.8 points
+  pooled: 300 OOS trades, -0.556%/trade, t = -3.78
+  pooled 95% CI per trade       : -0.836% to -0.258%
+```
+
+Read the last line twice. The confidence interval sits **entirely below zero** at
+t = −3.78. This is not "no edge found" — it is a statistically significant
+finding that selecting indicator rules by in-sample performance and trading them
+on the next window **reliably loses money**, at roughly half a percent per trade.
+
+The mechanism is not mysterious: 0.30% round-trip costs on every trade, applied
+to a rule chosen precisely because it fitted noise that then failed to repeat.
+
+That is the most valuable output this repo has produced. It cost nothing to learn
+and it would have cost real money to learn any other way.

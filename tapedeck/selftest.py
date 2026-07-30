@@ -382,6 +382,90 @@ def test_backtest():
           all((t["gross_pct"] > 0) == (t["exit"] < t["entry"]) for t in short["trades"]))
 
 
+def test_research():
+    """
+    The validation harness has to be harder on a strategy than the strategy is on
+    itself, so these checks are mostly "does it correctly say NO".
+    """
+    print("research / validation")
+    import research
+
+    check("t-statistic of zero-mean noise is near zero",
+          abs(research.t_stat([1.0, -1.0, 1.0, -1.0, 1.0, -1.0])) < 0.5)
+    check("t-statistic of a consistent gain is positive",
+          research.t_stat([1.0, 1.1, 0.9, 1.0, 1.05]) > 5)
+    check("a single trade cannot produce a t-statistic",
+          research.t_stat([5.0]) == 0.0)
+    check("a flat series cannot produce a t-statistic",
+          research.t_stat([1.0, 1.0, 1.0]) == 0.0)
+
+    # the multiple-testing bar must rise as you test more things
+    bars_10 = research.expected_max_t(10)
+    bars_500 = research.expected_max_t(500)
+    check("the noise bar rises with the number of candidates tested",
+          bars_500 > bars_10 > 0, "%r vs %r" % (bars_500, bars_10))
+    check("testing 500 rules sets a bar above the naive 2.0",
+          bars_500 > 2.0, "%r" % bars_500)
+
+    low, high = research.bootstrap_ci([1.0, 1.2, 0.8, 1.1, 0.9, 1.0, 1.05, 0.95],
+                                      iterations=500)
+    check("a bootstrap interval brackets the mean", low < 1.0 < high,
+          "%r %r" % (low, high))
+    check("a clearly positive sample excludes zero", low > 0)
+    noisy = research.bootstrap_ci([5.0, -5.0, 4.0, -4.5, 3.0, -3.5, 2.0, -2.0],
+                                  iterations=500)
+    check("a noisy sample's interval includes zero",
+          noisy[0] < 0 < noisy[1], "%r" % (noisy,))
+    check("too few trades gives no interval",
+          research.bootstrap_ci([1.0, 2.0]) == (None, None))
+
+    # folds must be chronological, non-overlapping, and after the warm-up
+    windows = research.fold_bounds(1000, 4, warmup=200)
+    check("folds start after the warm-up", windows and windows[0][0] == 200)
+    check("folds do not overlap",
+          all(windows[i][1] == windows[i + 1][0] for i in range(len(windows) - 1)))
+    check("folds reach the end of the data", windows[-1][1] == 1000)
+    check("too little history yields no folds", research.fold_bounds(100, 4) == [])
+
+    # the selection must never see the window it is judged on
+    synthetic = synth(900)
+    pool = research.candidates(max_conditions=1)[:40]
+    wf = research.walk_forward(synthetic, pool, folds=3, warmup=200)
+    check("walk-forward produces out-of-sample folds", len(wf["folds"]) >= 2,
+          str(len(wf["folds"])))
+    check("each fold records what it chose and what that scored after",
+          all("chosen" in f and "oos_pct" in f for f in wf["folds"]))
+    check("out-of-sample returns are collected across folds",
+          len(wf["oos_returns"]) == sum(len(f["oos_returns"]) for f in wf["folds"]))
+
+    spec = research.make_spec([research.cond(research.ref("rsi", 14), "<", 40.0,
+                                             "RSI(14) below 40")],
+                              atr_stop=1.5, target_pct=3.0, max_hold=24)
+    check("a constructed spec is one the backtester accepts",
+          isinstance(backtest.run(synthetic, spec)["stats"]["trades"], int))
+    check("a constructed spec carries its entry into the strategy",
+          spec["strategy"]["entry"] == spec["filters"])
+
+    dist = research.random_entry_baseline(synthetic, spec, trade_count=5, iterations=50)
+    check("the random baseline returns one result per run", len(dist) == 50)
+    check("the random baseline is sorted", dist == sorted(dist))
+    check("percentile_of places a value in its distribution",
+          research.percentile_of(dist[len(dist) // 2], dist) > 40)
+    check("a value above everything scores 100",
+          research.percentile_of(max(dist) + 1, dist) == 100.0)
+
+    # the verdict must refuse thin or unconvincing evidence
+    good, reasons = research.verdict([0.1] * 5, 100, 99.0, 10.0, 1.0)
+    check("a handful of trades is refused", not good)
+    check("and the refusal says why", any("too few" in r for r in reasons))
+    weak, reasons2 = research.verdict([0.5, -0.4] * 30, 300, 50.0, 2.0, 5.0)
+    check("a coin-flip strategy is refused", not weak)
+    check("losing to buy-and-hold is one of the stated reasons",
+          any("buy-and-hold" in r for r in reasons2), str(reasons2))
+    check("failing the random-entry baseline is a stated reason",
+          any("random-entry" in r for r in reasons2), str(reasons2))
+
+
 def main():
     print("Tapedeck self-test — offline, synthetic data\n")
     test_indicators(); print()
@@ -393,6 +477,7 @@ def main():
     test_watch_clock(); print()
     test_cache_rules(); print()
     test_backtest(); print()
+    test_research(); print()
     if FAILED:
         print("%d check(s) FAILED:" % len(FAILED))
         for name in FAILED:
