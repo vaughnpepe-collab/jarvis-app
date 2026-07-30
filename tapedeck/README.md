@@ -284,3 +284,182 @@ unlisted symbol never silently becoming a market you didn't ask for.
 - Long or short, one position at a time, fixed notional, no compounding.
 - `levels()` finds horizontal price bands. It does not draw trendlines or channels.
 - The scanner checks bars that have **closed**. It is not a live alerting service.
+
+---
+
+# Execution — trading a brief automatically
+
+Everything above is read-only. This part sends orders.
+
+```
+python live.py "BTC with RSI below 30 and volume +200%, 1.5 ATR stop, 3% target"
+```
+
+`tapedeck.py` **cannot trade**. It has no order path and no credential handling —
+the read-only tool stays read-only, and every line that can spend money lives in
+`live.py` and the four modules it imports. That split is the point: the trading
+surface is small enough to read in one sitting.
+
+## Three modes
+
+| mode | money | keys | what it does |
+|---|---|---|---|
+| `--mode paper` *(default)* | simulated | none | real prices, simulated fills, full blotter |
+| `--mode shadow` | none | read keys | authenticates, reads your real balances and market rules, **prints** the orders it would send |
+| `--mode live` | **real** | trade keys | sends orders |
+
+Run them in that order. Shadow is the stage that tells you whether your sizing,
+the venue's increments and your actual funds survive contact with the real
+account — before an order exists.
+
+## Arming live mode takes two independent actions
+
+```
+--mode live                    on the command line
+TAPEDECK_LIVE_CONFIRM=yes      in the environment
+```
+
+Miss either and it refuses, names the missing gate, and exits without sending
+anything. One gate is too easy to trip with a stale shell alias.
+
+## Keys
+
+From the environment only — never a CLI argument (those land in shell history and
+in `ps` output), never a file in the repo.
+
+| `--venue` | environment variables | signing |
+|---|---|---|
+| `kraken` | `KRAKEN_API_KEY`, `KRAKEN_API_SECRET` | HMAC-SHA512 |
+| `coinbase-exchange` | `CB_EXCHANGE_KEY`, `CB_EXCHANGE_SECRET`, `CB_EXCHANGE_PASSPHRASE` | HMAC-SHA256 |
+| `coinbase-advanced` | `CB_CDP_KEY_NAME`, `CB_CDP_PRIVATE_KEY` | ES256 JWT |
+
+`python venues.py` reports which venues are configured. It prints presence only,
+never a value — a truncated key in a log is still a leaked key.
+
+Grant the key **trade** permission and nothing more. There is no withdrawal or
+transfer call anywhere in this project, and no venue requires withdrawal
+permission to place an order. A trading key that cannot move coins off the
+exchange is a categorically smaller problem if it leaks.
+
+`coinbase-advanced` is the one adapter with a dependency: ES256 is not in the
+standard library, so it needs `pip install "PyJWT[crypto]"`. Everything else,
+including all of paper mode, stays dependency-free.
+
+## How a bar is traded — and why it matches the backtest
+
+The backtester evaluates conditions on a **closed** bar and enters at the **next
+bar's open**. Live, the moment a bar closes *is* the next bar's open, so a market
+order placed immediately after the close is the faithful equivalent. That is why
+the loop is bar-aligned rather than polling every few seconds: it makes the live
+rule and the tested rule the same rule.
+
+Each bar close, per market:
+
+1. refresh candles
+2. let resting stops resolve (paper simulates; live asks the venue)
+3. manage an open position — stop gone? target hit? exit signal? held too long?
+4. otherwise test the entry conditions, then ask the risk gate
+5. on a permitted entry: send the order, then **immediately** park a protective
+   stop at the venue
+
+If step 5's stop cannot be placed, the position is closed again at once. A
+position without a stop is the one state this loop will not sit in — it would
+rather take a small round-trip loss than hold something unprotected.
+
+## The risk gate
+
+Every entry passes `risk.RiskEngine.check_entry()` before an order exists.
+Nothing in the loop sizes a trade by itself.
+
+```
+kill switch       a file on disk halts new entries, immediately
+shorting          refused unless the broker can actually borrow (spot cannot)
+daily loss        realised losses past the day's cap stop new entries
+position count    one at a time by default
+cooldown          N bars of silence after a loss
+exposure          total open notional ceiling
+size              clamped DOWN to the per-trade cap; refused below the floor
+price sanity      an intended fill far from the signal bar's close is refused
+stop sanity       a stop on the wrong side, or absurdly tight, is refused
+funds             the quote balance has to cover it, fees included
+```
+
+`--max-notional`, `--max-exposure`, `--max-positions`, `--daily-loss` and
+`--cooldown` set the numbers. The defaults are deliberately tiny; a user who
+wants size has to say so.
+
+**The gate never blocks an exit.** A risk limit that can stop you from *closing* a
+position is not a limit, it is a trap — a daily-loss stop that refuses the sell
+order which would end the losing day is precisely backwards. Entries are gated;
+exits, cancels and flattens always proceed.
+
+## Stopping it
+
+```
+touch HALT                          stop opening new positions, keep managing open ones
+python live.py --flatten            close everything now
+Ctrl-C                              stop the loop, leave positions as they are
+```
+
+`HALT` is a file rather than a flag so you can stop a running loop from another
+terminal, from a phone over SSH, or from a cron job, without finding the process.
+
+## Crash safety
+
+The loop will be killed mid-trade eventually. `ledger.py` is the memory and
+`reconcile()` is the part that matters — on every start it asks the venue what is
+actually true and compares:
+
+- **ledger holds something the venue doesn't** → usually the stop filled while we
+  were dead. Booked at the stop price, marked `reconciled-stop`, counted against
+  the daily loss. Not silently forgotten.
+- **position is real but its stop is gone** → a naked position. Reported, and the
+  stop is replaced before anything else happens.
+- **venue holds orders we don't know about** → reported, never auto-cancelled.
+  They might be yours from another tool.
+
+If the ledger and the venue disagree in a way that can't be resolved safely, it
+refuses to trade until you look, or until you pass `--adopt`.
+
+Every order carries a **deterministic client id** hashed from the market, the side
+and the bar that triggered it. Send it twice — a retry after a timeout, a restart
+mid-loop — and the venue sees a duplicate and rejects it instead of doubling your
+size. Submitted ids are recorded *before* the send, so the worst case of a crash
+between those two lines is a signal you skip, never an order you send twice.
+
+## Verification status
+
+```
+python selftest_live.py     148 offline checks — no network, no credentials, no venue
+```
+
+Covers: sizes rounding down and never up, a retried order not becoming two
+positions, every risk rejection, the kill switch, the daily loss stop, a short on
+spot being refused rather than quietly flipped, ledger P&L matching the blotter, a
+corrupt or wrong-version ledger starting empty instead of crashing, all four
+reconciliation outcomes, and the signing schemes against pinned vectors.
+
+Paper mode has been run end to end against live Coinbase data: entry, protective
+stop, position surviving three separate processes, target/stop/time exits,
+`--flatten`, and both refusal paths.
+
+**The live adapters have not been exercised against a funded account from this
+repo.** No keys were available, and claiming an order path works when it has never
+placed an order would be the most dangerous sentence in this README. The signing
+tests prove the implementations don't drift; they cannot prove a venue accepts
+them. `--mode shadow` is how you find out, and it is the first thing you should
+run.
+
+## What none of this does
+
+- A stop is an instruction, not a guarantee. Gaps, halts and thin books all fill
+  it worse than its price — sometimes far worse.
+- Limits are per-process. Two Tapedecks on one account do not know about each
+  other and will happily double your exposure.
+- The daily loss stop counts **realised** losses. An open position can be far
+  underwater without tripping it.
+- A backtested edge is not evidence that live fills will resemble the backtest's.
+  Costs, latency and slippage are where paper profits go.
+- Nothing here models funding, borrow, tax, or a venue freezing withdrawals.
+
+Not advice. The strategy is yours; this only executes it.

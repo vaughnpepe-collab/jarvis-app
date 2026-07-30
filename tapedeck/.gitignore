@@ -1,3 +1,9 @@
 # Generated output — recreate any time with `python tapedeck.py "<brief>"`.
 cache/
 charts/
+# Live/paper trading state: positions, submitted order ids, paper balances.
+# Never commit this — it is a record of your account, and a stale copy pushed
+# over a live one would resurrect closed positions.
+state/
+# The kill switch. Its presence halts entries, so it must never arrive via git.
+HALT
