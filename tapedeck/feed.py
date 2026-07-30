@@ -236,13 +236,19 @@ def liquid_products(quotes=("USD",), limit=60, fresh=False):
 
 
 def resolve(query, quotes=("USD",)):
-    """'BTC' -> every BTC market; 'BTC-USD' -> itself. Case-insensitive."""
+    """
+    'BTC' -> every BTC market; 'BTC-USD' -> itself. Case-insensitive.
+    Returns [] when the symbol isn't listed — the caller must say so rather than
+    substitute something.
+
+    Deliberately exact: a loose substring match turned "ES" into
+    ['ESP-USD', 'USELESS-USD'], which is worse than an honest miss.
+    """
     want = query.strip().upper()
     universe = products(quotes)
     if want in universe:
         return [want]
-    hits = [p for p in universe if p.split("-")[0] == want]
-    return hits or [p for p in universe if want in p]
+    return [p for p in universe if p.split("-")[0] == want]
 
 
 if __name__ == "__main__":

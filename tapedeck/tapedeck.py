@@ -207,6 +207,18 @@ def main(argv=None):
         print(brief.describe(spec))
         print()
 
+    # Say so before doing any work: these venues list crypto spot pairs, so a
+    # stock, an FX pair or a futures contract simply has no market here.
+    resolved, unlisted = scan.resolve_universe(spec)
+    if unlisted:
+        print("Not listed on these venues: %s" % ", ".join(unlisted))
+        print("Tapedeck reads crypto spot markets (%d USD pairs on Coinbase, "
+              "Kraken as fallback)." % len(feed.products()))
+        print("No equities, FX or futures — and no way to fake them.\n")
+    if not resolved:
+        print("Nothing to scan. Try a listed pair, e.g. BTC-USD, ETH-USD, SOL-USD.")
+        return 1
+
     # ---------------------------------------------------------- scan
     charted, results = [], []
     if "scan" in spec["actions"]:

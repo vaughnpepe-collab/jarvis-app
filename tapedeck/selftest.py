@@ -234,6 +234,40 @@ def test_exits():
           "exit_rule" in result["assumptions"], str(result["assumptions"].keys()))
 
 
+def test_universe():
+    print("universe resolution")
+    import feed
+    listed = ["BTC-USD", "ETH-USD", "SOL-USD", "ESP-USD", "USELESS-USD", "BTC-EUR"]
+    real = feed.products
+    # stand in for the venue, filtering by quote the way the real call does
+    feed.products = lambda quotes=("USD",), fresh=False: [
+        p for p in listed if p.split("-")[1] in quotes]
+    try:
+        check("an exact base resolves", feed.resolve("BTC") == ["BTC-USD"],
+              str(feed.resolve("BTC")))
+        check("a base with several quotes resolves to all of them",
+              feed.resolve("BTC", quotes=("USD", "EUR")) == ["BTC-USD", "BTC-EUR"],
+              str(feed.resolve("BTC", quotes=("USD", "EUR"))))
+        check("a full product id resolves", feed.resolve("SOL-USD") == ["SOL-USD"])
+        check("matching is case-insensitive", feed.resolve("eth") == ["ETH-USD"])
+        check("no loose substring match — 'ES' is not USELESS",
+              feed.resolve("ES") == [], str(feed.resolve("ES")))
+        check("an unlisted ticker resolves to nothing", feed.resolve("AAPL") == [])
+
+        mixed = {"whole_market": False, "symbols": ["AAPL", "SOL"], "universe_size": 10}
+        products, unlisted = scan.resolve_universe(mixed)
+        check("unlisted symbols are reported back", unlisted == ["AAPL"], str(unlisted))
+        check("listed symbols still resolve alongside them", products == ["SOL-USD"],
+              str(products))
+
+        none = {"whole_market": False, "symbols": ["AAPL"], "universe_size": 10}
+        products, unlisted = scan.resolve_universe(none)
+        check("nothing listed gives an empty universe, not a silent BTC fallback",
+              products == [], str(products))
+    finally:
+        feed.products = real
+
+
 def test_watch_clock():
     print("watch clock")
     import tapedeck
@@ -355,6 +389,7 @@ def main():
     test_scan(); print()
     test_crossings(); print()
     test_exits(); print()
+    test_universe(); print()
     test_watch_clock(); print()
     test_cache_rules(); print()
     test_backtest(); print()

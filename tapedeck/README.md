@@ -175,19 +175,57 @@ still printed for a human to read before anything executes.
 
 ---
 
-## Data
+## What markets it works on
 
-Public, keyless, read-only:
+**Crypto spot pairs, and only those.** Public, keyless, read-only:
 
-1. **Coinbase Exchange** — spot, ~400 USD markets, primary
+1. **Coinbase Exchange** — primary, 528 tradable spot pairs
 2. **Kraken** — fallback when Coinbase has no data for a pair
+
+Coinbase's listings by quote currency, at the time of writing:
+
+| quote | pairs | | quote | pairs |
+|---|---:|---|---|---:|
+| **USD** | **402** | | USDT | 23 |
+| EUR | 35 | | ETH | 6 |
+| GBP | 25 | | USDC | 5 |
+| BTC | 24 | | INR / SGD / AUD / CAD / BRL | 8 |
+
+The default universe is the **402 USD pairs**. `feed.products()` and
+`feed.liquid_products()` take a `quotes` tuple if you want EUR or GBP, though the
+brief parser doesn't yet read "in EUR" out of a sentence — pass it in code.
+
+**Timeframes:** `1m`, `5m`, `15m`, `1h`, `6h`, `1d`. Ask for 4h and it uses 6h and
+says so. History is paginated, so a few hundred to a few thousand bars per market
+is routine.
+
+**Naming:** `BTC-USD` for an exact pair, or just `BTC` for every USD market with
+that base. `bitcoin`, `ether`, `solana` and a dozen other full names work too.
+Anything else needs the ticker in caps (`HYPE`, `TAO`).
+
+### What it does not cover
+
+No equities, no FX, no futures, no perps, no options, no indices. There is no
+venue behind this that lists them, so:
+
+```
+python tapedeck.py "scan AAPL for RSI below 30"
+
+Not listed on these venues: AAPL
+Tapedeck reads crypto spot markets (402 USD pairs on Coinbase, Kraken as fallback).
+No equities, FX or futures — and no way to fake them.
+
+Nothing to scan. Try a listed pair, e.g. BTC-USD, ETH-USD, SOL-USD.
+```
+
+Name a symbol it can't find and it stops and tells you. It will not substitute a
+market you didn't ask for. Ask for "BTC futures" and it reads BTC **spot** and
+lists that as an assumption — no funding, no basis, no leverage anywhere in the
+model.
 
 Responses cache to `cache/` for about half a bar, so re-running a brief is instant
 and a whole-market scan costs one ranking call plus one call per market. If both
 venues are unreachable the cache is served stale rather than failing.
-
-This is **spot** data. Ask for futures or perps and it will read spot and tell you
-that's what it did — no funding, no basis, no leverage anywhere in the model.
 
 ---
 
@@ -222,7 +260,7 @@ indicators.py   RSI, EMA/SMA, ATR, MACD, Bollinger, volume ratio, pivots,
 scan.py         evaluates a spec's conditions across the universe
 backtest.py     the rules over history, with costs and no look-ahead
 chart.py        writes the self-contained HTML chart + replay
-selftest.py     85 offline checks — no network needed
+selftest.py     94 offline checks — no network needed
 ```
 
 ```
@@ -234,7 +272,8 @@ quietly: series alignment, RSI at its limits, the no-look-ahead rule, the
 stop-before-target rule, hit rate matching the blotter, level clustering not
 collapsing into one band, crossings firing exactly once at the transition, exit
 clauses not swallowing strategy parameters, bar-close alignment for watch mode,
-and the cache never answering a request for more history than it holds.
+the cache never answering a request for more history than it holds, and an
+unlisted symbol never silently becoming a market you didn't ask for.
 
 ---
 

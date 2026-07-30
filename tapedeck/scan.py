@@ -104,13 +104,29 @@ def readings(filters, cache, bars, i):
     return out
 
 
-def universe_for(spec):
+def resolve_universe(spec):
+    """
+    Returns (products, unlisted) for the brief's universe.
+
+    `unlisted` is every symbol that isn't on these venues. It matters: this reads
+    crypto spot, so "AAPL" has no market here, and quietly charting BTC-USD
+    instead would answer a question nobody asked.
+    """
     if spec["whole_market"]:
-        return feed.liquid_products(limit=spec["universe_size"])
-    found = []
+        return feed.liquid_products(limit=spec["universe_size"]), []
+    found, unlisted = [], []
     for symbol in spec["symbols"]:
-        found.extend(feed.resolve(symbol))
-    return list(dict.fromkeys(found)) or ["BTC-USD"]
+        hits = feed.resolve(symbol)
+        if hits:
+            found.extend(hits)
+        else:
+            unlisted.append(symbol)
+    return list(dict.fromkeys(found)), unlisted
+
+
+def universe_for(spec):
+    """Just the tradable products — see resolve_universe for what got dropped."""
+    return resolve_universe(spec)[0]
 
 
 def run(spec, history=None, progress=True, fresh=False):
