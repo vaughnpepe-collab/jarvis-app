@@ -49,6 +49,9 @@ WHOLE_MARKET = r"\b(?:all|any|every|everything|the market|markets|scan the marke
 
 BELOW = r"(?:below|under|less than|lower than|beneath|<=?)"
 ABOVE = r"(?:above|over|greater than|higher than|more than|>=?)"
+# the filler between a field and its comparison: "RSI is / goes / drops below 30"
+LINK = (r"(?:\s*(?:is|are|was|goes|gets|moves|rises|drops|falls|climbs|reaches"
+        r"|hits|turns|sits|stays|back|comes\s+back)\b)*\s*")
 
 # words that never mean "ticker", however they're capitalised
 STOP_TOKENS = {
@@ -80,6 +83,82 @@ def _op(word):
 
 def _filter(left, op, right, text):
     return {"left": left, "op": op, "right": right, "text": text}
+
+
+NUMBER = r"-?\d+(?:\.\d+)?"
+
+# what can sit on the left of a cross
+SOURCE = (r"price|close|rsi\s*(?:\(\s*\d+\s*\))?|macd(?:\s*histogram)?"
+          r"|whale(?:[- ]momentum)?|volume")
+# ...and what it can cross
+TARGET = (r"the zero line|zero line|zero"
+          r"|(?:its |the )?signal(?:\s*line)?"
+          r"|(?:the )?upper (?:bollinger )?band|(?:the )?lower (?:bollinger )?band"
+          r"|(?:the )?\d+\s*[- ]?(?:ema|sma|ma)\b"
+          r"|(?:its |the )?average"
+          r"|" + NUMBER)
+
+CROSS_RE = re.compile(
+    r"\b(?P<left>%s)\s*(?:is\s*)?cross(?:es|ed|ing)?\s*(?:back\s*)?"
+    r"(?P<dir>above|below|over|under|up through|down through)\s*"
+    r"(?P<right>%s)" % (SOURCE, TARGET))
+
+
+def _source_ref(raw):
+    """Left-hand side of a comparison, as a series reference."""
+    t = raw.strip()
+    if t in ("price", "close", "it"):
+        return _ref("close")
+    if t.startswith("rsi"):
+        m = re.search(r"\(\s*(\d+)\s*\)", t)
+        return _ref("rsi", int(m.group(1)) if m else 14)
+    if t.startswith("macd"):
+        return _ref("macd_hist" if "histogram" in t else "macd")
+    if t.startswith("whale"):
+        return _ref("whale")
+    if t == "volume":
+        return _ref("vol_ratio", 20)
+    return None
+
+
+def _target_ref(raw):
+    """Right-hand side: a number, or another series to compare against."""
+    t = raw.strip()
+    if re.fullmatch(NUMBER, t):
+        return float(t)
+    if "zero" in t:
+        return 0.0
+    if "signal" in t:
+        return _ref("macd_signal")
+    if "upper" in t:
+        return _ref("bb_upper", 20)
+    if "lower" in t:
+        return _ref("bb_lower", 20)
+    m = re.search(r"(\d+)\s*[- ]?(ema|sma|ma)\b", t)
+    if m:
+        return _ref("ema" if m.group(2) == "ema" else "sma", int(m.group(1)))
+    if "average" in t:
+        return _ref("sma", 20)
+    return None
+
+
+def _cross_filters(text, notes):
+    """"MACD crosses above its signal", "price crosses back above the 200 EMA"."""
+    out = []
+    for m in CROSS_RE.finditer(text):
+        left = _source_ref(m.group("left"))
+        right = _target_ref(m.group("right"))
+        if left is None or right is None:
+            continue
+        up = m.group("dir") in ("above", "over", "up through")
+        op = "crosses_above" if up else "crosses_below"
+        right_label = (ind.label(right["kind"], right.get("length"))
+                       if isinstance(right, dict) else "%g" % right)
+        out.append(_filter(left, op, right,
+                           "%s crosses %s %s" % (ref_label(left),
+                                                 "above" if up else "below",
+                                                 right_label)))
+    return out
 
 
 # ---------------------------------------------------------------- sections
@@ -128,10 +207,11 @@ def _universe(text, notes):
 
 
 def _filters(text, notes):
-    out = []
+    # crossings first: "RSI crosses above 30" must not also read as "RSI above 30"
+    out = _cross_filters(text, notes)
 
     # --- RSI, with optional length: "RSI below 30", "rsi(21) > 70"
-    for m in re.finditer(r"\brsi\s*(?:\(\s*(\d+)\s*\))?\s*(?:is\s*)?(%s|%s)\s*(\d+(?:\.\d+)?)"
+    for m in re.finditer(r"\brsi\s*(?:\(\s*(\d+)\s*\))?" + LINK + r"(%s|%s)\s*(\d+(?:\.\d+)?)"
                          % (BELOW, ABOVE), text):
         length = int(m.group(1)) if m.group(1) else 14
         op, value = _op(m.group(2)), float(m.group(3))
@@ -161,7 +241,7 @@ def _filters(text, notes):
         notes.append("'volume spike' pinned to 2.00x the 20-bar average")
 
     # --- price against a moving average: "price above the 200 EMA"
-    for m in re.finditer(r"\b(?:price|close|it)\s*(?:is\s*)?(%s|%s)\s*(?:the\s*)?(\d+)\s*[- ]?"
+    for m in re.finditer(r"\b(?:price|close|it)" + LINK + r"(%s|%s)\s*(?:the\s*)?(\d+)\s*[- ]?"
                          r"(ema|sma|ma)\b" % (BELOW, ABOVE), text):
         op, length, kind = _op(m.group(1)), int(m.group(2)), m.group(3)
         kind = "ema" if kind == "ema" else "sma"
@@ -170,9 +250,9 @@ def _filters(text, notes):
                                                     length, kind.upper())))
 
     # --- MACD sign
-    if re.search(r"\bmacd\s*(?:is\s*)?(?:positive|bullish|above zero)\b", text):
+    if re.search(r"\bmacd" + LINK + r"(?:positive|bullish|above zero)\b", text):
         out.append(_filter(_ref("macd_hist"), ">", 0.0, "MACD histogram positive"))
-    if re.search(r"\bmacd\s*(?:is\s*)?(?:negative|bearish|below zero)\b", text):
+    if re.search(r"\bmacd" + LINK + r"(?:negative|bearish|below zero)\b", text):
         out.append(_filter(_ref("macd_hist"), "<", 0.0, "MACD histogram negative"))
 
     # --- Bollinger touches
@@ -182,7 +262,7 @@ def _filters(text, notes):
         out.append(_filter(_ref("close"), ">", _ref("bb_upper", 20), "close above the upper Bollinger band"))
 
     # --- the project's own composite
-    for m in re.finditer(r"\bwhale[- ]?(?:momentum|activity)?\s*(?:is\s*)?(%s|%s)\s*(-?\d+(?:\.\d+)?)"
+    for m in re.finditer(r"\bwhale[- ]?(?:momentum|activity)?" + LINK + r"(%s|%s)\s*(-?\d+(?:\.\d+)?)"
                          % (BELOW, ABOVE), text):
         op, value = _op(m.group(1)), float(m.group(2))
         out.append(_filter(_ref("whale"), op, value,
@@ -200,7 +280,7 @@ def _filters(text, notes):
     return out
 
 
-def _strategy(text, filters, notes):
+def _strategy(text, filters, exit_filters, notes):
     short = bool(re.search(r"\bshort(?:ing|s)?\b|\bsell\s*signal\b|\bfade\b", text))
     stop_pct = target_pct = atr_stop = None
     max_hold = DEFAULTS["max_hold"]
@@ -230,8 +310,8 @@ def _strategy(text, filters, notes):
         notes.append("no target given — using %g%%" % target_pct)
 
     return dict(direction="short" if short else "long", entry=filters,
-                stop_pct=stop_pct, atr_stop=atr_stop, target_pct=target_pct,
-                max_hold=max_hold)
+                exit=exit_filters, stop_pct=stop_pct, atr_stop=atr_stop,
+                target_pct=target_pct, max_hold=max_hold)
 
 
 def _replay_bars(text, timeframe, notes):
@@ -279,6 +359,30 @@ def _actions(text, explicit_universe, filters):
 CARRY_OVER = (r"\bmy (?:system|strategy|setup|rules|conditions|filters)\b"
               r"|\bthe same (?:thing|conditions|setup|rules)\b|\bthose\b|\bthat setup\b")
 
+# "exit when RSI goes above 70" — the tail is an exit rule, not another entry rule.
+# The verb has to be explicit: "close" on its own is the close price, not a verb.
+EXIT_RE = re.compile(
+    r"\b(?:exit|get\s*out|flatten|sell|close\s+the\s+(?:trade|position))\s*"
+    r"(?:the\s+(?:trade|position)\s+)?(?:when|if|once|on)\s+(?P<cond>.+?)\s*$")
+
+
+def _split_exit(lowered, notes):
+    """Returns (entry_text, exit_filters)."""
+    m = EXIT_RE.search(lowered)
+    if not m:
+        return lowered, []
+    # "exit when RSI goes above 70, 2% stop" — the trailing clause is a strategy
+    # parameter, not part of the exit condition, so don't feed it to the matcher
+    parts = [p for p in re.split(r"\s*,\s*", m.group("cond"))
+             if not re.search(r"\b(?:stop|target|take\s*profit|tp|hold|exit after)\b", p)]
+    condition = ", ".join(parts) or m.group("cond")
+    exit_filters = _filters(" " + condition + " ", notes)
+    if not exit_filters:
+        notes.append("couldn't read an exit rule out of %r — leaving it to "
+                     "stop/target/time" % condition.strip())
+        return lowered, []
+    return lowered[:m.start()] + " ", exit_filters
+
 
 def parse(text, default_timeframe="1h", previous=None):
     """
@@ -296,17 +400,20 @@ def parse(text, default_timeframe="1h", previous=None):
                      % (", ".join(symbols) if symbols else "the whole-market scan"))
     elif defaulted:
         notes.append("no market named — defaulting to BTC-USD")
-    filters = _filters(lowered, notes)
+    entry_text, exit_filters = _split_exit(lowered, notes)
+    filters = _filters(entry_text, notes)
 
     if not filters and previous and previous.get("filters") and re.search(CARRY_OVER, lowered):
         filters = previous["filters"]
         notes.append("carried %d condition(s) over from the previous brief"
                      % len(filters))
+    if not exit_filters and previous and re.search(CARRY_OVER, lowered):
+        exit_filters = (previous.get("strategy") or {}).get("exit") or []
     actions = _actions(lowered, explicit, filters)
 
     # strategy defaults are only worth reporting if a backtest is actually going to use them
     strategy_notes = []
-    strategy = _strategy(lowered, filters, strategy_notes)
+    strategy = _strategy(lowered, filters, exit_filters, strategy_notes)
 
     if "backtest" in actions and not filters:
         notes.append("nothing to backtest — no entry condition in the brief")
@@ -341,6 +448,8 @@ def describe(spec):
         stop = ("%.2f x ATR" % st["atr_stop"]) if st["atr_stop"] else "%g%%" % st["stop_pct"]
         lines.append("  Strategy   %s · stop %s · target %g%% · max hold %d bars"
                      % (st["direction"], stop, st["target_pct"], st["max_hold"]))
+        for f in st.get("exit") or []:
+            lines.append("    exit when %s" % f["text"])
     lines.append("  Will do    %s" % ", ".join(spec["actions"]))
     if spec["notes"]:
         lines.append("")

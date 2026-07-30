@@ -150,9 +150,127 @@ def test_scan():
     check("an impossible condition finds nothing", scan.hits(bars, impossible)[0] == [])
 
 
+def test_crossings():
+    print("crossings")
+    # closes walk 95 -> 105, crossing 100 exactly once
+    up = [Candle(1_700_000_000 + i * 3600, 95.0 + i, 95.5 + i, 94.5 + i, 95.0 + i, 100.0)
+          for i in range(11)]
+    above = [{"left": {"kind": "close"}, "op": "crosses_above", "right": 100.0,
+              "text": "close crosses above 100"}]
+    fired, _ = scan.hits(up, above)
+    check("a cross fires once, not on every bar above", len(fired) == 1, str(fired))
+    check("it fires on the bar that broke through",
+          fired and up[fired[0]].close > 100 and up[fired[0] - 1].close <= 100)
+
+    below = [{"left": {"kind": "close"}, "op": "crosses_below", "right": 100.0,
+              "text": "close crosses below 100"}]
+    check("a rising series never crosses down", scan.hits(up, below)[0] == [])
+    down = list(reversed([b._replace(ts=1_700_000_000 + i * 3600)
+                          for i, b in enumerate(up)]))
+    check("a falling series crosses down once", len(scan.hits(down, below)[0]) == 1)
+
+    # touching the level without breaking it is not a cross
+    flat = [Candle(1_700_000_000 + i * 3600, 99.0, 100.0, 98.0, 100.0, 100.0)
+            for i in range(10)]
+    check("sitting exactly on the level is not a cross", scan.hits(flat, above)[0] == [])
+
+    check("bar 0 can never be a cross (no bar before it)",
+          0 not in scan.hits(up, above)[0])
+
+    spec = brief.parse("find BTC where macd crosses above its signal")
+    f = spec["filters"][0]
+    check("parses 'crosses above its signal'",
+          f["op"] == "crosses_above" and f["right"]["kind"] == "macd_signal", str(f))
+    spec = brief.parse("find BTC where price crosses back above the 200 EMA")
+    f = spec["filters"][0]
+    check("parses 'crosses back above the 200 EMA'",
+          f["op"] == "crosses_above" and f["right"] == {"kind": "ema", "length": 200},
+          str(f))
+    spec = brief.parse("find BTC where rsi crosses below 30")
+    check("parses 'rsi crosses below 30'",
+          spec["filters"][0]["op"] == "crosses_below" and spec["filters"][0]["right"] == 30.0)
+    spec = brief.parse("find BTC where rsi crosses above 30")
+    check("a crossing is not also read as a plain comparison",
+          len(spec["filters"]) == 1, str(spec["filters"]))
+
+
+def test_exits():
+    print("exit rules")
+    spec = brief.parse("backtest BTC with rsi below 30, exit when rsi goes above 70, "
+                       "2% stop, 5% target")
+    st = spec["strategy"]
+    check("splits the exit clause off the entry rules",
+          len(spec["filters"]) == 1 and spec["filters"][0]["right"] == 30.0,
+          str(spec["filters"]))
+    check("reads the exit condition",
+          len(st["exit"]) == 1 and st["exit"][0]["right"] == 70.0, str(st["exit"]))
+    check("the exit clause doesn't swallow the stop", st["stop_pct"] == 2.0, str(st))
+    check("the exit clause doesn't swallow the target", st["target_pct"] == 5.0, str(st))
+
+    spec = brief.parse("backtest BTC with rsi below 30, exit when the vibes are bad")
+    check("an unreadable exit rule is reported, not invented",
+          not spec["strategy"]["exit"]
+          and any("couldn't read an exit rule" in n for n in spec["notes"]),
+          str(spec["notes"]))
+    check("...and it doesn't eat the entry rules either", len(spec["filters"]) == 1)
+
+    # an exit condition that is true from bar 5 onward should close the trade there
+    bars = [Candle(1_700_000_000 + i * 3600, 100.0, 100.4, 99.8, 100.0 + (i >= 5) * 0.2,
+                   100.0) for i in range(40)]
+    always = [{"left": {"kind": "close"}, "op": ">", "right": 0.0, "text": "always"}]
+    on_signal = [{"left": {"kind": "close"}, "op": ">", "right": 100.1,
+                  "text": "close above 100.1"}]
+    result = backtest.run(bars, _spec_for(always, exit=on_signal,
+                                          stop_pct=50.0, target_pct=50.0))
+    trades = result["trades"]
+    check("a signal exit closes the trade", trades and trades[0]["reason"] == "signal",
+          str(trades[:1]))
+    check("a signal exit fills at that bar's close",
+          trades and trades[0]["exit"] == bars[trades[0]["exit_index"]].close)
+    check("stop and target still win over a later signal",
+          backtest.run(bars, _spec_for(always, exit=on_signal, stop_pct=0.05,
+                                       target_pct=50.0))["trades"][0]["reason"] == "stop")
+    check("the exit rule is listed in the assumptions",
+          "exit_rule" in result["assumptions"], str(result["assumptions"].keys()))
+
+
+def test_watch_clock():
+    print("watch clock")
+    import tapedeck
+    import feed
+    # 2026-07-30 00:17:00 UTC — mid-bar on every timeframe
+    now = 1785370620
+    for tf, expect in (("1m", 60), ("15m", 780), ("1h", 2580), ("1d", 85380)):
+        nxt = tapedeck.next_bar_close(tf, now)
+        check("%s bar closes in %ds" % (tf, expect), nxt - now == expect,
+              "got +%ds" % (nxt - now))
+        check("%s close lands on a bar boundary" % tf, nxt % feed.TIMEFRAMES[tf] == 0)
+    exactly_on = tapedeck.next_bar_close("1h", 1785369600)
+    check("on a boundary it waits for the NEXT bar, not this one",
+          exactly_on == 1785369600 + 3600, str(exactly_on))
+    check("countdown formats coarsely", tapedeck._countdown(3725) == "1h02m",
+          tapedeck._countdown(3725))
+    check("countdown formats minutes", tapedeck._countdown(95) == "1m35s",
+          tapedeck._countdown(95))
+
+
+def test_cache_rules():
+    print("feed cache")
+    import feed
+    entry = {"bars": [0] * 260, "asked": 260}
+    check("260 cached bars cannot answer a 700-bar request",
+          not feed._cache_covers(entry, 700))
+    check("260 cached bars answer a 200-bar request",
+          feed._cache_covers(entry, 200))
+    check("a short venue history answers a larger request",
+          feed._cache_covers({"bars": [0] * 350, "asked": 900}, 700))
+    check("an exact-size cache answers its own size",
+          feed._cache_covers(entry, 260))
+
+
 # ---------------------------------------------------------------- backtest
 def _spec_for(filters, **strategy):
-    base = dict(direction="long", entry=filters, stop_pct=2.0, atr_stop=None,
+    base = dict(direction="long", entry=filters, exit=[], stop_pct=2.0, atr_stop=None,
                 target_pct=4.0, max_hold=48)
     base.update(strategy)
     return {"strategy": base, "timeframe": "1h", "filters": filters,
@@ -235,6 +353,10 @@ def main():
     test_indicators(); print()
     test_brief(); print()
     test_scan(); print()
+    test_crossings(); print()
+    test_exits(); print()
+    test_watch_clock(); print()
+    test_cache_rules(); print()
     test_backtest(); print()
     if FAILED:
         print("%d check(s) FAILED:" % len(FAILED))

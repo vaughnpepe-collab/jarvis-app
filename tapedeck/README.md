@@ -56,9 +56,23 @@ Python 3.8+. Standard library only — no pip install, no build step.
 | `--charts N` | how many matching markets to chart (default 6) |
 | `--history N` | bars of history per market (default 700) |
 | `--fresh` | ignore the cache, refetch |
+| `--watch` | keep re-scanning on every bar close, report new firings |
 | `--open` | open the chart when it's written |
 | `--new` | forget the previous brief |
 | `--quiet` | skip the spec echo |
+
+### Watch mode
+
+```
+python tapedeck.py "scan the market for RSI below 30 and volume +200%" --watch
+```
+
+Runs the scan once, then wakes on each bar close (aligned to the venue's bar
+boundary, plus a few seconds' grace) and re-checks. A setup is announced on the
+bar it fires, once — a market that stays in condition for hours doesn't spam you,
+and each firing writes its chart. `Ctrl-C` stops it.
+
+It reads and reports. It cannot place an order, because no such code exists here.
 
 ### It remembers the last brief
 
@@ -85,8 +99,11 @@ Open `charts/<market>-<tf>.html` — one file, no server, works offline.
 - Entry and exit markers per trade, with the stop and target rails shown while a
   trade is live
 - **Replay** — press `Replay` or `space`, and it walks the window bar by bar with
-  realised and open P&L updating live. `←`/`→` step, the slider scrubs, and
-  scrubbing back is also how you pan through history.
+  realised and open P&L updating live. `←`/`→` step, the slider scrubs.
+- An **equity curve** of closed-trade P&L that builds as the replay runs
+- **Pan and zoom** — drag the chart to move through history, scroll to zoom,
+  double-click (or `Home`) to re-pin the view to the replay cursor. Bars the
+  replay hasn't reached stay hidden however far you pan.
 - Hover any candle for OHLC, RSI and whale-momentum at that bar
 
 ---
@@ -124,16 +141,30 @@ It understands, among others:
 
 | you write | it runs |
 |---|---|
-| `RSI below 30`, `rsi(21) above 70` | RSI at any length, either direction |
+| `RSI below 30`, `rsi(21) goes above 70` | RSI at any length, either direction |
 | `volume +200%`, `volume above 3x average`, `volume spike` | volume vs its 20-bar average |
 | `price above the 200 EMA` | close compared against another series |
+| `MACD crosses above its signal` | crossings, on any supported field |
+| `price crosses back above the 200 EMA` | close crossing a moving average |
+| `RSI crosses below 30`, `MACD crosses above zero` | crossing a level |
 | `below the lower Bollinger band` | close vs BB(20, 2) |
 | `MACD positive` | MACD histogram sign |
 | `up more than 5%` | % change over 24 bars |
+| `exit when RSI goes above 70` | condition-based exit, filled at that bar's close |
 | `1.5 ATR stop`, `2% stop`, `3% target`, `hold 10 bars` | strategy parameters |
 | `on the 4 hour`, `daily`, `15m` | timeframe (rounded to a bar the feed has, and it says so) |
 | `scan the market`, `all BTC`, `SOL` | universe |
 | `replay last week`, `last 30 days` | replay window |
+
+A crossing fires **once**, on the bar that broke through — not on every bar that
+stays on the far side. `RSI crosses above 30` is not read as `RSI above 30`, and
+sitting exactly on a level is not a cross.
+
+Conditions combine with AND: they must all hold on the same bar. An exit rule is
+parsed from its own clause, so `exit when RSI goes above 70, 2% stop` keeps the
+stop as a strategy parameter instead of folding it into the exit condition. If an
+exit clause can't be read, it says so and falls back to stop/target/time rather
+than inventing a rule.
 
 <a id="llm-handoff"></a>
 **LLM_HANDOFF** — to accept looser phrasing, put a model in front of `brief.parse`
@@ -191,7 +222,7 @@ indicators.py   RSI, EMA/SMA, ATR, MACD, Bollinger, volume ratio, pivots,
 scan.py         evaluates a spec's conditions across the universe
 backtest.py     the rules over history, with costs and no look-ahead
 chart.py        writes the self-contained HTML chart + replay
-selftest.py     49 offline checks — no network needed
+selftest.py     85 offline checks — no network needed
 ```
 
 ```
@@ -200,8 +231,10 @@ python selftest.py
 
 Runs on synthetic candles and asserts the things that would otherwise fail
 quietly: series alignment, RSI at its limits, the no-look-ahead rule, the
-stop-before-target rule, hit rate matching the blotter, and level clustering not
-collapsing into one band.
+stop-before-target rule, hit rate matching the blotter, level clustering not
+collapsing into one band, crossings firing exactly once at the transition, exit
+clauses not swallowing strategy parameters, bar-close alignment for watch mode,
+and the cache never answering a request for more history than it holds.
 
 ---
 

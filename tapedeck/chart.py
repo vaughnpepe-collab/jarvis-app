@@ -153,6 +153,8 @@ td{padding:5px 8px 5px 0;border-bottom:1px solid rgba(27,36,32,.6)}
 td.n,th.n{text-align:right}
 .scroll{max-height:260px;overflow-y:auto}
 .note{color:var(--muted);font-size:12px;margin-top:6px}
+.spark{width:100%;height:56px;margin-top:12px;display:block}
+.hint{color:var(--muted);font-size:11px;margin-top:8px;letter-spacing:.02em}
 ul.caveats{list-style:none;font-size:12px;color:var(--muted)}
 ul.caveats li{padding:3px 0 3px 14px;position:relative}
 ul.caveats li:before{content:"—";position:absolute;left:0}
@@ -185,6 +187,8 @@ footer{color:var(--muted);font-size:11px;margin:22px 0 8px;line-height:1.7}
   <input type="range" id="bScrub" min="1" value="1">
   <span class="dim" id="bPos"></span>
 </div>
+<div class="hint">drag the chart to pan · scroll to zoom · double-click or Home to
+  re-pin to the cursor · space plays, ←/→ step</div>
 
 <div class="grid">
   <div class="card">
@@ -194,6 +198,7 @@ footer{color:var(--muted);font-size:11px;margin:22px 0 8px;line-height:1.7}
     <div class="kv"><span>open</span><span id="pnlOpen">—</span></div>
     <div class="kv"><span>closed trades</span><span id="pnlCount">0</span></div>
     <div class="kv"><span>hit rate so far</span><span id="pnlHit">—</span></div>
+    <canvas id="eq" class="spark"></canvas>
     <div class="note" id="pnlNote"></div>
   </div>
 
@@ -249,12 +254,15 @@ const CAVEATS = /*__CAVEATS__*/null;
 
 const bars = D.bars.map(b => ({ts:b[0], o:b[1], h:b[2], l:b[3], c:b[4], v:b[5]}));
 const N = bars.length;
-const VIEW = 200;                       // candles on screen at once
 const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
 const tip = document.getElementById('tip');
 
-let cursor = N;                          // bars revealed
+let cursor = N;                          // bars revealed by the replay
+let view = Math.min(200, N);             // candles on screen (zoom)
+let right = N;                           // rightmost visible bar (pan)
+let follow = true;                       // keep the right edge pinned to the cursor
 let playing = false, timer = null, hover = null;
+let drag = null;
 const tradeByEntry = new Map(), tradeByExit = new Map(), signalSet = new Set(D.signals);
 D.trades.forEach((t, i) => { t.n = i + 1;
   tradeByEntry.set(t.entry_index, t); tradeByExit.set(t.exit_index, t); });
@@ -291,9 +299,14 @@ function layout() {
 }
 
 function visible() {
-  const end = Math.max(1, cursor);
-  const start = Math.max(0, end - VIEW);
+  // never past the cursor — bars the replay hasn't reached must stay hidden
+  const end = Math.max(1, Math.min(follow ? cursor : right, cursor));
+  const start = Math.max(0, end - view);
   return {start, end};
+}
+
+function clampPan() {
+  right = Math.max(Math.min(view, cursor), Math.min(right, cursor));
 }
 
 function scales() {
@@ -504,11 +517,56 @@ function draw() {
 }
 
 /* ---------------------------------------------------------------- panels */
+function drawEquity(closedPnls) {
+  const eq = document.getElementById('eq');
+  const ec = eq.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = eq.clientWidth || 240, h = 56;
+  eq.width = w * dpr; eq.height = h * dpr;
+  ec.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ec.clearRect(0, 0, w, h);
+
+  // cumulative realised P&L, one step per closed trade
+  const pts = [0];
+  for (const p of closedPnls) pts.push(pts[pts.length - 1] + p);
+  const lo = Math.min(...pts, 0), hi = Math.max(...pts, 0);
+  const span = (hi - lo) || 1;
+  const x = i => (pts.length < 2 ? 0 : i / (pts.length - 1) * (w - 2)) + 1;
+  const y = v => h - 4 - (v - lo) / span * (h - 8);
+
+  const zero = Math.round(y(0)) + .5;
+  ec.strokeStyle = 'rgba(232,240,234,.18)'; ec.setLineDash([3, 3]);
+  ec.beginPath(); ec.moveTo(0, zero); ec.lineTo(w, zero); ec.stroke();
+  ec.setLineDash([]);
+
+  if (pts.length < 2) {
+    ec.fillStyle = '#7d8f85'; ec.font = '11px ui-monospace,monospace';
+    ec.textAlign = 'left'; ec.textBaseline = 'middle';
+    ec.fillText('equity curve — no closed trades yet', 2, h / 2);
+    return;
+  }
+
+  const last = pts[pts.length - 1];
+  const colour = last >= 0 ? '#3fcf8e' : '#ef5d5d';
+  ec.beginPath(); ec.moveTo(x(0), y(pts[0]));
+  for (let i = 1; i < pts.length; i++) ec.lineTo(x(i), y(pts[i]));
+  ec.strokeStyle = colour; ec.lineWidth = 1.6; ec.stroke();
+
+  ec.lineTo(x(pts.length - 1), zero); ec.lineTo(x(0), zero); ec.closePath();
+  ec.fillStyle = last >= 0 ? 'rgba(63,207,142,.12)' : 'rgba(239,93,93,.12)';
+  ec.fill();
+
+  ec.fillStyle = colour;
+  ec.beginPath(); ec.arc(x(pts.length - 1), y(last), 2.6, 0, Math.PI * 2); ec.fill();
+}
+
 function paintPnl() {
   let realised = 0, closed = 0, wins = 0, openPnl = 0, openTrade = null;
+  const closedPnls = [];
   for (const t of D.trades) {
     if (t.exit_index < cursor) {
       realised += t.pnl; closed++; if (t.net_pct > 0) wins++;
+      closedPnls.push(t.pnl);
     } else if (t.entry_index < cursor) {
       openTrade = t;
       const now = bars[Math.min(cursor - 1, N - 1)].c;
@@ -527,8 +585,11 @@ function paintPnl() {
   el('pnlCount').textContent = closed;
   el('pnlHit').textContent = closed ? (wins / closed * 100).toFixed(0) + '%' : '—';
   el('pnlMode').textContent = cursor >= N ? '(full window)' : '(at ' + fmtTime(bars[cursor-1].ts) + ')';
-  el('bPos').textContent = cursor + ' / ' + N + ' bars';
+  const v = visible();
+  el('bPos').textContent = cursor + ' / ' + N + ' bars · showing ' +
+    (v.end - v.start) + (follow ? '' : ' (panned)');
   el('bScrub').value = cursor;
+  drawEquity(closedPnls);
 }
 
 function paintStatic() {
@@ -595,11 +656,12 @@ const esc = s => String(s).replace(/[&<>"]/g, c =>
 /* ---------------------------------------------------------------- controls */
 function setCursor(v) {
   cursor = Math.max(1, Math.min(N, v));
+  if (follow) right = cursor; else clampPan();
   draw();
   if (cursor >= N) stop();
 }
 function play() {
-  if (cursor >= N) cursor = Math.max(1, N - (D.replay_bars || VIEW));
+  if (cursor >= N) { cursor = Math.max(1, N - (D.replay_bars || view)); follow = true; }
   playing = true;
   document.getElementById('bPlay').textContent = '❚❚ Pause';
   document.getElementById('bPlay').classList.add('on');
@@ -622,21 +684,61 @@ function tick() {
 
 document.getElementById('bPlay').onclick = () => playing ? stop() : play();
 document.getElementById('bStep').onclick = () => { stop(); setCursor(cursor + 1); };
-document.getElementById('bEnd').onclick  = () => { stop(); setCursor(N); };
+document.getElementById('bEnd').onclick  = () => {
+  stop(); follow = true; view = Math.min(200, N); setCursor(N);
+};
 document.getElementById('bScrub').oninput = e => { stop(); setCursor(Number(e.target.value)); };
 
-cv.addEventListener('mousemove', e => {
+function barAt(clientX) {
   const rect = cv.getBoundingClientRect(), s = scales();
-  const i = Math.round((e.clientX - rect.left - L.padL - s.cw / 2) / s.cw) + s.start;
-  hover = (i >= s.start && i < s.end) ? i : null;
+  const i = Math.round((clientX - rect.left - L.padL - s.cw / 2) / s.cw) + s.start;
+  return (i >= s.start && i < s.end) ? i : null;
+}
+
+cv.addEventListener('mousedown', e => {
+  drag = {x: e.clientX, right: follow ? cursor : right};
+  cv.style.cursor = 'grabbing';
+});
+window.addEventListener('mouseup', () => { drag = null; cv.style.cursor = 'crosshair'; });
+
+cv.addEventListener('mousemove', e => {
+  if (drag) {
+    // drag right = walk back in time
+    const moved = (e.clientX - drag.x) / Math.max(scales().cw, 0.5);
+    const next = Math.round(drag.right - moved);
+    if (next !== right || follow) { follow = false; right = next; clampPan(); }
+    hover = null;
+    draw();
+    return;
+  }
+  hover = barAt(e.clientX);
   draw();
 });
 cv.addEventListener('mouseleave', () => { hover = null; draw(); });
+
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  const anchor = barAt(e.clientX);
+  const before = view;
+  view = Math.max(30, Math.min(N, Math.round(view * (e.deltaY > 0 ? 1.18 : 0.85))));
+  if (view === before) return;
+  if (anchor !== null && !follow) {
+    // keep the bar under the pointer roughly where it was
+    const frac = (anchor - (right - before)) / before;
+    right = Math.round(anchor + (1 - frac) * view);
+    clampPan();
+  }
+  draw();
+}, {passive: false});
+
+cv.addEventListener('dblclick', () => { follow = true; view = Math.min(200, N); draw(); });
+
 window.addEventListener('resize', draw);
 window.addEventListener('keydown', e => {
   if (e.key === ' ') { e.preventDefault(); playing ? stop() : play(); }
   if (e.key === 'ArrowRight') { stop(); setCursor(cursor + 1); }
   if (e.key === 'ArrowLeft')  { stop(); setCursor(cursor - 1); }
+  if (e.key === 'Home') { follow = true; view = Math.min(200, N); draw(); }
 });
 
 paintStatic();

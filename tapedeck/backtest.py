@@ -45,7 +45,8 @@ def run(bars, spec, stake=STAKE, fee_pct=FEE_PCT, slippage_pct=SLIPPAGE_PCT):
         return dict(trades=[], stats=_stats([], stake), assumptions=_assumptions(
             st, stake, fee_pct, slippage_pct), signals=[])
 
-    cache = scan.build_series(bars, filters)
+    exit_filters = st.get("exit") or []
+    cache = scan.build_series(bars, filters + exit_filters)
     atr_series = ind.atr(bars) if st.get("atr_stop") else [None] * len(bars)
     long = st["direction"] == "long"
     cost = (fee_pct + slippage_pct) / 100.0
@@ -85,6 +86,11 @@ def run(bars, spec, stake=STAKE, fee_pct=FEE_PCT, slippage_pct=SLIPPAGE_PCT):
                 break
             if hit_target:
                 exit_index, exit_price, reason = j, target, "target"
+                break
+            # An exit condition is only known once the bar has closed, so it fills
+            # at that close — after the intrabar stop/target checks above.
+            if exit_filters and scan.holds(exit_filters, cache, bars, j):
+                exit_index, exit_price, reason = j, bar.close, "signal"
                 break
         if exit_index is None:
             exit_index, exit_price, reason = limit, bars[limit].close, "time"
@@ -147,7 +153,7 @@ def _stats(trades, stake):
 
 def _assumptions(st, stake, fee_pct, slippage_pct):
     stop = ("%.2f x ATR(14)" % st["atr_stop"]) if st.get("atr_stop") else "%g%%" % st["stop_pct"]
-    return {
+    out = {
         "direction": st["direction"],
         "stop": stop,
         "target": "%g%%" % st["target_pct"],
@@ -159,6 +165,10 @@ def _assumptions(st, stake, fee_pct, slippage_pct):
         "same_bar": "stop taken when stop and target both fall inside one bar",
         "positions": "one at a time; signals during an open trade are ignored",
     }
+    if st.get("exit"):
+        out["exit_rule"] = ("; ".join(f["text"] for f in st["exit"])
+                            + " — filled at that bar's close")
+    return out
 
 
 def caveats():

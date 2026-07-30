@@ -17,10 +17,14 @@ import brief
 import feed
 
 
+CROSS_OPS = ("crosses_above", "crosses_below")
+
+
 def _resolve_value(right, series_cache, bars, i):
-    """The right-hand side of a condition: a constant, or another series."""
+    """Either side of a condition at bar i: a constant, or a series reading."""
     if isinstance(right, dict):
-        return series_cache[_key(right)][i]
+        series = series_cache[_key(right)]
+        return series[i] if 0 <= i < len(series) else None
     return right
 
 
@@ -38,18 +42,35 @@ def build_series(bars, filters):
     return cache
 
 
+def _one_holds(f, cache, bars, i):
+    left = _resolve_value(f["left"], cache, bars, i)
+    right = _resolve_value(f["right"], cache, bars, i)
+    if left is None or right is None:
+        return False
+
+    if f["op"] == "<":
+        return left < right
+    if f["op"] == ">":
+        return left > right
+
+    if f["op"] in CROSS_OPS:
+        # A cross needs the bar before it: same side then the other side. Without
+        # the previous reading there is no cross to speak of, so warm-up is a no.
+        if i == 0:
+            return False
+        prev_left = _resolve_value(f["left"], cache, bars, i - 1)
+        prev_right = _resolve_value(f["right"], cache, bars, i - 1)
+        if prev_left is None or prev_right is None:
+            return False
+        if f["op"] == "crosses_above":
+            return prev_left <= prev_right and left > right
+        return prev_left >= prev_right and left < right
+    return False
+
+
 def holds(filters, series_cache, bars, i):
     """Do all conditions hold on bar i? Unknown (warm-up) counts as no."""
-    for f in filters:
-        left = series_cache[_key(f["left"])][i]
-        right = _resolve_value(f["right"], series_cache, bars, i)
-        if left is None or right is None:
-            return False
-        if f["op"] == "<" and not left < right:
-            return False
-        if f["op"] == ">" and not left > right:
-            return False
-    return True
+    return all(_one_holds(f, series_cache, bars, i) for f in filters)
 
 
 def hits(bars, filters):
@@ -58,20 +79,28 @@ def hits(bars, filters):
     return [i for i in range(len(bars)) if holds(filters, cache, bars, i)], cache
 
 
+OP_TEXT = {"<": "<", ">": ">", "crosses_above": "x↑", "crosses_below": "x↓"}
+
+
 def readings(filters, cache, bars, i):
     """What the indicators actually said at bar i — the receipt for a hit."""
     out = []
     for f in filters:
-        left = cache[_key(f["left"])][i]
-        right = _resolve_value(f["right"], series_cache=cache, bars=bars, i=i)
-        out.append({
+        left = _resolve_value(f["left"], cache, bars, i)
+        right = _resolve_value(f["right"], cache, bars, i)
+        row = {
             "label": brief.ref_label(f["left"]),
             "value": left,
             "op": f["op"],
             "against": right,
             "against_label": (brief.ref_label(f["right"])
                               if isinstance(f["right"], dict) else None),
-        })
+        }
+        if f["op"] in CROSS_OPS:
+            # a cross is only legible next to where it came from
+            row["from"] = _resolve_value(f["left"], cache, bars, i - 1)
+            row["from_against"] = _resolve_value(f["right"], cache, bars, i - 1)
+        out.append(row)
     return out
 
 
@@ -84,7 +113,7 @@ def universe_for(spec):
     return list(dict.fromkeys(found)) or ["BTC-USD"]
 
 
-def run(spec, history=None, progress=True):
+def run(spec, history=None, progress=True, fresh=False):
     """
     Scan the brief's universe. Returns (results, skipped).
 
@@ -100,7 +129,7 @@ def run(spec, history=None, progress=True):
             sys.stderr.write("\r  scanning %-14s %d/%d " % (product, n, len(products)))
             sys.stderr.flush()
         try:
-            bars = feed.candles(product, spec["timeframe"], history)
+            bars = feed.candles(product, spec["timeframe"], history, fresh=fresh)
         except feed.FeedError as exc:
             skipped.append((product, str(exc)))
             continue
@@ -132,6 +161,22 @@ def run(spec, history=None, progress=True):
     return results, skipped
 
 
+def reading_lines(readings, indent="       "):
+    """The per-condition receipt lines, shared by the report and watch mode."""
+    lines = []
+    for reading in readings:
+        value = _num(reading["value"])
+        if "from" in reading:
+            value = "%s→%s" % (_num(reading["from"]), value)
+        against = reading["against_label"] or ""
+        lines.append("%s%-26s %12s  %s %s%s"
+                     % (indent, reading["label"], value,
+                        OP_TEXT.get(reading["op"], reading["op"]),
+                        _num(reading["against"]),
+                        " (%s)" % against if against else ""))
+    return lines
+
+
 def render(results, skipped, spec):
     """Text report — what a scan prints in the terminal."""
     if not results:
@@ -147,15 +192,9 @@ def render(results, skipped, spec):
         when = time.strftime("%Y-%m-%d %H:%M", time.gmtime(r["last_ts"]))
         flag = "LIVE NOW" if r["live"] else "last fired"
         lines.append("  %-12s %-9s %s UTC   close %s   %d hit%s in window"
-                     % (r["product"], flag, when, _money(r["close"]),
+                     % (r["product"], flag, when, money(r["close"]),
                         r["count"], "" if r["count"] == 1 else "s"))
-        for reading in r["readings"]:
-            against = (reading["against_label"] or "")
-            target = _num(reading["against"])
-            lines.append("       %-26s %8s  %s %s%s"
-                         % (reading["label"], _num(reading["value"]),
-                            reading["op"], target,
-                            " (%s)" % against if against else ""))
+        lines.extend(reading_lines(r["readings"]))
     if skipped:
         lines.append("")
         lines.append("  %d market%s skipped (no data or too little history)"
@@ -164,13 +203,26 @@ def render(results, skipped, spec):
 
 
 def _num(value):
+    """
+    Two decimals is fine for RSI and useless for a MACD line on a $0.002 token —
+    "-0.02 crosses above -0.02" tells you nothing. Small magnitudes get
+    significant digits instead so the crossing is actually visible.
+    """
     if value is None:
         return "—"
-    return format(value, ",.0f") if abs(value) >= 1000 else "%.2f" % value
+    size = abs(value)
+    if size >= 1000:
+        return format(value, ",.0f")
+    if size >= 1 or size == 0:
+        return "%.2f" % value
+    return "%.4g" % value
 
 
-def _money(value):
-    return format(value, ",.0f") if value >= 1000 else format(value, ",.2f")
+def money(value):
+    """Price formatting that survives both BTC and sub-cent tokens."""
+    if value >= 1000:
+        return format(value, ",.0f")
+    return format(value, ",.2f") if value >= 1 else "%.6g" % value
 
 
 if __name__ == "__main__":

@@ -18,6 +18,7 @@ and mean the conditions you just gave. `--new` forgets.
     --charts N     how many matching markets to chart (default 6)
     --history N    bars of history to load per market (default 700)
     --fresh        ignore the cache and refetch
+    --watch        keep re-scanning on every bar close, report new firings
     --open         open the chart when it's written
     --new          start a fresh session
     --quiet        skip the spec echo
@@ -81,6 +82,94 @@ def do_indicator(bars, product):
     print("  Change the formula in indicators.py — it is nine lines.")
 
 
+GRACE = 20          # seconds after a bar closes before the venue is asked for it
+
+
+def next_bar_close(timeframe, now=None):
+    """Epoch second at which the current bar closes."""
+    step = feed.TIMEFRAMES[timeframe]
+    now = time.time() if now is None else now
+    return (int(now) // step + 1) * step
+
+
+def _sleep_until(when, label):
+    """Interruptible wait, so Ctrl-C lands immediately instead of at the end."""
+    while True:
+        left = when - time.time()
+        if left <= 0:
+            return
+        sys.stderr.write("\r  %s in %s   " % (label, _countdown(left)))
+        sys.stderr.flush()
+        time.sleep(min(left, 20))
+
+
+def _countdown(seconds):
+    seconds = int(seconds)
+    if seconds >= 3600:
+        return "%dh%02dm" % (seconds // 3600, seconds % 3600 // 60)
+    if seconds >= 60:
+        return "%dm%02ds" % (seconds // 60, seconds % 60)
+    return "%ds" % seconds
+
+
+def watch(spec, history):
+    """
+    Re-scan on every bar close and report setups the moment they go live.
+
+    Only *newly* fired setups print — a market that stays in condition across
+    several bars is announced once per bar it fires on, never on a loop.
+    """
+    universe = scan.universe_for(spec)
+    print("Watching %d market%s on %s bars. Ctrl-C to stop."
+          % (len(universe), "" if len(universe) == 1 else "s", spec["timeframe"]))
+    print("Reports a setup only on the bar it fires. Nothing is ordered.\n")
+
+    step = feed.TIMEFRAMES[spec["timeframe"]]
+    seen = set()
+    while True:
+        try:
+            closes_at = next_bar_close(spec["timeframe"])
+            _sleep_until(closes_at + GRACE, "next bar close")
+            sys.stderr.write("\r" + " " * 46 + "\r")
+            sys.stderr.flush()
+            # venues stamp a bar with its open time, so the bar that just closed
+            # is the one that opened a step ago
+            just_closed = closes_at - step
+            results, _ = scan.run(spec, history=history, progress=False, fresh=True)
+        except KeyboardInterrupt:
+            print("\nStopped watching.")
+            return 0
+        except feed.FeedError as exc:
+            print("  ! feed problem, will retry next bar: %s" % exc)
+            continue
+
+        fresh_hits = []
+        for r in results:
+            if not r["live"] or (r["product"], r["last_ts"]) in seen:
+                continue
+            seen.add((r["product"], r["last_ts"]))
+            fresh_hits.append(r)
+
+        if not fresh_hits:
+            print("  %s UTC bar — nothing live"
+                  % time.strftime("%Y-%m-%d %H:%M", time.gmtime(just_closed)))
+            continue
+        for r in fresh_hits:
+            # the bar's own close time, not the wall clock — that's what fired
+            print("  %s UTC bar — %s FIRED   close %s"
+                  % (time.strftime("%Y-%m-%d %H:%M", time.gmtime(r["last_ts"])),
+                     r["product"], scan.money(r["close"])))
+            for line in scan.reading_lines(r["readings"]):
+                print(line)
+            try:
+                bars = feed.candles(r["product"], spec["timeframe"], history)
+                path, _, _ = chart_market(r["product"], spec, bars,
+                                          "backtest" in spec["actions"])
+                print("       chart: %s" % os.path.relpath(path))
+            except feed.FeedError as exc:
+                print("       (no chart: %s)" % exc)
+
+
 def chart_market(product, spec, bars, run_backtest):
     levels = ind.levels(bars, top=5)
     result = (backtest.run(bars, spec) if run_backtest
@@ -96,6 +185,8 @@ def main(argv=None):
     ap.add_argument("--charts", type=int, default=6)
     ap.add_argument("--history", type=int, default=None)
     ap.add_argument("--fresh", action="store_true")
+    ap.add_argument("--watch", action="store_true",
+                    help="after the first pass, re-scan on every bar close")
     ap.add_argument("--open", action="store_true")
     ap.add_argument("--new", action="store_true")
     ap.add_argument("--quiet", action="store_true")
@@ -187,6 +278,16 @@ def main(argv=None):
 
     if args.open:
         webbrowser.open("file://" + os.path.abspath(target))
+
+    if args.watch:
+        if not spec["filters"]:
+            print("\nNothing to watch for — the brief has no conditions.")
+            return 1
+        print()
+        try:
+            return watch(spec, min(history, brief.DEFAULTS["scan_history"]))
+        except KeyboardInterrupt:
+            print("\nStopped watching.")
     return 0
 
 

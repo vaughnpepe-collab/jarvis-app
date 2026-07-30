@@ -151,6 +151,19 @@ def _kraken_candles(product, timeframe, limit):
 
 
 # ---------------------------------------------------------------- public api
+def _cache_covers(cached, limit):
+    """
+    Can this cache entry answer a request for `limit` bars?
+
+    Yes if it holds that many, or if an earlier, larger request already proved
+    the venue has no more history than this. Anything else has to refetch —
+    serving 260 cached bars to a request for 700 quietly shortens every
+    indicator warm-up downstream, which is how a backtest ends up reporting
+    "no trades" on a window that does contain them.
+    """
+    return len(cached["bars"]) >= limit or cached.get("asked", 0) >= limit
+
+
 def candles(product, timeframe="1h", limit=400, fresh=False):
     """OHLCV for one market, oldest first. Cached for roughly half a bar."""
     if timeframe not in TIMEFRAMES:
@@ -159,7 +172,7 @@ def candles(product, timeframe="1h", limit=400, fresh=False):
     key = "candles_%s_%s" % (product, timeframe)
     if not fresh:
         cached = _cache_read(key, max_age=TIMEFRAMES[timeframe] / 2)
-        if cached and len(cached["bars"]) >= min(limit, cached.get("asked", 0)):
+        if cached and _cache_covers(cached, limit):
             return [Candle(*b) for b in cached["bars"]][-limit:]
 
     bars, errors = [], []
