@@ -33,6 +33,8 @@ import json
 import os
 import time
 
+from broker import trim
+
 VERSION = 1
 
 
@@ -244,7 +246,7 @@ class Ledger:
                     report["conflicts"].append(
                         "%s: ledger says %s %s, venue shows %s and the stop is still "
                         "working. Something else traded this account."
-                        % (product, _trim(expected), base, _trim(held)))
+                        % (product, trim(expected), base, trim(held)))
                     report["blocking"] = True
                 continue
 
@@ -269,11 +271,6 @@ class Ledger:
         except Exception:                           # noqa: BLE001 - orphans are advisory
             pass
         return report
-
-
-def _trim(value):
-    text = "%.8f" % float(value)
-    return text.rstrip("0").rstrip(".") or "0"
 
 
 def render_reconcile(report):
@@ -301,7 +298,7 @@ if __name__ == "__main__":
     print("  open positions   %d" % len(book.state["positions"]))
     for position in book.state["positions"]:
         print("    %s %s %s @ %s stop %s"
-              % (position["direction"], _trim(position["qty"]), position["product"],
+              % (position["direction"], trim(position["qty"]), position["product"],
                  format(position["entry"], ",.2f"),
                  format(position["stop"] or 0, ",.2f")))
     print("  closed trades    %d" % stats["trades"])

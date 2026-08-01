@@ -47,8 +47,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from broker import (BUY, SELL, Broker, BrokerError, Fill, Market, Order,
-                    Rejected, round_price)
+from broker import (SELL, Broker, BrokerError, Fill, Market, Order, Rejected,
+                    round_price)
 
 UA = "tapedeck/1.0"
 TIMEOUT = 20
@@ -183,7 +183,7 @@ class KrakenBroker(Broker):
         base = {"BTC": "XBT"}.get(base, base)
         return base + quote
 
-    def market(self, product):
+    def _fetch_market(self, product):
         if self._pairs is None:
             self._pairs = self._public("AssetPairs")
         want = self._altname(product)
@@ -371,7 +371,7 @@ class CoinbaseExchangeBroker(Broker):
         return "-".join((digest[:8], digest[8:12], digest[12:16],
                          digest[16:20], digest[20:32]))
 
-    def market(self, product):
+    def _fetch_market(self, product):
         row = _request("GET", "%s/products/%s" % (self.BASE, product))
         base, _, quote = product.partition("-")
         increment = float(row.get("base_increment") or 0.00000001)
@@ -493,7 +493,9 @@ class CoinbaseAdvancedBroker(Broker):
             raise BrokerError("coinbase-advanced needs CB_CDP_KEY_NAME and "
                               "CB_CDP_PRIVATE_KEY")
         try:
-            import jwt                                    # noqa: F401
+            import importlib.util
+            if importlib.util.find_spec("jwt") is None:
+                raise ImportError("jwt")
             from cryptography.hazmat.primitives import serialization
         except ImportError:
             raise BrokerError(
@@ -530,7 +532,7 @@ class CoinbaseAdvancedBroker(Broker):
                 raise Rejected(str(exc))
             raise
 
-    def market(self, product):
+    def _fetch_market(self, product):
         row = self._call("GET", "%s/products/%s" % (self.PREFIX, product))
         base, _, quote = product.partition("-")
         increment = float(row.get("base_increment") or 0.00000001)

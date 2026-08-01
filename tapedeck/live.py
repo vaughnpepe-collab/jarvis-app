@@ -90,7 +90,8 @@ def build_broker(mode, venue, prices, cash, paper_state=None):
                               state_path=paper_state)
     inner = venues.connect(venue)
     if mode == "shadow":
-        return bk.ShadowBroker(inner)
+        return bk.ShadowBroker(inner, fee_pct=backtest.FEE_PCT,
+                               slippage_pct=backtest.SLIPPAGE_PCT)
     return inner
 
 
@@ -190,13 +191,13 @@ def manage(product, position, bars, spec, cache, broker, book, log):
                   else last.low <= position["target"])
     reason = None
     if position.get("target") and hit_target:
-        reason, exit_price = "target", position["target"]
+        reason = "target"
     else:
         exit_filters = st.get("exit") or []
         if exit_filters and scan.holds(exit_filters, cache, bars, len(bars) - 1):
-            reason, exit_price = "signal", last.close
+            reason = "signal"
         elif st.get("max_hold") and bars_held(position, last.ts, step) >= st["max_hold"]:
-            reason, exit_price = "time", last.close
+            reason = "time"
     if not reason:
         return
 
@@ -320,7 +321,7 @@ def try_entry(product, bars, spec, cache, broker, book, engine, notional, log):
         signal_bar_ts=last.ts, entry_cid=cid, fees=fill.fee,
         max_hold=spec["strategy"].get("max_hold"))
     log("  ENTERED %s %s %s at %s   stop %s   target %s"
-        % (spec["strategy"]["direction"], bk._trim(fill.qty), product,
+        % (spec["strategy"]["direction"], bk.trim(fill.qty), product,
            scan.money(fill.price), scan.money(stop_price), scan.money(target_price)))
 
     scid = bk.client_id(product, bk.SELL if long else bk.BUY, last.ts, "s")
@@ -346,7 +347,7 @@ def try_entry(product, bars, spec, cache, broker, book, engine, notional, log):
 
 
 # ---------------------------------------------------------------- flatten
-def flatten(products, spec, broker, book, log):
+def flatten(broker, book, log):
     """Cancel every protective stop and close every open position, now."""
     positions = list(book.state["positions"])
     if not positions:
@@ -464,7 +465,7 @@ def run(spec, args):
     print()
 
     if args.flatten:
-        return flatten(products, spec, trader, book, print)
+        return flatten(trader, book, print)
 
     print("Reconciling the ledger against %s..." % trader.name)
     report = book.reconcile(trader)
@@ -514,6 +515,9 @@ def run(spec, args):
             except feed.FeedError as exc:
                 print("  ! %s: feed problem, skipping this bar (%s)" % (product, exc))
                 continue
+            # The venue publishes the in-progress bar; trading on it would evaluate
+            # rules against a candle that has not finished happening.
+            bars = feed.closed_only(bars, spec["timeframe"])
             if len(bars) < 60:
                 print("  ! %s: only %d bars of history" % (product, len(bars)))
                 continue

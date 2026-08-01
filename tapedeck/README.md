@@ -260,7 +260,7 @@ indicators.py   RSI, EMA/SMA, ATR, MACD, Bollinger, volume ratio, pivots,
 scan.py         evaluates a spec's conditions across the universe
 backtest.py     the rules over history, with costs and no look-ahead
 chart.py        writes the self-contained HTML chart + replay
-selftest.py     94 offline checks — no network needed
+selftest.py     135 offline checks — no network needed
 ```
 
 ```
@@ -430,7 +430,7 @@ between those two lines is a signal you skip, never an order you send twice.
 ## Verification status
 
 ```
-python selftest_live.py     148 offline checks — no network, no credentials, no venue
+python selftest_live.py     155 offline checks — no network, no credentials, no venue
 ```
 
 Covers: sizes rounding down and never up, a retried order not becoming two

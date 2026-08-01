@@ -194,6 +194,28 @@ def candles(product, timeframe="1h", limit=400, fresh=False):
     return bars
 
 
+def closed_only(bars, timeframe, now=None):
+    """
+    Drop any trailing bar that has not finished forming.
+
+    Venues stamp a candle with its OPEN time and publish it the moment it starts,
+    so the newest row from the API is almost always the bar in progress — a few
+    minutes of volume and a close price that is still moving. Twelve minutes into
+    an hourly bar, BTC's volume ratio reads 0.02 against its 20-bar average purely
+    because the hour is 20% over.
+
+    Evaluating a rule on that is not a signal, it is a guess about a bar that has
+    not happened yet, and it breaks the promise the backtester is built on:
+    conditions are evaluated on CLOSED bars. Anything that trades must pass its
+    candles through here first.
+    """
+    step = TIMEFRAMES[timeframe]
+    now = time.time() if now is None else now
+    while bars and bars[-1].ts + step > now:
+        bars = bars[:-1]
+    return bars
+
+
 def products(quotes=("USD",), fresh=False):
     """Tradable product ids, e.g. ['BTC-USD', 'ETH-USD', ...]."""
     key = "products_" + "-".join(quotes)

@@ -382,6 +382,39 @@ def test_backtest():
           all((t["gross_pct"] > 0) == (t["exit"] < t["entry"]) for t in short["trades"]))
 
 
+def test_closed_bars():
+    """
+    The venue hands you the bar that is still forming. Anything that trades has to
+    throw it away, or it is acting on a candle that has not finished happening.
+    """
+    print("closed bars only")
+    import feed
+    step = 3600
+    base = 1_700_000_000                       # exactly on an hour boundary
+    bars = [Candle(base + i * step, 100, 101, 99, 100, 50.0) for i in range(5)]
+
+    # 12 minutes into the bar that opened at index 4
+    mid_bar = bars[-1].ts + 720
+    trimmed = feed.closed_only(bars, "1h", now=mid_bar)
+    check("the in-progress bar is dropped", len(trimmed) == 4, str(len(trimmed)))
+    check("the newest kept bar is the last CLOSED one",
+          trimmed[-1].ts == bars[-2].ts)
+
+    just_closed = bars[-1].ts + step
+    check("a bar is kept the instant it closes",
+          len(feed.closed_only(bars, "1h", now=just_closed)) == 5)
+    check("a second before its close it is still dropped",
+          len(feed.closed_only(bars, "1h", now=just_closed - 1)) == 4)
+
+    check("several unfinished bars are all dropped",
+          len(feed.closed_only(bars, "1h", now=bars[2].ts + 60)) == 2)
+    check("a fully historical series is untouched",
+          feed.closed_only(bars, "1h", now=base + 99 * step) == bars)
+    check("an empty series survives", feed.closed_only([], "1h") == [])
+    check("the timeframe decides what counts as closed",
+          len(feed.closed_only(bars, "1d", now=just_closed)) == 0)
+
+
 def test_research():
     """
     The validation harness has to be harder on a strategy than the strategy is on
@@ -438,6 +471,20 @@ def test_research():
     check("out-of-sample returns are collected across folds",
           len(wf["oos_returns"]) == sum(len(f["oos_returns"]) for f in wf["folds"]))
 
+    singles = research.entry_conditions()
+    check("every condition is tagged with its indicator family",
+          all(len(c) == 3 and c[1] for c in singles))
+    families = {key: family for key, family, _ in singles}
+    check("opposite thresholds on one indicator share a family",
+          families["rsi14<30"] == families["rsi14>70"],
+          "%s vs %s" % (families["rsi14<30"], families["rsi14>70"]))
+    check("different indicators do not", families["rsi14<30"] != families["macd>0"])
+    pairs = [c for c in research.candidates(max_conditions=2) if " + " in c[0]]
+    check("the search pairs conditions from different indicators", pairs)
+    check("and never stacks two conditions on the same indicator",
+          all(families[k.split(" + ")[0]] != families[k.split(" + ")[1]]
+              for k, _, _ in pairs))
+
     spec = research.make_spec([research.cond(research.ref("rsi", 14), "<", 40.0,
                                              "RSI(14) below 40")],
                               atr_stop=1.5, target_pct=3.0, max_hold=24)
@@ -477,6 +524,7 @@ def main():
     test_watch_clock(); print()
     test_cache_rules(); print()
     test_backtest(); print()
+    test_closed_bars(); print()
     test_research(); print()
     if FAILED:
         print("%d check(s) FAILED:" % len(FAILED))

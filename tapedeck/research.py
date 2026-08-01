@@ -50,7 +50,6 @@ import time
 
 import backtest
 import indicators as ind
-import scan
 
 CONF = 0.95
 
@@ -89,7 +88,12 @@ def make_spec(filters, timeframe="1h", direction="long", stop_pct=2.0, atr_stop=
 # ---------------------------------------------------------------- the candidate space
 def entry_conditions():
     """
-    Single conditions the search can combine. Each is a (key, filter) pair.
+    Single conditions the search can combine, as (key, family, filter) triples.
+
+    `family` names the underlying indicator so `candidates()` can refuse to stack
+    two conditions on the same one. Carrying it explicitly beats inferring it from
+    the key string: "rsi14<30" and "rsi14>70" are the same indicator, and any
+    scheme that splits the key on an operator gets that wrong for half the pairs.
 
     Deliberately ordinary: these are the rules retail systems are actually built
     from. If an edge exists in this vocabulary the search will find it, and if it
@@ -98,43 +102,43 @@ def entry_conditions():
     out = []
     for length in (7, 14, 21):
         for level in (20, 25, 30, 35, 40):
-            out.append(("rsi%d<%d" % (length, level),
+            out.append(("rsi%d<%d" % (length, level), "rsi%d" % length,
                         cond(ref("rsi", length), "<", float(level),
                              "RSI(%d) below %d" % (length, level))))
         for level in (60, 65, 70, 75, 80):
-            out.append(("rsi%d>%d" % (length, level),
+            out.append(("rsi%d>%d" % (length, level), "rsi%d" % length,
                         cond(ref("rsi", length), ">", float(level),
                              "RSI(%d) above %d" % (length, level))))
-        out.append(("rsi%dx30" % length,
+        out.append(("rsi%dx30" % length, "rsi%d" % length,
                     cond(ref("rsi", length), "crosses_above", 30.0,
                          "RSI(%d) crosses above 30" % length)))
-        out.append(("rsi%dx70" % length,
+        out.append(("rsi%dx70" % length, "rsi%d" % length,
                     cond(ref("rsi", length), "crosses_below", 70.0,
                          "RSI(%d) crosses below 70" % length)))
     for ratio in (1.5, 2.0, 3.0, 5.0):
-        out.append(("vol>%.1f" % ratio,
+        out.append(("vol>%.1f" % ratio, "volume",
                     cond(ref("vol_ratio", 20), ">", ratio,
                          "volume above %.1fx its 20-bar average" % ratio)))
     for length in (20, 50, 200):
-        out.append(("px>ema%d" % length,
+        out.append(("px>ema%d" % length, "ema%d" % length,
                     cond(ref("close"), ">", ref("ema", length),
                          "close above the %d EMA" % length)))
-        out.append(("px<ema%d" % length,
+        out.append(("px<ema%d" % length, "ema%d" % length,
                     cond(ref("close"), "<", ref("ema", length),
                          "close below the %d EMA" % length)))
-        out.append(("pxXema%d" % length,
+        out.append(("pxXema%d" % length, "ema%d" % length,
                     cond(ref("close"), "crosses_above", ref("ema", length),
                          "close crosses above the %d EMA" % length)))
-    out.append(("macd>0", cond(ref("macd_hist"), ">", 0.0, "MACD histogram positive")))
-    out.append(("macd<0", cond(ref("macd_hist"), "<", 0.0, "MACD histogram negative")))
-    out.append(("macdXsig", cond(ref("macd"), "crosses_above", ref("macd_signal"),
+    out.append(("macd>0", "macd", cond(ref("macd_hist"), ">", 0.0, "MACD histogram positive")))
+    out.append(("macd<0", "macd", cond(ref("macd_hist"), "<", 0.0, "MACD histogram negative")))
+    out.append(("macdXsig", "macd", cond(ref("macd"), "crosses_above", ref("macd_signal"),
                                  "MACD crosses above its signal")))
-    out.append(("px<bbl", cond(ref("close"), "<", ref("bb_lower", 20),
+    out.append(("px<bbl", "bollinger", cond(ref("close"), "<", ref("bb_lower", 20),
                                "close below the lower Bollinger band")))
-    out.append(("px>bbu", cond(ref("close"), ">", ref("bb_upper", 20),
+    out.append(("px>bbu", "bollinger", cond(ref("close"), ">", ref("bb_upper", 20),
                                "close above the upper Bollinger band")))
-    out.append(("whale>20", cond(ref("whale"), ">", 20.0, "whale-momentum above 20")))
-    out.append(("whale<-20", cond(ref("whale"), "<", -20.0, "whale-momentum below -20")))
+    out.append(("whale>20", "whale", cond(ref("whale"), ">", 20.0, "whale-momentum above 20")))
+    out.append(("whale<-20", "whale", cond(ref("whale"), "<", -20.0, "whale-momentum below -20")))
     return out
 
 
@@ -151,13 +155,13 @@ def candidates(max_conditions=2, limit=None, seed=7):
     """Every rule combination the search will try."""
     singles = entry_conditions()
     out = []
-    for key, filt in singles:
+    for key, _family, filt in singles:
         for exit_spec in EXITS:
             out.append((key, [filt], exit_spec))
     if max_conditions >= 2:
-        for i, (key_a, filt_a) in enumerate(singles):
-            for key_b, filt_b in singles[i + 1:]:
-                if key_a.split("<")[0] == key_b.split("<")[0]:
+        for i, (key_a, family_a, filt_a) in enumerate(singles):
+            for key_b, family_b, filt_b in singles[i + 1:]:
+                if family_a == family_b:
                     continue                    # same indicator, don't stack it
                 for exit_spec in EXITS:
                     out.append(("%s + %s" % (key_a, key_b), [filt_a, filt_b], exit_spec))

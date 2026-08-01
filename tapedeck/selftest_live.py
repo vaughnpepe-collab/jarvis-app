@@ -632,6 +632,49 @@ def test_shadow():
     check("and no stop actually rests at the venue", inner.open_orders() == [])
     check("reads pass through to the real venue", shadow.ticker("BTC-USD") == 100.0)
 
+    # a shadow blotter is only useful if it can be compared against paper and the
+    # backtest, which means it has to price fills with the same cost model
+    paper_broker, _ = paper(price=100.0, cash=1000.0)
+    paper_fill = paper_broker.market_order("BTC-USD", bk.BUY, 1.0, "same")
+    shadow2 = bk.ShadowBroker(paper(price=100.0)[0], fee_pct=0.10, slippage_pct=0.05)
+    shadow_fill = shadow2.market_order("BTC-USD", bk.BUY, 1.0, "same")
+    check("a shadow fill prices like a paper fill",
+          abs(shadow_fill.price - paper_fill.price) < 1e-9,
+          "%r vs %r" % (shadow_fill.price, paper_fill.price))
+    check("and charges the same fee",
+          abs(shadow_fill.fee - paper_fill.fee) < 1e-9,
+          "%r vs %r" % (shadow_fill.fee, paper_fill.fee))
+    sell = bk.ShadowBroker(paper(price=100.0)[0]).market_order(
+        "BTC-USD", bk.SELL, 1.0, "s")
+    check("a shadow sell slips against you too", sell.price < 100.0, "%r" % sell.price)
+
+
+class _CountingBroker(bk.Broker):
+    """Counts how often the venue is actually asked for market rules."""
+
+    name = "counting"
+
+    def __init__(self):
+        self.fetches = 0
+
+    def _fetch_market(self, product):
+        self.fetches += 1
+        return bk.Market(product, "BTC", "USD", 0.0001, 0.00000001, 0.01)
+
+
+def test_market_cache():
+    print("market-rule caching")
+    broker = _CountingBroker()
+    first = broker.market("BTC-USD")
+    second = broker.market("BTC-USD")
+    check("the venue is asked once for a product's rules", broker.fetches == 1,
+          "%d fetches" % broker.fetches)
+    check("and the same rules come back", first is second)
+    broker.market("ETH-USD")
+    check("a different product is a separate fetch", broker.fetches == 2)
+    check("caching is per instance, not global",
+          _CountingBroker().market("BTC-USD") is not first)
+
 
 # ---------------------------------------------------------------- helpers
 def _raises(exception, function, *args, **kwargs):
@@ -649,7 +692,7 @@ def main():
     for test in (test_sizing, test_idempotency, test_paper_broker, test_risk_gate,
                  test_kill_switch, test_ledger, test_reconciliation,
                  test_live_wiring, test_signing, test_credentials_report,
-                 test_shadow):
+                 test_shadow, test_market_cache):
         test()
         print()
     if FAILED:

@@ -60,7 +60,8 @@ class Limits:
         if unknown:
             raise ValueError("unknown risk limit(s): %s" % ", ".join(sorted(unknown)))
         merged = dict(DEFAULTS)
-        merged.update({k: v for k, v in kwargs.items() if v is not None})
+        merged.update({k: v for k, v in kwargs.items()
+                       if v is not None and k in DEFAULTS})
         for key, value in merged.items():
             setattr(self, key, value)
         self.kill_file = kwargs.get("kill_file") or os.environ.get(

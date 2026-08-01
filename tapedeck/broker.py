@@ -105,13 +105,18 @@ def size_for(notional, price, market):
     if qty < market.min_size:
         raise Rejected(
             "notional %s at %s works out to %s %s, below the venue minimum of %s"
-            % (format(notional, ",.2f"), format(price, ",.2f"), _trim(qty),
-               market.base, _trim(market.min_size)))
+            % (format(notional, ",.2f"), format(price, ",.2f"), trim(qty),
+               market.base, trim(market.min_size)))
     return qty
 
 
-def _trim(value):
-    """Print a size without exponent notation or a tail of zeros."""
+def trim(value):
+    """
+    Print a size without exponent notation or a tail of zeros.
+
+    Public because sizes get printed from every layer — the loop, the ledger, the
+    reconcile report — and `8e-05 BTC` in a log at 3am helps nobody.
+    """
     text = format(_dec(value), "f")
     return text.rstrip("0").rstrip(".") if "." in text else text
 
@@ -130,7 +135,22 @@ class Broker:
     can_short = False           # spot cannot borrow; margin venues would override
 
     def market(self, product):
-        """Trading rules for one product (min size, increments)."""
+        """
+        Trading rules for one product (min size, increments), cached per process.
+
+        Cached in the base rather than in each adapter because every venue pays
+        an HTTP round trip for this and the order path asks repeatedly — sizing
+        the trade, sending it, then formatting the stop. Increments do not change
+        between bars; re-fetching them three times per entry is pure latency in
+        front of an order.
+        """
+        cache = self.__dict__.setdefault("_market_cache", {})
+        if product not in cache:
+            cache[product] = self._fetch_market(product)
+        return cache[product]
+
+    def _fetch_market(self, product):
+        """Ask the venue for one product's trading rules. Adapters implement this."""
         raise NotImplementedError
 
     def ticker(self, product):
@@ -230,7 +250,7 @@ class PaperBroker(Broker):
         os.replace(tmp, self._state_path)
 
     # -- market data ---------------------------------------------------
-    def market(self, product):
+    def _fetch_market(self, product):
         if product in self._markets:
             return self._markets[product]
         base, _, quote = product.partition("-")
@@ -258,7 +278,7 @@ class PaperBroker(Broker):
             return self._seen[cid]          # duplicate send: same answer, no new fill
         market = self.market(product)
         if qty < market.min_size:
-            raise Rejected("%s below minimum size %s" % (_trim(qty), _trim(market.min_size)))
+            raise Rejected("%s below minimum size %s" % (trim(qty), trim(market.min_size)))
 
         raw = self.ticker(product)
         slip = self.slippage_pct / 100.0
@@ -277,7 +297,7 @@ class PaperBroker(Broker):
             held = self.holdings.get(market.base, 0.0)
             if qty > held + 1e-12:
                 raise Rejected("paper holdings %s %s cannot cover a sale of %s"
-                               % (_trim(held), market.base, _trim(qty)))
+                               % (trim(held), market.base, trim(qty)))
             self.holdings[market.base] = held - qty
             self.cash += gross - fee
 
@@ -379,14 +399,16 @@ class ShadowBroker(Broker):
     name = "shadow"
     live = False
 
-    def __init__(self, inner):
+    def __init__(self, inner, fee_pct=0.10, slippage_pct=0.05):
         self.inner = inner
         self.name = "shadow:" + inner.name
         self.intents = []
+        self.fee_pct = fee_pct
+        self.slippage_pct = slippage_pct
         self._seq = 0
         self._seen = {}
 
-    def market(self, product):
+    def _fetch_market(self, product):
         return self.inner.market(product)
 
     def ticker(self, product):
@@ -401,10 +423,14 @@ class ShadowBroker(Broker):
     def market_order(self, product, side, qty, cid):
         if cid in self._seen:
             return self._seen[cid]
-        price = self.ticker(product)
+        # Same cost model as paper and the backtester, rather than a number of its
+        # own: a shadow blotter is only useful if it can be compared against them.
+        raw = self.ticker(product)
+        slip = self.slippage_pct / 100.0
+        price = raw * (1 + slip) if side == BUY else raw * (1 - slip)
         self._seq += 1
         fill = Fill(cid, "shadow-%d" % self._seq, product, side, qty, price,
-                    price * qty * 0.0015, time.time())
+                    price * qty * self.fee_pct / 100.0, time.time())
         self.intents.append(("market", product, side, qty, price))
         self._seen[cid] = fill
         return fill
